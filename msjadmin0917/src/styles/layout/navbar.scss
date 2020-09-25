@@ -1,0 +1,105 @@
+.navbar {
+  min-width: 1090px;
+  height: 60px;
+  line-height: 60px;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  font-size: 16px;
+
+  .navbar_content {
+    float: left;
+    padding-left: 25px;
+    font-family: PingFangSC-Semibold;
+    font-size: 22px;
+    color: #4e5583;
+    span {
+      font-family: PingFangSC-Regular;
+      font-size: 16px;
+      color: #6f7695;
+    }
+  }
+  .navbar_content_right {
+    position: absolute;
+    right: 0;
+    // padding: 0 20px;
+    font-family: PingFangSC-Regular;
+    font-size: 16px;
+    color: #4e5583;
+  }
+  .navbar_webexit {
+    float: left;
+    padding: 0 20px;
+    font-size: 14px;
+  }
+  .navbar_webexit:hover {
+    // height: 50px;
+    cursor: hand;
+    cursor: pointer;
+    background: #fafafa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+  }
+  .navbar_webtitlename {
+    float: left;
+    padding-right: 10px;
+  }
+  .navbar_webtitleimg {
+    float: left;
+    width: 35px;
+    height: 35px;
+    margin: 4px 0 0 0;
+    border-radius: 30px;
+    text-align: center;
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .navbar_signOut {
+    float: left;
+    width: 35px;
+    height: 35px;
+    margin: 6px 0 0 0;
+    border-radius: 30px;
+    text-align: center;
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+.navigation {
+  overflow: auto;
+  min-width: 1090px;
+  height: 38px;
+  line-height: 38px;
+  background: #fff;
+  border: 1px solid #e4e7ed;
+  padding-left: 20px;
+  font-size: 13px;
+  overflow: hidden;
+  .navigation_link {
+    padding: 5px 8px 5px 8px;
+    margin-right: 5px;
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #e4e7ed;
+  }
+  .navigation_link1 {
+    padding: 5px 8px 5px 8px;
+    margin-right: 5px;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    font-size: 14px;
+    // border: 1px solid #409eff;
+    background: #5270c7;
+  }
+  .link_close {
+    cursor: pointer;
+  }
+  .link_close:hover {
+    color: #8197d1;
+  }
+}

@@ -1,0 +1,188 @@
+<template>
+  <div>
+    <el-form :model="internal" :rules="salesRules" ref="internal" label-width="150px" class="demo-ruleForm">
+      <el-form-item label="名称：" prop="name">
+        <el-input v-model="internal.name" maxlength="30" show-word-limit placeholder="请输入名称" style="width:70%" size="medium"></el-input>
+      </el-form-item>
+      <el-form-item label="联系人：" prop="contact">
+        <el-input v-model="internal.contact" maxlength="15" show-word-limit placeholder="请输入联系人" style="width:70%" size="medium"></el-input>
+      </el-form-item>
+      <el-form-item label="联系人手机：" prop="phoneNumber">
+        <el-input type="age" v-model.number="internal.phoneNumber" placeholder="请输入手机号" minlength="11" maxlength="11" style="width:70%" size="medium" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="所属分公司：" prop="subsidiary">
+        <el-select v-model="internal.subsidiary" @change="getcompanyid"  :disabled="subsidiaryData.length == 0 ||isNewOrEdit==false" filterable placeholder="所属分公司（支持搜索）" size="medium" style="width:70%;">
+          <el-option v-for="(item,index) in subsidiaryData" :key="item.label" :label="item.label" :value="item.label"></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "internal",
+  components: {},
+  watch: {},
+  data() {
+    var phoneNumber = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入手机号"));
+      } else {
+        var telStr = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+        // var telStr = /^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/;
+        if (!telStr.test(value)) {
+          callback(new Error("手机号码输入不规范"));
+        } else {
+          callback();
+        }
+      }
+    };
+    return {
+      // 所属分公司选项
+      subsidiaryData: [],
+      // 表单数据与规则
+      // 销售
+      internal: {
+        //创建销售账号表单数据
+        name: "", //名称
+        contact: "", //联系人
+        phoneNumber: null, //联系人手机
+        subsidiary: "", //所属分公司
+        firmid:"",//所属分公司id
+      },
+      salesRules: {
+        //创建分公司账号表单规则
+        name: [{ required: true, message: "请输入名称", trigger: "blur" }],
+        contact: [{ required: true, message: "请输入联系人", trigger: "blur" }],
+        phoneNumber: [
+          { validator: phoneNumber, trigger: "change" },
+          { required: true, message: "请输入联系人手机号", trigger: "blur" },
+          { type: "number", message: "手机号必须为数字值", trigger: "blur" }
+        ],
+        subsidiary: [
+          { required: true, message: "请选择所属分公司", trigger: "blur" }
+        ]
+      },
+      // 上传服务器的数据
+      body: {},
+      // 获取编辑数据
+      editObj: {},
+      // 判断新增还是编辑
+      isNewOrEdit: null
+    };
+  },
+  mounted() {
+    this.Assignment();
+    // 获取选择框数据
+
+      if (this.$store.getters.getRoleInfo.AccountType == 0) {
+        // 获取所属分公司数据
+         this.getSelectionData();
+
+      } else if (this.$store.getters.getRoleInfo.AccountType == 1) {
+        this.subsidiaryData = [];
+        console.log(this.$store.getters.getRoleInfo)
+        this.internal.subsidiary = this.$store.getters.getRoleInfo.AccountName;
+        this.internal.firmid = this.$store.getters.getRoleInfo.Id;
+      }
+   
+  },
+  methods: {
+
+   getcompanyid(){
+   
+    for(var j = 0,len = this.subsidiaryData.length; j < len; j++){
+       if(this.subsidiaryData[j].label==this.internal.subsidiary){
+             this.internal.firmid =this.subsidiaryData[j].value          
+              break;
+        }  
+    }
+   
+   },
+ 
+    // 获取选择框数据
+    getSelectionData() {
+       console.log(this.$store.getters)
+       var body={
+          AccountType:0,
+          AccountName:this.$store.getters.getRoleInfo.AccountName,
+      }
+      this.$api.get("/account/pullOrg2", body).then(res => {  
+         console.log (res)
+
+          this.subsidiaryData=[]
+        for(var i=0;i<res.data.length;i++){
+            if(res.data[i].AccountType=="1"){
+              res.data[i].Name.map((item,index)=>{
+               var arr={
+               label:item,
+               value:res.data[i].ID[index]
+             }
+             this.subsidiaryData.push(arr)  
+  
+            })
+            }
+        
+         }
+      
+      }); 
+    },
+    Assignment() {
+      var temp = JSON.stringify(this.$store.getters.getEditObj);
+      this.editObj = JSON.parse(temp);
+      // console.log(JSON.stringify(this.editObj));
+      if (this.editObj == "") {
+        this.isNewOrEdit = true;
+        console.log("创建");
+      } else {
+        this.isNewOrEdit = false;
+        console.log("编辑");
+        this.internal.name = this.editObj.AccountName; //名称
+        this.internal.contact = this.editObj.LinkMan; //联系人
+        this.internal.phoneNumber = Number(this.editObj.Mobile); //联系人手机
+        this.internal.subsidiary = this.editObj.FromCompany; //所属分公司
+      }
+    },
+    submitForm() {
+        console.log(this.internal.subsidiary)
+      this.$refs["internal"].validate(valid => {
+        if (valid) {
+          console.log("销售submit!");
+          console.log(this.isNewOrEdit);
+          if (this.isNewOrEdit) {
+            var body = {
+              AccountType: "7", //账号类型 0运营 1分公司 2销售 3企业 4门店
+              AccountName: this.internal.name, //名称
+              LinkMan: this.internal.contact, //联系人
+              Mobile: JSON.stringify(this.internal.phoneNumber), //联系人手机
+              FromCompany: this.internal.subsidiary, //所属分公司
+              Id:this.internal.firmid
+            };
+            this.$emit("CreateAccountPost", body);
+          } else {
+             
+            this.editObj.AccountName = this.internal.name; //名称
+            this.editObj.LinkMan = this.internal.contact; //联系人
+            this.editObj.Mobile = JSON.stringify(this.internal.phoneNumber); //联系人手机
+            this.editObj.FromCompany = this.internal.subsidiary; //所属分公司
+            this.$emit("editAccountPost", this.editObj, 7);
+          }
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    //重置表单数据和校验
+    resetSalesForm() {
+      console.log("salesForm重置表单数据和校验");
+      this.$refs["internal"].resetFields();
+    }
+  },
+  computed: {}
+};
+</script>
+
+<style lang="scss" scoped>
+</style>

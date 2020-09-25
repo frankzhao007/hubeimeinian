@@ -1,0 +1,196 @@
+#app {
+  // 主体区域
+  .main-container {
+    min-height: 100%;
+    transition: margin-left 0.28s;
+    margin-left: 190px;
+  }
+  // 侧边栏
+  .sidebar-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.28s;
+    width: 191px !important;
+    // height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 190px;
+    left: 0;
+    z-index: 1001;
+    background-image: linear-gradient(-200deg, #5a79cf 40%, #5b63d4 90%);
+
+    a {
+      display: inline-block;
+      width: 100%;
+    }
+
+    .svg-icon {
+      margin-right: 16px;
+    }
+
+    .el-menu {
+      border: none;
+      width: 190px;
+      // margin: 0 20px;
+      background: none;
+    }
+    .el-submenu__title:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+  .sidebar-container1 {
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.28s;
+    width: 191px !important;
+    // height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 30px;
+    left: 0;
+    z-index: 1001;
+    background-image: linear-gradient(-200deg, #5a79cf 40%, #5b63d4 90%);
+
+    a {
+      display: inline-block;
+      width: 100%;
+    }
+
+    .svg-icon {
+      margin-right: 16px;
+    }
+
+    .el-menu {
+      border: none;
+      width: 190px;
+      // margin: 0 20px;
+      background: none;
+    }
+    .el-submenu__title:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .sidebar-container::-webkit-scrollbar {
+    display: none;
+  }
+  .sidebar-container1::-webkit-scrollbar {
+    display: none;
+  }
+  .sidebar-container {
+    scrollbar-width: none;
+ }
+  .sidebar-container1 {
+    scrollbar-width: none;
+ }
+
+
+  .hideSidebar {
+    .sidebar-container,
+    .sidebar-container .el-menu {
+      width: 36px !important;
+    }
+    .main-container {
+      margin-left: 36px;
+    }
+  }
+  .hideSidebar {
+    .submenu-title-noDropdown {
+      padding-left: 10px !important;
+      position: relative;
+      span {
+        height: 0;
+        width: 0;
+        visibility: hidden;
+        transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
+        opacity: 0;
+        display: inline-block;
+      }
+      &:hover {
+        span {
+          display: block;
+          border-radius: 3px;
+          z-index: 1002;
+          width: 140px;
+          height: 56px;
+          visibility: visible;
+          position: absolute;
+          right: -145px;
+          text-align: left;
+          text-indent: 20px;
+          top: 0px;
+          background: rgba(0, 0, 0, 0.15);
+          opacity: 1;
+        }
+      }
+    }
+    .el-submenu {
+      & > .el-submenu__title {
+        padding-left: 10px !important;
+        & > span {
+          display: none;
+        }
+        .el-submenu__icon-arrow {
+          display: none;
+        }
+      }
+      .nest-menu {
+        .el-submenu__icon-arrow {
+          display: block !important;
+        }
+        span {
+          display: inline-block !important;
+        }
+      }
+    }
+  }
+  .nest-menu .el-submenu > .el-submenu__title,
+  .el-submenu .el-menu-item {
+    // width: 140px !important;
+    min-width: 80px !important;
+    height: 45px;
+    line-height: 45px;
+    padding: 0;
+    &:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+  .el-menu-item.is-active {
+    background: rgba(0, 0, 0, 0.15);
+  }
+  .esclassmenu{
+    .el-menu-item.is-active {
+      background: #ffffff;
+    }
+    .nest-menu .el-submenu > .el-submenu__title,
+    .el-submenu .el-menu-item {
+      // width: 140px !important;
+      min-width: 80px !important;
+      height: 45px;
+      line-height: 45px;
+      padding: 0;
+      &:hover {
+        background: rgb(236, 245, 255);
+      }
+    }
+    .el-menu-item:hover {
+      background: rgb(236, 245, 255);
+    }
+    .el-icon-arrow-down:before {
+      // content: url("../assets/img/arrow.png");
+      color: #333;
+      font-size: 16px;
+    }
+    .el-menu{
+      border: none;
+    }
+  }
+  // .el-menu--collapse .el-menu .el-submenu {
+  //   min-width: 180px !important;
+  //   background: linear-gradient(to right, #5a79cf, #5b63d4);
+  // }
+}
+.el-icon-arrow-down:before {
+  color: #ffffff;
+  font-size: 16px;
+}

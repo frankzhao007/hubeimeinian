@@ -1,0 +1,461 @@
+// element组件
+.el-menu-item:focus {
+  outline: 1;
+  background-color: #5472c4;
+}
+
+.el-input__count {
+  line-height: 10px;
+}
+
+.selectstaff_table {
+
+  .el-dialog__body {
+    padding: 0 20px;
+  }
+}
+
+
+.el-button+.el-button {
+  margin-left: 20px;
+}
+
+.yuyueclass {
+  .el-button {
+    line-height: 26px !important;
+    padding: 0;
+
+  }
+
+  .el-button+.el-button {
+    margin-left: 0px;
+  }
+}
+
+// .el-transfer__button.is-disabled, .el-transfer__button.is-disabled:hover{
+//   margin: 0%;
+// }
+.mytransfer {
+  .el-transfer__buttons .el-button {
+    margin: 5px 0%;
+    padding: 10px;
+    border-radius: 50%;
+    color: #fff;
+    border: 1px solid #409eff;
+    background-color: #409eff;
+    font-size: 0;
+  }
+
+  .el-button--primary.is-disabled {
+    opacity: 0.7;
+    border: 1px solid #dcdfe6;
+    background-color: #f5f7fa !important;
+    color: #c0c4cc;
+  }
+
+}
+
+.mybigtransfer {
+  .el-transfer__buttons .el-button {
+    margin: 10px 0%;
+    padding: 10px;
+    border-radius: 50%;
+    color: #fff;
+    border: 1px solid #409eff;
+    background-color: #409eff;
+    font-size: 0;
+  }
+
+  .el-button--primary.is-disabled {
+    opacity: 0.7;
+    border: 1px solid #dcdfe6;
+    background-color: #f5f7fa !important;
+    color: #c0c4cc;
+  }
+
+  .el-transfer-panel {
+    width: 42%;
+    height: 500px;
+  }
+
+  .el-transfer-panel__body {
+    height: 450px;
+  }
+
+  .el-transfer-panel__list.is-filterable {
+    height: 400px;
+  }
+}
+
+.projectmytransfer {
+  .el-transfer__buttons {
+    // width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .el-transfer__buttons .el-button {
+    margin: 10px;
+    padding: 10px;
+    // border-radius: 50%;
+    color: #fff;
+    border: 1px solid #409eff;
+    background-color: #409eff;
+    font-size: 0;
+
+    i {
+      display: none;
+    }
+  }
+
+  .el-button--primary.is-disabled {
+    opacity: 0.7;
+    border: 1px solid #dcdfe6;
+    background-color: #f5f7fa !important;
+    color: #c0c4cc;
+  }
+
+  .el-transfer-panel {
+    width: 100%
+  }
+
+}
+
+.saleswelfarevoucher {
+  .el-button--primary {
+    color: #fff;
+    background-color: #409EFF;
+    border-color: #409EFF;
+    border-radius: 4px;
+  }
+
+  .el-button--primary:hover {
+    background: #66b1ff;
+    border-color: #66b1ff;
+    color: #fff;
+  }
+
+  .el-button--primary:focus {
+    background: #66b1ff;
+    border-color: #66b1ff;
+    color: #fff;
+  }
+
+  .saleswelfarevoucher_transfer {
+    margin: 0 auto;
+    width: 700px;
+
+    .el-transfer {
+      text-align: left;
+    }
+
+    .el-transfer-panel__item.el-checkbox {
+      width: 265px;
+    }
+
+    .el-transfer-panel {
+      width: 300px;
+      height: 500px;
+    }
+
+    .el-transfer-panel__list.is-filterable {
+      height: 380px;
+    }
+
+    .el-transfer__buttons .el-button {
+      margin: 5px 0%;
+      padding: 10px;
+      border-radius: 50%;
+      color: #fff;
+      border: 1px solid #409eff;
+      background-color: #409eff;
+      font-size: 0;
+    }
+
+    .el-button--primary.is-disabled {
+      opacity: 0.7;
+      border: 1px solid #dcdfe6;
+      background-color: #f5f7fa !important;
+      color: #c0c4cc;
+    }
+  }
+}
+
+.el-table th {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.el-table__header {
+  background: rgba(0, 0, 0, 0.04);
+
+}
+
+.el-step__title.is-wait {
+  color: #333333;
+}
+
+.el-step__description.is-wait {
+  color: #333333;
+}
+
+.el-step__head.is-wait {
+  color: #333333;
+  border-color: #333333;
+}
+
+// 按钮
+.el-button--text {
+  color: #6985d3;
+}
+
+// /* 更改element-UI按钮样式 */
+.el-button--primary {
+  border-radius: 0px;
+  color: #fff;
+  background-color: #5270c7;
+  border-color: #5270c7;
+}
+
+.el-button--primary:hover {
+  background-color: #6985d3;
+  border-color: #6985d3;
+}
+
+.el-button--primary:focus {
+  background-color: #5270c7;
+  border-color: #5270c7;
+}
+
+.el-button--primary.is-disabled {
+  opacity: 0.7;
+  background-color: #6985d3;
+  border-color: #6985d3;
+}
+
+// 图标
+// 商品
+.el-icon-my-commodity {
+  background: url("../assets/img/commodity.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+//
+.el-icon-my-branchOffice {
+  background: url("../assets/img/branchOffice.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+// 角色
+.el-icon-my-character {
+  background: url("../assets/img/character.png") center no-repeat;
+  margin-top: -3px;
+  height: 25px;
+}
+
+// 城市门店
+.el-icon-my-cityStore {
+  background: url("../assets/img/cityStore.png") center no-repeat;
+  margin-top: -2px;
+  height: 25px;
+}
+
+.el-icon-my-Marketing {
+  background: url("../assets/img/Marketing.png") center no-repeat;
+  margin-top: -2px;
+  height: 24px;
+}
+
+.el-icon-my-health {
+  background: url("../assets/img/health.png") center no-repeat;
+  margin-top: -2px;
+  height: 24px;
+}
+
+.el-icon-my-heart {
+  background: url("../assets/img/heart.png") center no-repeat;
+  margin-top: -3px;
+  height: 25px;
+}
+
+//
+.el-icon-my-enterprise {
+  background: url("../assets/img/enterprise.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+.el-icon-my-medicalExamination {
+  background: url("../assets/img/medicalExamination.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+// 订单
+.el-icon-my-order {
+  background: url("../assets/img/order.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+.el-icon-my-heart {
+  background: url("../assets/img/heart.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+.el-icon-my-overview {
+  background: url("../assets/img/overview.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+.el-icon-my-ordermanagement {
+  background: url("../assets/img/OrderManagement.png") center no-repeat;
+  background-size: 20px 22px;
+  margin-top: -5px;
+  height: 25px;
+}
+
+.el-icon-my-amordermanagement {
+  background: url("../assets/img/amOrderManagement.png") center no-repeat;
+  background-size: 20px 22px;
+  margin-top: -5px;
+  height: 25px;
+}
+
+.el-icon-my-sales {
+  background: url("../assets/img/sales.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+.el-icon-my-staff {
+  background: url("../assets/img/staff.png") center no-repeat;
+  margin-top: -5px;
+  height: 25px;
+}
+
+// 手机
+.el-icon-my-phone {
+  background: url("../assets/img/phone.png") center no-repeat;
+  margin-top: 6px;
+  height: 25px;
+}
+
+// 验证码
+.el-icon-my-code {
+  background: url("../assets/img/code.png") center no-repeat;
+  margin-top: 6px;
+  height: 25px;
+}
+
+// 密码
+.el-icon-my-password {
+  background: url("../assets/img/password.png") center no-repeat;
+  margin-top: 6px;
+  height: 25px;
+}
+.el-icon-my-connections {
+  background: url("../assets/img/connections.png") ;
+  background-size: cover;
+  height: 30px;
+  width: 30px;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+//返回
+.el-icon-my-back {
+  background: url("../assets/img/back.png") center no-repeat;
+  background-size: cover;
+  height: 25px;
+  width: 25px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.el-icon-my-download {
+  background: url("../assets/img/clouddownload-fill.png") center no-repeat;
+  height: 50px;
+  width: 50px;
+  background-size: cover;
+  display: inline-block;
+  vertical-align: middle;
+}
+.el-icon-my-upload {
+  background: url("../assets/img/cloudupload-fill.png") center no-repeat;
+  height: 50px;
+  width: 50px;
+  background-size: cover;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.filmorderdetails {
+  .el-table th>.cell {
+    text-align: center;
+  }
+
+  .el-table--border th,
+  .el-table__fixed-right-patch {
+    background-color: #909399;
+    color: black;
+  }
+}
+
+.el-table__fixed-right-patch {
+  background: rgb(245, 245, 245);
+}
+
+.filmmanagement {
+  .el-date-editor .el-range-separator {
+    padding: 0;
+  }
+}
+
+.paymentorder {
+  .el-date-editor .el-range-separator {
+    padding: 0;
+  }
+}
+
+.filmorderdetails {
+  .el-table td div {
+    text-align: center;
+  }
+}
+
+.alinehidden {
+  .el-button--text {
+    // width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    /*超出部分隐藏*/
+    white-space: nowrap;
+    /*让文本强制在一行不换行*/
+    text-overflow: ellipsis;
+    /*显示省略号来代表被修剪的文本*/
+  }
+}
+
+.enterpriselist_Configuration {
+  .el-button--text {
+    // width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    /*超出部分隐藏*/
+    white-space: nowrap;
+    /*让文本强制在一行不换行*/
+    text-overflow: ellipsis;
+    /*显示省略号来代表被修剪的文本*/
+  }
+}
+
+.el-radio-button__orig-radio:checked+.el-radio-button__inner {
+  //分销客的选择框
+  background-color: #5270c7 !important;
+  border-color: #5270c7 !important;
+  -webkit-box-shadow: -1px 0 0 0 #5270c7 !important;
+}

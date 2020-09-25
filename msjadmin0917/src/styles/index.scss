@@ -1,0 +1,183 @@
+@import "./variables.scss"; //定义的属性
+@import "./transition.scss"; //动画
+@import "./element-ui.scss"; //elementUI重置
+//layout侧边栏
+@import "./layout/sidebar.scss";
+@import "./layout/mixin.scss";
+//navbar
+@import "./layout/navbar.scss";
+
+
+
+body {
+  margin: 0;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
+    Microsoft YaHei, Arial, sans-serif;
+  background: #f0f2f5;
+  font-size: 14px;
+
+}
+
+html {
+  box-sizing: border-box;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+html {
+  scrollbar-width: none;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+div:focus {
+  outline: none;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+//main-container全局样式
+.app-main {
+  min-width: 1060px;
+  // max-height: 100%;
+  margin: 15px 20px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba（0, 0, 0, 10）;
+  box-sizing: border-box;
+  overflow-y: auto;
+  position: absolute;
+  top: 100px;
+  left: 190px;
+  right: 0;
+  bottom: 0%;
+}
+
+.app-main1 {
+  min-width: 1060px;
+  // max-height: 100%;
+  margin: 15px 20px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba（0, 0, 0, 10）;
+  box-sizing: border-box;
+  overflow-y: auto;
+  // position: absolute;
+  // top: 210px;
+  // left: 190px;
+  // right: 0;
+  // bottom: 0%;
+}
+
+.app-container {
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba（0, 0, 0, 10）;
+}
+
+.backbtn {
+  cursor: pointer;
+}
+
+.inquire {
+  min-width: 900px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.grid_lable {
+  float: left;
+  width: 20%;
+  min-width: 100px;
+  text-align: right;
+  min-height: 36px;
+  line-height: 36px;
+}
+
+.grid_content {
+  width: 58%;
+  text-align: center;
+  display: inline-block;
+}
+
+.grid_date {
+  width: 60%;
+  text-align: center;
+  display: inline-block;
+}
+
+.grid_button {
+  float: right;
+  text-align: right;
+  margin-left: 20px;
+}
+
+.centernData {
+  margin-top: 30px;
+  border: 1px solid #bbbbbb;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.block {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.sidebar-container {
+  overflow: auto;
+}
+
+.sidebar-container::-webkit-scrollbar {
+  display: none;
+}
+.sidebar-container {
+  scrollbar-width: none;
+}
+
+
+.alinehidden {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.TooLong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
