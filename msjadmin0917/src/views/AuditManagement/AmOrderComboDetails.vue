@@ -47,6 +47,14 @@
             <el-input v-model="scope.row.PRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
           </template>
         </el-table-column>
+        <el-table-column prop="OLDPRICE" label="套餐折扣率">
+          <template slot-scope="scope">
+            <div style="max-width: 200px;border: 1px solid #E4E7ED;background-color:#F5F7FA;padding-left: 10px ;color: #C0C4CC;">
+              {{toFixed(scope.row.PRICE/yuanjiachange(scope.row.details)*100)}}%
+            </div>
+<!--            <el-input v-model="toFixed(scope.row.PRICE/yuanjiachange(scope.row.details)*100)" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>-->
+          </template>
+        </el-table-column>
         <el-table-column prop="costCoefficient" v-if="role=='财务'" label="成本系数">
         	<template slot-scope="scope">
             <el-input  v-model="scope.row.costCoefficient" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
@@ -57,7 +65,7 @@
             <el-input v-model="scope.row.costCoefficientRate" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
           </template>
         </el-table-column>
-        
+
       </el-table>
       <!-- <div style="height:30px;margin-top:20px;">
         <el-pagination style="float:right" @size-change="" @current-change="" :current-page="tableobj1.pageindex" :page-sizes="[10, 20, 30, 40]" :page-size="tableobj1.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="tableobj1.total">
@@ -147,7 +155,7 @@
             <el-select v-model="scope.row.HYZK" placeholder=""  :disabled="true" style="width:100%" size="mini">
               <el-option label="已婚" value="01"></el-option>
               <el-option label="未婚" value="02"></el-option>
-               <el-option label="未知" value="03"></el-option> 
+               <el-option label="未知" value="03"></el-option>
             </el-select>
           </template>
         </el-table-column>
@@ -346,6 +354,9 @@ export default {
     this.role = this.$store.getters.getrolemsg
   },
   methods: {
+    toFixed(value){
+      return value.toFixed(2)
+    },
     importcombo(str) {
       if (str == "员工") {
         this.isyuangong = true;
@@ -588,7 +599,7 @@ export default {
      if(this.currentRow){
      	 return this.currentRow.PRICE;
      }
-     
+
     },
     combonamechange(item) {
       console.log(item);
