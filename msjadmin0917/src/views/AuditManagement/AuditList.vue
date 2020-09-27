@@ -250,8 +250,8 @@
 					}else{
 						this.$message.error("订单未审核通过，请审核通过后进行导出操作");
 					}
-					
-					
+
+
 				}else{
 					this.$message.error("请选择订单");
 				}
@@ -393,21 +393,35 @@
 			STATUSchange(val) {
 				switch(val) {
 					case 0:
-						return "未审核";
-						break;
-					case 1:
 						return "审核中";
 						break;
-					case 2:
+					case 1:
 						return "审核通过";
 						break;
-					case 3:
+					case 2:
 						return "审核拒绝";
 						break;
-
 					default:
 						break;
 				}
+
+        // switch(val) {
+        //   case 0:
+        //     return "未审核";
+        //     break;
+        //   case 1:
+        //     return "审核中";
+        //     break;
+        //   case 2:
+        //     return "审核通过";
+        //     break;
+        //   case 3:
+        //     return "审核拒绝";
+        //     break;
+        //
+        //   default:
+        //     break;
+        // }
 			},
 			FKFSchange(val) {
 				switch(val) {
@@ -532,7 +546,8 @@
 									DWMC: item.Ord.DWMC, //单位名称
 									YWYDM: item.Ord.YWYDM, //业务员
 									YWYXM: item.Ord.ZRHS, //制单人
-									Status: item.Ord.auditStatus, //状态
+                  Status: item.Oas.status, //状态
+									// Status: item.Ord.auditStatus, //状态
 									//									Status:1,//状态
 
 									createdAt: item.Oas.createdAt, //登记时间
