@@ -1320,6 +1320,58 @@ let Operation = [
       },
     ]
   },
+  {
+    managementName: "TuanAdmin",
+    management: "团单管理员",
+    listName: "团单管理员",
+    listAll: "全选",
+    selected: false,
+    partitionId: 1,
+    isIndeterminate: false,
+    rolesList: [
+      {
+        id: "AM001",
+        roleName: "查询",
+        mark: "ScheduleAdmin",
+        verifyName: "query",
+        url: "",
+        selected: false
+      },
+      {
+        id: "OM002",
+        roleName: "查询/编辑订单基本情况",
+        mark: "CheckTuanDetail",
+        verifyName: "edit0",
+        url: "",
+        selected: false
+      },
+      {
+        id: "OM005",
+        roleName: "容量设置",
+        mark: "TijianCapacity",
+        verifyName: "edit0",
+        url: "",
+        selected: false
+      },
+      {
+        id:"OM003",
+        roleName:"分院管理",
+        mark:"BranchMM",
+        verifyName:"list",
+        url:"",
+        selected:false
+      },
+      {
+        id:"OM004",
+        roleName:"新增/编辑分院",
+        mark:"AddBranchMM",
+        verifyName:"listEdit",
+        url:"",
+        selected:false
+      },
+
+    ]
+  },
    {
     managementName: "ScheduleManagement",
     management: "排期管理",
@@ -1346,16 +1398,17 @@ let Operation = [
         selected: false
       },
       {
-        id: "OM002",
-        roleName: "查询/编辑排期基本情况",
+        id: "OM003",
+        roleName: "订单排期",
         mark: "OrderSchedule",
         verifyName: "edit0",
         url: "",
         selected: false
       }
-      
+
     ]
   },
+
   {
     managementName: "reconciliationmanagement",
     management: "对账管理",

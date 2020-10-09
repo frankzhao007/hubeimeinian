@@ -924,6 +924,70 @@ let OperationRouter = [{
     },
   ]
 },
+  {
+    path: "/TuanAdmin",
+    component: "Layout",
+    redirect: "/TuanAdmin/ScheduleAdmin",
+    name: "TuanAdmin",
+    meta: {
+      title: "团单管理员",
+      icon: "el-icon-my-amordermanagement"
+    },
+    children: [
+      {
+        path: "ScheduleAdmin",
+        name: "ScheduleAdmin",
+        component: "TuanAdmin/ScheduleAdmin",
+        meta: {
+          title: "排期审核",
+          mark: "ScheduleAdmin",
+          icon: "ScheduleAdmin"
+        }
+      },
+      {
+        path: "CheckTuanDetail",
+        name: "CheckTuanDetail",
+        component: "TuanAdmin/CheckTuanDetail",
+        meta: {
+          title: "查看排期",
+          mark: "CheckTuanDetail",
+          icon: "CheckTuanDetail",
+          // hidden: "false"
+        }
+      },{
+        path: "TijianCapacity",
+        name: "TijianCapacity",
+        component: "TuanAdmin/TijianCapacity",
+        meta: {
+          title: "体检容量设置",
+          mark: "TijianCapacity",
+          icon: "TijianCapacity",
+        }
+      },
+      {
+        path:"BranchMM",
+        name:"BranchMM",
+        component:"TuanAdmin/BranchMM",
+        meta:{
+          title:"分院管理",
+          mark:"BranchMM",
+          icon:"BranchMM"
+        }
+      },
+      {
+        path:"AddBranchMM",
+        name:"AddBranchMM",
+        component:"TuanAdmin/AddBranchMM",
+        hidden:"false",
+        meta:{
+          title:"新增/编辑分院",
+          mark:"AddBranchMM",
+          icon:"AddBranchMM",
+        }
+      },
+
+    ]
+  },
 {
   path: "/ScheduleManagement",
   component: "Layout",
@@ -964,7 +1028,7 @@ let OperationRouter = [{
         icon: "OrderSchedule"
       }
     }
-     
+
   ]
 },
 

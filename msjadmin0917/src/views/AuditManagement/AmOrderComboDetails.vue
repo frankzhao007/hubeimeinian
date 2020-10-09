@@ -39,7 +39,10 @@
         </el-table-column>
         <el-table-column prop="OLDPRICE" label="原价">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.OLDPRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
+            <div style="max-width: 200px;border: 1px solid #E4E7ED;background-color:#F5F7FA;padding-left: 10px ;color: #C0C4CC;">
+              {{scope.row.calculateOldprice}}
+            </div>
+<!--            <el-input v-model="scope.row.OLDPRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>-->
           </template>
         </el-table-column>
         <el-table-column prop="PRICE" label="结算价">
@@ -50,7 +53,7 @@
         <el-table-column prop="OLDPRICE" label="套餐折扣率">
           <template slot-scope="scope">
             <div style="max-width: 200px;border: 1px solid #E4E7ED;background-color:#F5F7FA;padding-left: 10px ;color: #C0C4CC;">
-              {{toFixed(scope.row.PRICE/yuanjiachange(scope.row.details)*100)}}%
+              {{toFixed((scope.row.PRICE/scope.row.calculateOldprice)*100)}}%
             </div>
 <!--            <el-input v-model="toFixed(scope.row.PRICE/yuanjiachange(scope.row.details)*100)" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>-->
           </template>
@@ -1029,6 +1032,22 @@ export default {
             this.tableobj1.list = res.data;
             this.tableobj1.loading = false;
             if (this.tableobj1.list.length > 0) {
+              this.tableobj1.list.map((item, index) => {
+
+                if(item.details.length>0){
+                  var calculateOldprice=0;
+                  for(var i=0;i<item.details.length;i++){
+
+                    calculateOldprice+=Number(item.details[i].PRICE)
+
+                  }
+                  console.log(calculateOldprice);
+                  item.calculateOldprice=calculateOldprice
+                }
+
+                console.log(this.tableobj1.list);
+              });
+
               if (this.currentRow && this.currentRow != "") {
                 this.tableobj1.list.map((item, index) => {
                   if (item.ID == this.currentRow.ID) {
@@ -1036,7 +1055,9 @@ export default {
                       this.tableobj1.list[index]
                     );
                   }
+
                 });
+
               } else {
                 this.$refs.singleTable.setCurrentRow(this.tableobj1.list[0]);
               }

@@ -177,6 +177,7 @@
 				},
 				usermsg: "",
 				seekobj: {
+					passStatus:0,
 					MsjBILLCODE: '',
 					todo: true,
 					Status: -1,
@@ -203,8 +204,9 @@
 		},
 		methods: {
 			handleCurrentChange(val) {
+				console.log(555555555555)
 				this.seekobj.MsjBILLCODE=val.MsjBILLCODE
-				this.seekobj.Status=val.Status
+				this.seekobj.passStatus=val.Status
 				console.log(val);
 
 			},
@@ -241,7 +243,7 @@
 			},
 			packageExport(val) {
 				if(this.seekobj.MsjBILLCODE) {
-					if(this.seekobj.Status=="2"){
+					if(this.seekobj.passStatus=="1"){
 						if(val=="package"){
 							this.exportEXcel("/mnoracle/msj/exportDetail");
 						}else if(val=="person"){
@@ -547,7 +549,7 @@
 									YWYDM: item.Ord.YWYDM, //业务员
 									YWYXM: item.Ord.ZRHS, //制单人
                   Status: item.Oas.status, //状态
-									// Status: item.Ord.auditStatus, //状态
+									auditStatus: item.Ord.auditStatus, //状态
 									//									Status:1,//状态
 
 									createdAt: item.Oas.createdAt, //登记时间
@@ -568,7 +570,9 @@
 
 							})
 							if(list.length > 0) {
+                console.log(list)
 								for(var i = 0; i < list.length; i++) {
+
 									if(list[i].logs.length > 0) {
 										for(var j = 0; j < list[i].logs.length; j++) {
 											if(list[i].logs[j].type === 0) {
@@ -581,7 +585,7 @@
 													list[i].ShowStatus = list[i].logs[j].userName + "  审核拒绝"
 												}
 
-											} else if(list[i].logs[j].type === 1) {
+											} else if(list[i].logs[j].type === -1) {
 
 												list[i].ShowStatus = ""
 											}

@@ -86,7 +86,7 @@ const BranchOffice = [
     "账号列表",
     "角色列表",
     "数据统计",
-    
+
 ];
 const Sales = [
     "商品列表",
@@ -103,11 +103,11 @@ const Sales = [
     "企业列表",
     "员工列表",
     "审批列表",
-    
+
     "账单明细",
     "账号列表",
     "角色列表"
-    
+
 ];
 const ywy1 = [
     "商品列表",
@@ -135,7 +135,7 @@ const ywy1 = [
     "单位代码设置",
     "审批流程设置",
     "工作空间",
-    
+
     // "业务员提成统计表",
 ];
 const Hr = ["员工列表", "账号列表", "角色列表", "会员列表", "押金管理", "数据统计", "员工疫情列表"];
@@ -143,7 +143,7 @@ const Store = ["支付订单", "胶片管理", "账号列表", "角色列表"];
 const daxiang = ["胶片管理", "账号列表", "角色列表"];
 const weibao = ["商品列表-vb", "加项列表-vb", "订单列表-vb", "预约列表-vb", "体检项目列表-vb", "项目类别列表-vb", "门店列表-vb", "商品_门店列表-vb", "散户列表-vb", "权益列表-vb", "套餐_商品列表-vb", "套餐_商品列表新增-vb", "权益新增-vb"];
 const caiwu = ['审核列表']
-const neiqin = ['审核列表', '账号列表', '角色列表',"排期管理"]
+const neiqin = ['审核列表', '账号列表', '角色列表',"排期管理","团单管理员"]
 const msjneiqin = [
     "商品列表",
     "加项列表",
@@ -171,11 +171,12 @@ export function filterOperation() {
 
     console.log(store.getters.getRoleInfo);
     if (store.getters.getRoleInfo.RoleId == "8") {
-        return test(ywy1)
+        return test(neiqin)
+        // return test(ywy1)
     }
        switch ('7') {
 //  switch (store.getters.getRoleInfo.AccountType) {
-        // switch (store.getters.getRoleInfo.RoleId) {
+//         switch (store.getters.getRoleInfo.RoleId) {
         case '0':
             //console.log("运营账号")
             temp = test(yunying)
@@ -205,7 +206,7 @@ export function filterOperation() {
             temp = test(weibao)
             break;
         case '7':
-            //console.log("内勤")
+            console.log("内勤")
             temp = test(neiqin)
             break;
         case '8':
@@ -213,7 +214,7 @@ export function filterOperation() {
             temp = test(msjneiqin)
             break;
         case '9':
-            //console.log("业务员主管")
+            console.log("业务员主管")
             temp = test(ywy1)
             break;
         case '10':
@@ -223,17 +224,20 @@ export function filterOperation() {
         default:
             break;
     }
-    //console.log('temp************', temp)
+    console.log('temp************', temp)
     return temp
 }
 
 
 function test(params) {
+  console.log(operation.Operation)
+  console.log(params)
     const operations = operation.Operation
     var tempList = []
     for (let i = 0; i < operations.length; i++) {
         for (let j = 0; j < params.length; j++) {
             if (operations[i].listName == params[j]) {
+                console.log(operations[i])
                 tempList.push(operations[i]);
             }
         }
