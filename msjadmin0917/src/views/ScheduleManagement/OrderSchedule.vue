@@ -7,14 +7,14 @@
 			</div>
 			<div class="checkSchedule_form">
 				<el-form  :inline="false" :model="seekobj" label-position='left' label-width="120px" size="medium">
-			 
+
 				 <div class="checkSchedule_paiqi">
 				 	<el-form-item label="订单排期" style="font-size: 24px;">
-				           
+
 	       			 </el-form-item>
 				 </div>
-				
-				<el-form-item label="单据号：">
+
+				<el-form-item label="单据号01：">
 			         <el-input  v-model="seekobj.DJH" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
        			 </el-form-item>
        			 <el-form-item label="单位代码：">
@@ -37,18 +37,18 @@
        			 <el-form-item label="* 排期时间：">
        			 	 <div class="timeChoose" @click="chooseSchedule">日期控件(可选时间)</div>
 			         <!--<el-select v-model="seekobj.XB" placeholder="请选择时间" @visible-change="chooseSchedule" style="width:200px">
-			             
+
 			          </el-select>-->
        			 </el-form-item>
 
 			</el-form>
 			</div>
-			
-			
-			
+
+
+
           <el-dialog title="排期时间" :visible.sync="operate.dialogFormVisible">
 			<div style="margin:20px"   >
-			 
+
 				<el-calendar>
 					<template slot="dateCell" slot-scope="{date, data}" class="kalendar">
 						<div style="width:100%;height:100%">
@@ -205,8 +205,8 @@
 				//				console.log(new Date(dayData))
 				//				console.log(start)
 				//				console.log(new Date(end))
-				//				if(start < new Date(dayData) && new Date(dayData) < new Date(end)) 
-				//				if(new Date(dayData) <= new Date(end)) 
+				//				if(start < new Date(dayData) && new Date(dayData) < new Date(end))
+				//				if(new Date(dayData) <= new Date(end))
 				if(new Date(dayData) <= new Date(end)) {
 					for(var i = 0; i < dayList.length; i++) {
 						if(dayData == dayList[i].date) {
@@ -323,7 +323,7 @@
 	.word:hover {
 		color: #409EFF;
 	}
-	
+
 	.checkSchedule {
 		.checkSchedule_form{
 			margin-left: 27px;
@@ -342,7 +342,7 @@
 			border-radius: 4px;
 			cursor: pointer;
 		}
-		 
+
 		.checkSchedule_paiqi{
 			.el-form-item__label{
 				font-size: 24px;
