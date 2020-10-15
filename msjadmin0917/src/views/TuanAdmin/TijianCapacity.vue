@@ -5,33 +5,7 @@
       <i @click="goback()" class="el-icon-my-back backbtn"></i>
       <span>&nbsp&nbsp&nbsp返回</span>
     </div>
-<!--    <div class="checkSchedule_form">-->
-<!--      <el-form  :inline="false" :model="seekobj" label-position='left' label-width="120px" size="medium">-->
 
-<!--        <div class="checkSchedule_paiqi">-->
-<!--          <el-form-item label="查看排期" style="font-size: 24px;">-->
-
-<!--          </el-form-item>-->
-<!--        </div>-->
-
-<!--        <el-form-item label="*分院选择：">-->
-<!--          <el-select v-model="seekobj.XB" placeholder="" style="width:200px">-->
-<!--            &lt;!&ndash;<el-option label="全部" value=""></el-option>&ndash;&gt;-->
-<!--            <el-option label="男" value="1"></el-option>-->
-<!--            <el-option label="女" value="0"></el-option>-->
-<!--            <el-option label="全部" value="3"></el-option>-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
-
-<!--      </el-form>-->
-<!--    </div>-->
-<!--    <el-button type="primary" style="margin-top:20px" @click="addschedule()">添加排期</el-button>-->
-
-<!--    <el-tabs v-model="activeName" style="margin-top:20px" @tab-click="handleClick">-->
-<!-- -->
-<!--      <el-tab-pane v-for="itm in editableTabs" :key="itm.name" :label="itm.title" :name="itm.name"></el-tab-pane>-->
-<!-- -->
-<!--    </el-tabs>-->
 
     <div style="overflow:hidden;margin-top:10px;font-size:18px;min-width: 1200px;">
 
@@ -42,11 +16,9 @@
       <div style="width:350px;float:left;text-align: right;line-height:40px;text-align: left;">
         <span style="color:#F64649">*</span>
         <span style="font-size: 18px;">分院选择</span>
-        <el-select v-model="seekobj.XB" placeholder="" style="width:200px">
+        <el-select v-model="AllHospitalMsg.HospitalShow" @change="selectChange" placeholder="请选择分院" style="width:200px">
           <!--<el-option label="全部" value=""></el-option>-->
-          <el-option label="男" value="1"></el-option>
-          <el-option label="女" value="0"></el-option>
-          <el-option label="全部" value="3"></el-option>
+          <el-option v-for="item in AllHospitalMsg.AllHospital" :key="item.code" :label="item.name" :value="item.code"></el-option>
         </el-select>
       </div>
       <div style="clear: both"></div>
@@ -58,20 +30,21 @@
         </div>
         <div style="float:left;width:100%;margin-top:10px">
           <el-date-picker
-            v-model="value1"
+
+            v-model="TimePickervalue1_model"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期">
           </el-date-picker>
-          <el-date-picker value-format="yyyy-MM-dd" @change="begainTime(item.startTime,index)" v-model="item.startTime" type="date" placeholder="选择日期时间">
-          </el-date-picker>
-          <!--<el-date-picker start-placeholder="开始月份" :picker-options="pickerOptions" v-model="item.startTime" type="date" placeholder="选择日期"></el-date-picker>-->
-          <span style="color:#606266;margin-left:10px">预约结束时间：</span>
+<!--          <el-date-picker value-format="yyyy-MM-dd" @change="begainTime(item.startTime,index)" v-model="item.startTime" type="date" placeholder="选择日期时间">-->
+<!--          </el-date-picker>-->
 
-          <el-date-picker value-format="yyyy-MM-dd" @change="overTime(item.endTime,index)" v-model="item.endTime" type="date" placeholder="选择日期时间">
-          </el-date-picker>
-          <!--<el-date-picker v-model="item.endTime" :picker-options="pickerOptions" type="date" placeholder="选择日期"></el-date-picker>-->
+<!--          <span style="color:#606266;margin-left:10px">预约结束时间：</span>-->
+
+<!--          <el-date-picker value-format="yyyy-MM-dd" @change="overTime(item.endTime,index)" v-model="item.endTime" type="date" placeholder="选择日期时间">-->
+<!--          </el-date-picker>-->
+
         </div>
       </div>
       <div style="overflow:hidden;margin-top:10px;font-size:18px">
@@ -85,7 +58,7 @@
           <div style="width:600px;float:left;margin-left:20px">
             <div style="float:left;">
               <span>上午</span>
-              <el-input v-model="item.numberMorning" maxlength=4 @input="input_change_Mor(item.numberMorning,index)" placeholder="请输入0~1000之间的整数" style="width:200px" clearable></el-input>
+              <el-input v-model="AllHospitalMsg.maxHC_mor" maxlength=4 @input="input_change_Mor(AllHospitalMsg.maxHC_mor)" placeholder="请输入0~1000之间的整数" style="width:200px" clearable></el-input>
             </div>
             <div style="float:left;margin-left:20px">
               <span>备注</span>
@@ -93,7 +66,7 @@
             </div>
             <div style="float:left;margin-top:20px">
               <span>下午</span>
-              <el-input v-model="item.numberAfternoon" maxlength=4 @input="input_change_Aft(item.numberAfternoon,index)" placeholder="请输入0~1000之间的整数" style="width:200px" clearable></el-input>
+              <el-input v-model="AllHospitalMsg.maxHC_aft" maxlength=4 @input="input_change_Aft(AllHospitalMsg.maxHC_aft,)" placeholder="请输入0~1000之间的整数" style="width:200px" clearable></el-input>
             </div>
             <div style="float:left;margin-left:20px;margin-top:20px">
               <span>备注</span>
@@ -115,9 +88,9 @@
 
         <!-- {{matchingdata(days,'2020-04-11')}} -->
         <div style="margin:20px">
-          <el-calendar>
+          <el-calendar v-model="value">
             <template slot="dateCell" slot-scope="{date, data}" class="kalendar">
-              <div style="width:100%;height:100%" @click="selectDate(data,matchingdata(days,data.day),item.id)">
+              <div style="width:100%;height:100%" @click="selectDate(data,matchingdata(AllHospitalMsg.days,data.day))">
                 <div style="font-size: 15px;">{{data.day.split('-').slice(2).join('-')}}</div>
                 <div style=" font-size: 10px;float:right;width:calc(100% - 24px);overflow: hidden;">
                   <div style="float:left;width:33%;text-align: center;">总数</div>
@@ -126,22 +99,22 @@
                 </div>
                 <div style="font-size: 10px;float:left;width:24px;width:100%;overflow: hidden;">
                   <div style="float:left;">上午</div>
-                  <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="days.length>0">
+                  <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="AllHospitalMsg.days.length>0">
                     <div style="float:left;width:33%;text-align: center;">
-                      <span v-if="matchingdata(days,data.day)">{{matchingdata(days,data.day).numberMorning}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).limit_mor}}</span>
                       <span v-else>-</span>
                     </div>
 
                     <div style="float:left;width:34%;text-align: center;">
-                      <span v-if="matchingdata(days,data.day)">{{matchingdata(days,data.day).alreadyNumberM}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).sched_mor}}</span>
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:33%;text-align: center;">
-                      <span v-if="matchingdata(days,data.day)">{{matchingdata(days,data.day).stockNumberM}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).remain_mor}}</span>
                       <span v-else>-</span>
                     </div>
                   </div>
-                  <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="days.length==0">
+                  <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="AllHospitalMsg.days.length==0">
                     <div style="float:left;width:33%;text-align: center;">
 
                       <span>-</span>
@@ -157,21 +130,21 @@
                   </div>
 
                   <div style="float:left;">下午</div>
-                  <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="days.length>0">
+                  <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="AllHospitalMsg.days.length>0">
                     <div style="float:left;width:33%;text-align: center;">
-                      <span v-if="matchingdata(days,data.day)">{{matchingdata(days,data.day).numberAfternoon}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).limit_aft}}</span>
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:34%;text-align: center;">
-                      <span v-if="matchingdata(days,data.day)">{{matchingdata(days,data.day).alreadyNumberA}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).sched_aft}}</span>
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:33%;text-align: center;">
-                      <span v-if="matchingdata(days,data.day)">{{matchingdata(days,data.day).stockNumberA}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).remain_aft}}</span>
                       <span v-else>-</span>
                     </div>
                   </div>
-                  <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="days.length==0">
+                  <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="AllHospitalMsg.days.length==0">
                     <div style="float:left;width:33%;text-align: center;">
                       <!--<span v-if="matchingdata(days,data.day)">{{matchingdata(days,data.day).numberAfternoon}}</span>-->
                       <span>-</span>
@@ -193,19 +166,6 @@
 
       </div>
     </div>
-    <!-- 选择体检项目弹窗 -->
-    <div>
-      <el-dialog title=" 选择体检项目" :visible.sync="selectPhysical.isshow" width="800px">
-
-        <div class="projectmytransfer">
-          <el-transfer v-loading="selectPhysical.loading" :titles="['未选项目', '已选项目']" :button-texts="['到上边', '到下边']" v-model="selectPhysical.selectProjectList" filterable filter-placeholder="请输入" :data="selectPhysical.projectList"></el-transfer>
-        </div>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="selectPhysical.isshow = false">取 消</el-button>
-          <el-button type="primary" @click="confirmProjectBtn(index)">确 定</el-button>
-        </span>
-      </el-dialog>
-    </div>
 
     <el-dialog title="当前选择" :visible.sync="isdate" top="10vh" width="500px" center="">
       <div>
@@ -225,219 +185,38 @@
       </div>
     </el-dialog>
 
-    <!-- 批量导入员工弹窗 -->
-    <!--<div v-if="dialogImportEmployee">
-      <el-dialog title="上传表格" :visible.sync="dialogImportEmployee" width="600px">
-        <div v-loading="updataobj.isshow" :element-loading-text="updataobj.loadingtext" element-loading-spinner="el-icon-loading">
-          <div>
 
-            <div class="stafflist_UploadForm">请按照以下格式上传.xlsx文件：四列数据分别为门店编码 ，预约日期，上午，下午。请按照要求录入数据。</div>
-            <input ref="inputer" id="upload" style="display:none" type="file" @change="importfxx()" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-            <div style="width:100%;text-align:center;margin-top:10px;">
-              <el-button size="small" type="primary" @click="returnAllUsers">点击上传</el-button>
-              <div style="line-height:30px" v-if="errorFile">格式错误请重新上传！</div>
-              <div style="line-height:30px" v-if="filename!=''">已选择"{{filename}}"</div>
-              <div style="line-height:30px" v-if="rightWord">匹配到{{goodXlsx.length}}条有效员工信息，{{badXlsx.length}}条无效数据</div>
-              <div v-if="badXlsx.length>0">
-                无效数据：
-                <div style="text-align: left;margin-left: 140px;position: relative;margin-top: 20px;" v-for="item in badXlsx">
-                   <div style="float:left;margin-left: 0px; ">门店编码：{{item.localCenterCode||"无门店编码"}}</div> <div style="max-width:200px;float:left;color: red;margin-left: 30px;">错误提示：{{item.misdescription}}</div>
-                     <div style="clear: both;"></div>
-                </div>
-              </div>
-            </div>
-            <div style=" text-align: center; margin-top: 15px;">
-              <el-button type="text" @click="DownloadTemplate">
-                下载模板文件
-                <i class="el-icon-download el-icon--right"></i>
-              </el-button>
-            </div>
-          </div>
 
-          <div style="float:right">
-            <el-button @click="closeimport">取 消</el-button>
-            <el-button type="primary" @click="confirmimport">确 定</el-button>
-          </div>
-          <div style="height:40px"></div>
-        </div>
-      </el-dialog>
-    </div>-->
 
-    <!-- 员工批量操作 -->
-    <div class="ygplcz">
-      <el-dialog title="排期批量导入" :visible.sync="dialogImportEmployee" width="800px">
-
-        <div v-loading="updataobj.isshow" :element-loading-text="updataobj.loadingtext" element-loading-spinner="el-icon-loading">
-          <!--<span>选择企业：</span>
-              <el-select :disabled="ygplczobj.drobj.active!=0" aria-label="选择企业" size="small" v-model="ygplczobj.drobj.company" filterable>
-                <el-option v-for="(item,index) in ygplczobj.companyList" :key="index" :label="item" :value="item"></el-option>
-              </el-select>-->
-          <el-steps style="margin-top:10px" :active="ygplczobj.drobj.active" finish-status="success" process-status="finish" simple>
-            <el-step title="上传文件" icon="el-icon-upload"></el-step>
-            <el-step title="执行导入" icon="el-icon-s-platform"></el-step>
-            <el-step title="导入完成" icon="el-icon-success"></el-step>
-          </el-steps>
-          <div v-if="ygplczobj.drobj.active==0">
-            <el-card>
-              <div class="box-card">
-                <div>
-                  <i style="font-size:50px;margin:10px" class="el-icon-my-download "></i>
-                </div>
-                <div style="width:100%;margin-left:20px">
-                  <div style="">
-                    <div style="font-size:18px;">请按照模板填写信息后导入</div>
-                    <div style="font-size:14px; color:#ccc">为提高导入的成功率，请下载并使用系统提供的模板。单次导入不超过5000条</div>
-                  </div>
-                  <el-button class="carbtn" type="primary" size="small" @click="DownloadTemplate">下载模板</el-button>
-                </div>
-              </div>
-            </el-card>
-            <el-card>
-              <div class="box-card">
-                <div>
-                  <i style="font-size:50px;margin:10px" class="el-icon-my-upload"></i>
-                </div>
-                <div style="width:100%;margin-left:20px">
-                  <div style="">
-                    <div style="font-size:18px;">上传数据</div>
-                    <div style="font-size:14px; color:#9E9E9E">仅支持xlsx或xls（即Excel格式），文件大小≤4M。</div>
-                    <div style="font-size:14px; color:#3A83FF">{{filename}} <i v-if="filename" @click="delfile" style="cursor: pointer;" class="el-icon-error"></i></div>
-                  </div>
-                  <el-button class="carbtn" type="primary" size="small" @click="returnAllUsers">上传文件</el-button>
-                </div>
-              </div>
-            </el-card>
-            <div style="text-align:center;margin-top:20px">
-              <el-button type="primary" @click="verifyImport">校验数据</el-button>
-            </div>
-          </div>
-          <div v-if="ygplczobj.drobj.active==1">
-            <el-card>
-              <div class="box-card">
-                <div style="width:100%;margin-left:20px">
-                  <div style="">
-                    <div style="font-size:16px;">正确数据条数</div>
-                    <div style="font-size:14px; color:#4CCA32 ">{{goodXlsx.length-badXlsx.length}}条</div>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-            <el-card>
-              <div class="box-card">
-                <div style="width:100%;margin-left:20px">
-                  <div style="">
-                    <div style="font-size:16px;">异常数据条数</div>
-                    <div style="font-size:14px; color:#F63649  ">{{badXlsx.length}}条</div>
-                  </div>
-                  <!--<el-button class="carbtn" type="primary" size="small" @click="downloadfaildata">下载异常数据</el-button>-->
-                </div>
-              </div>
-            </el-card>
-            <div style="margin-top:20px">
-              <el-button type="primary" @click="confirmimport">确认导入</el-button>
-              <el-button style="float:right" @click="resetupload">重新上传</el-button>
-            </div>
-            <div style="margin-top: 20px;" v-if="badXlsx.length>0">
-              无效数据：
-              <div style="text-align: left;position: relative;margin-top: 20px;" v-for="item in badXlsx">
-                <div style="float:left;margin-left: 0px; ">门店编码：{{item.localCenterCode||"无门店编码"}}</div>
-
-                <div style="max-width:200px;float:left;color: red;margin-left: 30px;">错误提示：第{{item.serialNumber}}行，{{item.misdescription}}</div>
-                <div style="clear: both;"></div>
-              </div>
-            </div>
-
-          </div>
-          <div v-if="ygplczobj.drobj.active==2">
-            <div style="text-align:center">
-              <div style="font-size:28px;color:#00000;margin:20px">批量导入完成</div>
-              <div style="font-size:16px;color:#4CCA32;margin-bottom:20px">成功导入数量{{goodXlsx.length-badXlsx.length}}条</div>
-              <el-button type="primary" style="margin:20pxl.;padding:15px 50px" @click="okBtn()">完 成</el-button>
-            </div>
-          </div>
-        </div>
-
-      </el-dialog>
-    </div>
-    <input ref="inputer" id="upload" style="display:none" type="file" @change="importfxx()" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
   </div>
 
 </template>
 <script>
 export default {
   data() {
+
     return {
+      value: new Date(),
+      TimePickervalue1:[],
+      TimePickervalue1_model:[],
+      AllHospitalMsg:{
+        hospitalCode:'',
+        AllHospital:[],
+        HospitalShow:'',
+        startDate:'',
+        endDate:'',
+        maxHC_mor:'',
+        maxHC_aft:'',
+        schedule:[],
+        days:[],
+        schedules_modify:[],
+        chooseDate:'',
+        current_month:''
+      },
       seekobj:{XB:'0'},
-      //				time56:'2020-05-14 00:00:00',
-      ygplczobj: {
-        isshow: false,
-        activeName: "first",
-        companyList: [],
-        drobj: {
-          company: "", //企业名称，
-          fileName: "", //文件名称
-          active: 0, //当前步骤
-          yglist: [],
-          drResult: "",
-          loading: false,
-          loadingtext: ""
-        },
-
-      },
-      index: '0',
-      whetherOpen: "2",
-      // 上传表格
-      goodXlsx: [],
-      badXlsx: [],
-      errorFile: false,
-      rightWord: false,
-      filename: '',
-      file: '',
-      updataobj: {
-        isshow: false,
-        errshow: false,
-        errdata: [],
-        loadingtext: ''
-      },
 
 
-      dialogImportEmployee: false, //批量导入员工弹窗
-      selectPhysical: {
-        loading: false,
-        addPhysical: false,
-        confirmProjectList: [],
-        confirmProjectfirsttype: [],
-        selectProjectList: [],
-        selectProjectList_show: [],
-        isshow: false,
-        isshowtable: false,
-        FirstTypeList: [], //一级类别列表
-        FirstTypeValue: "", //一级类别选择的值
-        SecondTypeList: [], //二级类别列表，根据一级类别生成
-        SecondTypevalue: "", //二级类别选择的值
-        seeksex: "", //搜索框性别
-        seekPackageName: "", //搜索栏项目名称
-        //搜索栏属性列表
-        AddPackageseeklist: {
-          sex: [{
-            value: "通用",
-            label: "通用"
-          },
-            {
-              value: "男",
-              label: "男"
-            },
-            {
-              value: "女",
-              label: "女"
-            }
-          ]
-        },
-        projectList: [], //体检项目列表
-        projectCount: 0, //体检项目总数
-        projectpageSize: 10, //每页条数
-        projectcurrentPage: 1 //当前页
-      },
+
       seekList: {
         name: "",
         area: "",
@@ -469,13 +248,7 @@ export default {
       activeName: "selected",
       isopen: 'true',
       scheduleint: 0,
-      editableTabs: [{
-        title: '人工排期',
-        name: 'selected',
-      }, {
-        title: '全国单排期干预',
-        name: 'commonality',
-      }, ],
+
 
       rules: {
         name: [{
@@ -521,19 +294,43 @@ export default {
 
   },
   mounted() {
-    this.storeId = this.$route.query.storeId;
-    this.companyId = this.$route.query.companyId;
+    this.GetAllHospital();
+    var current_month = this.changeTime(new Date()).substring(0, 7)
+    this.AllHospitalMsg.current_month=current_month
+    console.log(current_month)
+
     this.localCenterCode = this.$route.query.localCenterCode;
-    console.log(this.$route.query)
-    console.log(this.storeId)
-    if(this.storeId) {
-      //				this.getpaiqiID(this.storeId);
-      this.getmessage()
-    }
-    this.queryAllCheckDirFir()
-    console.log(this.activeName)
+
+
+
+
   },
   methods: {
+    selectChange(e){
+      this.AllHospitalMsg.hospitalCode=e
+      this.getCalendar()
+      console.log(e)
+    },
+    // 获取所有分院
+    GetAllHospital() {
+      var that = this;
+      var body = {
+        // page:1, // 页码
+        // size:9999 // 单页条数
+      }
+      this.$network3
+        .get("/mnoracle/schedule/HospitalList")
+        .then(res => {
+          console.log(res.data);
+          that.AllHospitalMsg.AllHospital=[];
+          that.AllHospitalMsg.AllHospital=res.data||[];
+          console.log(that.AllHospitalMsg.AllHospital);
+
+        })
+        .catch(err => {
+          console.log("err", err);
+        });
+    },
     okBtn() {
       this.dialogImportEmployee = false
       this.closeimport()
@@ -542,42 +339,43 @@ export default {
       console.log(this.ygplczobj.drobj.active)
     },
 
-    //重新上传
-    resetupload() {
-      //    var nametemp = "";
-      //    switch (this.ygplczobj.activeName) {
-      //      case "first":
-      //        nametemp = "drobj";
-      //        break;
-      //      case "second":
-      //        nametemp = "xgobj";
-      //        break;
-      //      case "third":
-      //        nametemp = "scobj";
-      //        break;
-      //      default:
-      //        break;
-      //    }
-      this.ygplczobj.drobj.active -= 1;
+    input_change_modificationA(e) {
+      console.log(22222222)
+      if(e.length == 1) {
+        this.modificationA = e.replace(/[^0-9]/g, '')
+      } else if(e == "0" || e == "00" || e == "000" || e == "0000") {
+        this.modificationA = "0"
+      } else if(e > 1000) {
+        this.modificationA = "1000"
+        this.$message.error('不能大于1000')
+
+      } else if(e.indexOf(".") < 0 && e != "") { //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的金额
+        this.modificationA = parseFloat(e);
+      } else {
+        this.modificationA = e.replace(/^0[0-9]+/g, '0')
+
+        this.modificationA = e.replace(/\D/g, '')
+      }
+      console.log(this.modificationA)
     },
-    //删除文件
-    delfile() {
-      //				var nametemp = "";
-      //				switch(this.ygplczobj.activeName) {
-      //					case "first":
-      //						nametemp = "drobj";
-      //						break;
-      //					case "second":
-      //						nametemp = "xgobj";
-      //						break;
-      //					case "third":
-      //						nametemp = "scobj";
-      //						break;
-      //					default:
-      //						break;
-      //				}
-      this.filename = "";
-      this.goodXlsx = [];
+    input_change_modificationM(e) {
+      console.log(22222222)
+      if(e.length == 1) {
+        this.modificationM = e.replace(/[^0-9]/g, '')
+      } else if(e == "0" || e == "00" || e == "000" || e == "0000") {
+        this.modificationM = "0"
+      } else if(e > 1000) {
+        this.modificationM = "1000"
+        this.$message.error('不能大于1000')
+
+      } else if(e.indexOf(".") < 0 && e != "") { //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的金额
+        this.modificationM = parseFloat(e);
+      } else {
+        this.modificationM = e.replace(/^0[0-9]+/g, '0')
+
+        this.modificationM = e.replace(/\D/g, '')
+      }
+      console.log(this.modificationM)
     },
     overTime(time, index) {
       console.log(2222222222)
@@ -668,469 +466,54 @@ export default {
       }
 
     },
-    input_change_leadTime(e, index) {
 
-      console.log(22222222)
-      console.log(e)
-      var eString = e.toString()
-      console.log(eString)
 
-      if(eString == "0" || eString == "00" || eString == "000" || eString == "0000" || eString == "1") {
-        console.log(5555555)
-        this.MSJschedules[index].leadTime = "2"
-        this.$message.error('请输入2~30之间的整数')
-      }
-      console.log(this.MSJschedules[index].leadTime)
-
-      if(e.length == 1) {
-        //					this.MSJschedules[index].leadTime = e.replace(/[^0-9]/g, '')
-      } else if(e > 30) {
-        this.MSJschedules[index].leadTime = "30"
-        this.$message.error('不能大于30')
-
-      } else {
-        console.log(66666666666)
-        this.MSJschedules[index].leadTime = e.replace(/^0[0-9]+/g, '0')
-
-        this.MSJschedules[index].leadTime = e.replace(/\D/g, '')
-      }
-      console.log(this.MSJschedules[index].leadTime)
-
-    },
-    input_change_modificationA(e) {
-      console.log(22222222)
-      if(e.length == 1) {
-        this.modificationA = e.replace(/[^0-9]/g, '')
-      } else if(e == "0" || e == "00" || e == "000" || e == "0000") {
-        this.modificationA = "0"
-      } else if(e > 1000) {
-        this.modificationA = "1000"
-        this.$message.error('不能大于1000')
-
-      } else if(e.indexOf(".") < 0 && e != "") { //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的金额
-        this.modificationA = parseFloat(e);
-      } else {
-        this.modificationA = e.replace(/^0[0-9]+/g, '0')
-
-        this.modificationA = e.replace(/\D/g, '')
-      }
-      console.log(this.modificationA)
-    },
-    input_change_modificationM(e) {
-      console.log(22222222)
-      if(e.length == 1) {
-        this.modificationM = e.replace(/[^0-9]/g, '')
-      } else if(e == "0" || e == "00" || e == "000" || e == "0000") {
-        this.modificationM = "0"
-      } else if(e > 1000) {
-        this.modificationM = "1000"
-        this.$message.error('不能大于1000')
-
-      } else if(e.indexOf(".") < 0 && e != "") { //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的金额
-        this.modificationM = parseFloat(e);
-      } else {
-        this.modificationM = e.replace(/^0[0-9]+/g, '0')
-
-        this.modificationM = e.replace(/\D/g, '')
-      }
-      console.log(this.modificationM)
-    },
     input_change_Aft(e, index) {
 
       console.log(22222222)
       if(e.length == 1) {
-        this.MSJschedules[index].numberAfternoon = e.replace(/[^0-9]/g, '')
+        this.AllHospitalMsg.maxHC_aft = e.replace(/[^0-9]/g, '')
       } else if(e == "0" || e == "00" || e == "000" || e == "0000") {
-        this.MSJschedules[index].numberAfternoon = "0"
+        this.AllHospitalMsg.maxHC_aft = "0"
       } else if(e > 1000) {
-        this.MSJschedules[index].numberAfternoon = "1000"
+        this.AllHospitalMsg.maxHC_aft = "1000"
         this.$message.error('不能大于1000')
 
       } else if(e.indexOf(".") < 0 && e != "") { //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的金额
-        this.MSJschedules[index].numberAfternoon = parseFloat(e);
+        this.AllHospitalMsg.maxHC_aft = parseFloat(e);
       } else {
-        this.MSJschedules[index].numberAfternoon = e.replace(/^0[0-9]+/g, '0')
+        this.AllHospitalMsg.maxHC_aft = e.replace(/^0[0-9]+/g, '0')
 
-        this.MSJschedules[index].numberAfternoon = e.replace(/\D/g, '')
+        this.AllHospitalMsg.maxHC_aft = e.replace(/\D/g, '')
       }
-      console.log(this.MSJschedules[index].numberAfternoon)
+      console.log(this.AllHospitalMsg.maxHC_aft)
 
     },
     input_change_Mor(e, index) {
 
       console.log(22222222)
+      console.log(e)
       if(e.length == 1) {
-        this.MSJschedules[index].numberMorning = e.replace(/[^0-9]/g, '')
+        this.AllHospitalMsg.maxHC_mor = e.replace(/[^0-9]/g, '')
       } else if(e == "0" || e == "00" || e == "000" || e == "0000") {
-        this.MSJschedules[index].numberMorning = "0"
+        this.AllHospitalMsg.maxHC_mor = "0"
       } else if(e > 1000) {
-        this.MSJschedules[index].numberMorning = "1000"
+        this.AllHospitalMsg.maxHC_mor = "1000"
         this.$message.error('不能大于1000')
 
       } else if(e.indexOf(".") < 0 && e != "") { //以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的金额
-        this.MSJschedules[index].numberMorning = parseFloat(e);
+        this.AllHospitalMsg.maxHC_mor = parseFloat(e);
       } else {
-        this.MSJschedules[index].numberMorning = e.replace(/^0[0-9]+/g, '0')
+        this.AllHospitalMsg.maxHC_mor = e.replace(/^0[0-9]+/g, '0')
 
-        this.MSJschedules[index].numberMorning = e.replace(/\D/g, '')
+        this.AllHospitalMsg.maxHC_mor = e.replace(/\D/g, '')
       }
-      console.log(this.MSJschedules[index].numberMorning)
+      console.log(this.AllHospitalMsg.maxHC_mor)
 
     },
-    // 校验导入请求
-    verifyImport() {
-      var that = this;
-      //				if(this.UploadForm.company == "") {
-      //					this.$message.error("请选择企业名称");
-      //					return;
-      //				}
-      console.log(this.goodXlsx)
-      if(this.goodXlsx.length == 0) {
-        this.$message.error('请上传文件')
-        return
-      }
 
-      // console.log(this.goodXlsx);
-      var goodXlsxTemp = [];
-      //				this.goodXlsx.forEach(e => {
-      //
-      //								var de = {
-      //									localCenterCode: e.localCenterCode.toString(),
-      //									date: e.date.toString(),
-      //									numberMorning: Number(e.numberMorning),
-      //									numberAfternoon: Number(e.numberAfternoon),
-      //
-      //
-      //								}
-      //							 goodXlsxTemp.push(de)
-      //							})
 
-      var temp = JSON.parse(JSON.stringify(this.goodXlsx))
-      // for (let i = 0; i < temp.length; i++) {
-      //   const element = temp[i];
-      //   element.phone = JSON.stringify(element.phone);
-      // }
-      console.log(temp)
-      var body = {
-        msjId: this.paiqiID,
-        storeId: this.storeId,
-        formInfos: temp
-      }
-      this.updataobj.isshow = true
-      this.updataobj.loadingtext = '数据校验中，请耐心等待...'
-      this.$api
-        .post('/MSJschedule/verifySchedule', body)
-        .then(res => {
-          that.updataobj.isshow = false
-          console.log(res)
 
-          console.log('res', res)
-          console.log(res.data)
-          that.badXlsx = res.data.errFormInfo || []
-          that.updataobj.errdata = res.data.errFormInfo || []
-          if(that.updataobj.errdata.length > 0) {
-            that.updataobj.errshow = true
-            that.errorFile = true
-          } else {
-            //							that.$message.error(res.msg)
-          }
-          that.updataobj.isshow = false
-          that.ygplczobj.drobj.active += 1;
-          console.log(res)
-          console.log(that.ygplczobj)
-          console.log(that.updataobj.errdata)
-
-        })
-        .catch(err => {
-          //						this.updataobj.isshow = false
-          console.log('err', err)
-          console.log(err.data)
-
-          this.updataobj.errdata = err.data || []
-          if(this.updataobj.errdata.length > 0) {
-            this.updataobj.errshow = true
-
-          } else {
-            this.$message.error(err.msg)
-          }
-
-          // var str = "";
-          // for (let i = 0; i < err.data.length; i++) {
-          //   const element = err.data[i];
-          //   str =
-          //     str +
-          //     element.Num +
-          //     " " +
-          //     element.identityRemarks +
-          //     " " +
-          //     element.phoneRemarks +
-          //     " " +
-          //     "<br/>";
-          // }
-
-          // this.$msgbox({
-          //   title: "上传失败员工数据",
-          //   dangerouslyUseHTMLString: true,
-          //   message: str,
-          //   type: "error"
-          // });
-          // this.$message({
-          //   dangerouslyUseHTMLString: true,
-          //   message: str,
-          //   type: "error"
-          // });
-        })
-    },
-    // 导入请求
-    confirmimport() {
-
-      var that = this;
-      if(that.badXlsx.length > 0) {
-        this.$message.error('格式错误请重新上传！')
-        return;
-      }
-      //				if(this.UploadForm.company == "") {
-      //					this.$message.error("请选择企业名称");
-      //					return;
-      //				}
-      console.log(this.goodXlsx)
-      if(this.goodXlsx.length == 0) {
-        this.$message.error('请上传文件')
-        return
-      }
-
-      // console.log(this.goodXlsx);
-      var temp = JSON.parse(JSON.stringify(this.goodXlsx))
-      // for (let i = 0; i < temp.length; i++) {
-      //   const element = temp[i];
-      //   element.phone = JSON.stringify(element.phone);
-      // }
-      console.log(temp)
-      var body = {
-        msjId: this.paiqiID,
-        storeId: this.storeId,
-        formInfos: temp
-      }
-      this.updataobj.isshow = true
-      this.updataobj.loadingtext = '上传员工数据至服务器，请耐心等待...'
-      this.$api
-        .post('/MSJschedule/importSJschedulesData', body)
-        .then(res => {
-          that.ygplczobj.drobj.active += 1;
-          this.updataobj.isshow = false
-          console.log(res)
-          //						this.$message.success('上传成功！')
-          //						this.closeimport()
-
-          this.getmessage()
-        })
-        .catch(err => {
-          this.updataobj.isshow = true
-          console.log('err', err)
-          console.log(err.data)
-          this.updataobj.errdata = err.data || []
-          if(this.updataobj.errdata.length > 0) {
-            this.updataobj.errshow = true
-
-          } else {
-            this.$message.error(err.msg)
-          }
-          // var str = "";
-          // for (let i = 0; i < err.data.length; i++) {
-          //   const element = err.data[i];
-          //   str =
-          //     str +
-          //     element.Num +
-          //     " " +
-          //     element.identityRemarks +
-          //     " " +
-          //     element.phoneRemarks +
-          //     " " +
-          //     "<br/>";
-          // }
-
-          // this.$msgbox({
-          //   title: "上传失败员工数据",
-          //   dangerouslyUseHTMLString: true,
-          //   message: str,
-          //   type: "error"
-          // });
-          // this.$message({
-          //   dangerouslyUseHTMLString: true,
-          //   message: str,
-          //   type: "error"
-          // });
-        })
-    },
-    importfxx(e) {
-      let _this = this
-      _this.updataobj.isshow = true
-      _this.updataobj.loadingtext = '解析数据中，请耐心等待...'
-      console.log(event)
-      var myevent = event
-      setTimeout(() => {
-        // _this.$refs.inputer.value = "";
-        let inputDOM = _this.$refs.inputer
-        // 通过DOM取文件数据
-        console.log(myevent)
-        _this.file = myevent.target.files[0]
-        console.log(_this.file)
-        _this.filename = _this.file.name
-        var rABS = false //是否将文件读取为二进制字符串
-        var f = _this.file
-        var reader = new FileReader()
-        //if (!FileReader.prototype.readAsBinaryString) {
-        FileReader.prototype.readAsBinaryString = function(f) {
-          var binary = ''
-          var rABS = false //是否将文件读取为二进制字符串
-          var wb //读取完成的数据
-          var outdata
-          var reader = new FileReader()
-          reader.onload = function(e) {
-            var bytes = new Uint8Array(reader.result)
-            var length = bytes.byteLength
-            for(var i = 0; i < length; i++) {
-              binary += String.fromCharCode(bytes[i])
-            }
-            var XLSX = require('xlsx')
-            if(rABS) {
-              wb = XLSX.read(btoa(fixdata(binary)), {
-                //手动转化
-                type: 'base64'
-              })
-            } else {
-              wb = XLSX.read(binary, {
-                type: 'binary'
-              })
-            }
-            outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) //outdata就是你想要的东西
-            console.log('outdata', outdata)
-            //							outdata.splice(0, 1)
-
-            function getdateOfBirth(value1) {
-              if(value1) {
-                var y = value1.substring(6, 10)
-                var m = value1.substring(10, 12)
-                var d = value1.substring(12, 14)
-                var days = y + '-' + m + '-' + d
-                return days
-              } else {
-                var days = ''
-                return days
-              }
-            }
-
-            function standardization(value1) {
-              if(value1 && value1.length == 8) {
-                var y = value1.substring(0, 4)
-                var m = value1.substring(4, 6)
-                var d = value1.substring(6, 8)
-                var days = y + '-' + m + '-' + d
-                console.log(days)
-                return days
-              } else {
-                var days = ''
-                return days
-              }
-            }
-
-            outdata.forEach(e => {
-              var de = {
-                localCenterCode: String(e.门店编码 || ''),
-                date: "",
-                numberMorning: Number(e.上午 || ''),
-                numberAfternoon: Number(e.下午 || ''),
-                //									detailAdress: e.所属街道 + '',
-                //									rollOutHospital: e['转出医院（方舱）'],
-                //									rollOutTime: e.转出时间 + '',
-
-              }
-              if(e.预约日期) {
-                console.log("预约日期", e.预约日期);
-                de.date = _this.getFormatDate(
-                  _this.exceldataParse(e.预约日期)
-                );
-              }
-              // console.log(de)
-
-              _this.goodXlsx.push(de)
-              //								if(de.localCenterCode) {
-              //
-              //
-              //									_this.goodXlsx.push(de)
-              //
-              //
-              //									console.log(_this.goodXlsx)
-              //								} else {
-              //									_this.badXlsx.push(de)
-              //
-              //								}
-              _this.rightWord = true
-            })
-            //							_this.verifyImport();
-            _this.updataobj.isshow = false
-            _this.updataobj.loadingtext = ''
-          }
-          reader.readAsArrayBuffer(f)
-        }
-        if(rABS) {
-          reader.readAsArrayBuffer(f)
-        } else {
-          reader.readAsBinaryString(f)
-        }
-      }, 100)
-    },
-    getFormatDate(date) {
-      console.log(5555555555)
-      console.log(date)
-      // var date = new Date();
-      var seperator1 = "/";
-      console.log(5555555555)
-      var year = date.getFullYear();
-      var month = date.getMonth() + 1;
-      var strDate = date.getDate();
-      if(month >= 1 && month <= 9) {
-        month = "0" + month;
-      }
-      if(strDate >= 0 && strDate <= 9) {
-        strDate = "0" + strDate;
-      }
-      var currentdate = year + seperator1 + month + seperator1 + strDate;
-      return currentdate;
-    },
-    exceldataParse(date) {
-      console.log(date)
-      console.log(/^\d{1,5}$/.test(date))
-      console.log(parseInt(date) - 1)
-      console.log(/^\d{4}(0[0-9]|1[0-2])([0-3][0-9])?$/.test(date))
-      let result = "";
-      if(/^\d{1,5}$/.test(date)) {
-        result = new Date(1900, 0, parseInt(date) - 1);
-        console.log(result)
-      } else if(/^\d{4}(0[0-9]|1[0-2])([0-3][0-9])?$/.test(date)) {
-        if(date.length === 6) {
-          date = date.slice(0, 4) + "/" + date.slice(4);
-        } else {
-          date =
-            date.slice(0, 4) + "/" + data.slice(4, 6) + "/" + date.slice(6);
-        }
-        result = new Date(date);
-      } else {
-        result = new Date(date);
-      }
-      if(isNaN(result.getFullYear())) {
-        return null;
-      }
-      return result;
-    },
-    //批量导入员工数据
-    importEmployee() {
-      //    this.UploadForm.company = "";
-      //    if (this.$store.getters.getRoleInfo.AccountType == "3") {
-      //      this.UploadForm.company = this.$store.getters.getRoleInfo.AccountName;
-      //    }
-      this.dialogImportEmployee = true
-    },
     closeimport() {
       this.$refs.inputer.value = ''
       this.filename = ''
@@ -1140,271 +523,8 @@ export default {
       this.rightWord = false
       this.dialogImportEmployee = false
     },
-    returnAllUsers() {
-      this.$refs.inputer.value = ''
-      this.filename = ''
-      this.goodXlsx = []
-      this.badXlsx = []
-      this.errorFile = false
-      this.rightWord = false
-      document.getElementById('upload').click()
-    },
-    // 下载模板
-    DownloadTemplate() {
-      // console.log(
-      //   this.$parent.$parent.$parent.weburl +
-      //     "/film/web/downloadXlsx?xlsxName=EmployeeTemplate.xlsx"
-      // );
-      // window.open(
-      //   this.$parent.$parent.$parent.weburl +
-      //     "/film/web/downloadXlsx?xlsxName=EmployeeTemplate.xlsx"
-      // );
 
-      //				var body = {
-      //
-      //
-      //						}
-      //						this.$api
-      //							.get('/xinguan/DownLoad', body)
-      //							.then(res => {
-      //								console.log(res)
-      //								if(res.code == 200) {
-      //
-      //
-      //								}
-      //							})
-      //							.catch(err => {
-      //								console.log(err)
-      //							})
 
-      var xhr = new XMLHttpRequest()
-      var str = ''
-
-      xhr.open('GET', this.$parent.$parent.$parent.weburl + '/manage/DownLoadFile?id=5', true) //也可以使用POST方式，根据接口
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-      xhr.responseType = 'blob' //返回类型blob
-      xhr.onload = function() {
-        console.log(11111111111)
-        //定义请求完成的处理函数
-        if(this.status === 200) {
-          console.log(2222222222222)
-          var blob = this.response
-          if(blob.size > 0) {
-            var reader = new FileReader()
-            reader.readAsDataURL(blob) // 转换为base64，可以直接放入a标签href
-            reader.onload = function(e) {
-              // 转换完成，创建一个a标签用于下载
-              var a = document.createElement('a')
-              var newDate = new Date()
-              a.download = '上传导入预约信息模板' + '.xlsx'
-              a.href = e.target.result
-              document.body.appendChild(a)
-              // $("body").append(a); // 修复firefox中无法触发click
-              a.click()
-              // $(a).remove();
-              a.remove()
-              // window.location.reload();
-            }
-          } else {
-            // window.location.reload();
-          }
-        }
-      }
-      xhr.send()
-    },
-    // 门店导出
-    EmployeeExport() {
-      var that = this;
-      console.log(this.paiqiID);
-      //              console.log(this.$parent.$data.weburl);
-      var body = {
-        mjId: this.paiqiID,
-      }
-      this.$api
-        .get("/MSJschedule/exportJschedulesData", body)
-        .then(res => {
-          console.log(res.data);
-          //  window.open(this.$parent.$parent.$parent.weburl  + res.data.url);
-          let a = document.createElement("a");
-          //  console.log(require("../assets/qrcode.png"));
-          a.href = res.data; // href链接指向的地址
-          a.download = res.data; // 下载的的名称
-          a.click(); // 触发a标签的单击事件
-        })
-        .catch(err => {
-          console.log("err", err);
-        });
-    },
-
-    //查询所有--一级类目
-    queryAllCheckDirFir() {
-      this.selectPhysical.FirstTypeList = [{
-        value: "全部",
-        label: "全部"
-      }];
-      this.$api.post("/manage/queryAllCheckDirFir").then(res => {
-        console.log(res);
-        if(res.code == "200") {
-          res.data.map(item => {
-            var temp = {
-              value: item.checktypefirst,
-              label: item.checktypefirst
-            };
-            this.selectPhysical.FirstTypeList.push(temp);
-          });
-          //        if (this.isedit || this.$route.query.copy) {
-          //          this.manageQueryGoodById(this.$route.query.goodsid);
-          //        } else {
-          //          this.GetOneByName();
-          //          this.firstTxtisshow = true;
-          //        }
-        }
-      });
-    },
-    //确认选择的体检项目btn
-    confirmProjectBtn() {
-      console.log(this.selectPhysical.projectList);
-      console.log(this.MSJschedules[this.index]);
-      console.log(this.selectPhysical.selectProjectList);
-      console.log(this.selectPhysical.selectProjectList_show);
-      var selectProjectListTemp = [];
-
-      console.log(this.selectPhysical.selectProjectList);
-      console.log(selectProjectListTemp);
-
-      //				this.MSJschedules[this.index].containingProjects = this.selectPhysical.selectProjectList
-
-      this.selectPhysical.isshow = false;
-
-      if(this.MSJschedules[this.index].containingProjects.length > 0) {
-
-        this.MSJschedules[this.index].containingProjects.map((item, index) => {
-
-          this.MSJschedules[this.index].projectsName.map((itm, idx) => {
-            if(index==idx){
-              var obj = {
-
-                label: itm,
-                value: item
-
-              }
-              this.selectPhysical.projectList.push(obj)
-
-            }
-
-          });
-
-        });
-      }
-      console.log(this.selectPhysical.projectList);
-      if(this.selectPhysical.selectProjectList.length > 0) {
-        this.selectPhysical.selectProjectList.map((item, index) => {
-          this.selectPhysical.projectList.map((itm, idx) => {
-            if(item == itm.value) {
-              var obj = {
-                label: itm.label,
-                value: itm.value
-              }
-
-              selectProjectListTemp.push(obj)
-            }
-          });
-        });
-
-      }
-
-      this.selectPhysical.selectProjectList_show = selectProjectListTemp
-      console.log(this.selectPhysical.selectProjectList_show);
-      console.log(this.selectPhysical.selectProjectList);
-      console.log(this.selectPhysical.projectList);
-
-    },
-    //Closeshop
-    Closeshop(obj) {
-      console.log(obj);
-      console.log(this.selectPhysical.selectProjectList_show);
-      //				if(this.$route.query.look) {} else {
-      this.selectPhysical.selectProjectList_show.map((item, index) => {
-        if(item.value == obj) {
-          console.log(index);
-          this.selectPhysical.selectProjectList_show.splice(index, 1);
-        }
-      });
-      console.log(this.selectPhysical.selectProjectList_show);
-      //				}
-    },
-    //选择体检项目按钮
-    selectPhysicalBtn() {
-      this.selectPhysical.loading = true;
-      console.log(this.selectPhysical.confirmProjectList);
-      console.log(this.selectPhysical.projectList);
-      console.log(this.selectPhysical.selectProjectList);
-      //				this.selectPhysical.selectProjectList = [];
-      this.selectPhysical.confirmProjectList.map(item => {
-        this.selectPhysical.selectProjectList.push(item.checkid);
-      });
-      this.selectPhysical.addPhysical = false;
-      this.selectPhysical.isshowtable = false;
-      this.selectPhysical.isshow = true;
-
-      console.log(this.MSJschedules[this.index])
-      this.selectPhysical.projectList = [];
-      this.selectPhysical.projectcurrentPage = 1;
-      this.selectPhysical.FirstTypeValue = "";
-      this.selectPhysical.SecondTypevalue = "";
-      this.ProjectListQuery("1"); //查询体检项目
-    },
-    //查询体检项目列表
-    ProjectListQuery(bool) {
-      console.log(this.selectPhysical.projectList);
-      var that = this;
-      var body = {
-        companyId: this.companyId.toString(),
-        localCenterCode: this.localCenterCode,
-        //					checkname: this.selectPhysical.seekPackageName,
-        //					checkgender: this.selectPhysical.seeksex,
-        //					page: 1,
-        //					pagesize: 99999999,
-        //      instname: this.AddGoodsmsg.Filiale
-      };
-      this.$api.get("/MSJschedule/findEnterPackage", body).then(res => {
-        console.log(res);
-        if(res.code == "200") {
-          console.log(res);
-          console.log(res.data);
-          this.selectPhysical.loading = false;
-          //							this.selectPhysical.projectList = res.data;
-          //						this.selectPhysical.projectCount = res.data.count;
-          console.log(this.selectPhysical.projectList);
-          if(res.data.length > 0) {
-            res.data.map((item, index) => {
-              var obj = {
-                label: item.goodname,
-                value: item.goodid,
-                key: item.goodid,
-
-              }
-              this.selectPhysical.projectList.push(obj)
-              //								this.selectPhysical.projectList[index].key = item.goodid;
-              //								this.selectPhysical.projectList[index].label = item.goodname
-            });
-          }
-
-          console.log(this.selectPhysical.projectList);
-          // if (bool == "1") {
-          // }
-        } else {
-          console.log(898989898)
-          this.selectPhysical.loading = false;
-          this.$message.error(res.msg);
-        }
-      })
-        .catch(err => {
-          console.log(898989898)
-          this.selectPhysical.loading = false;
-          //						this.$message.error(err.msg);
-        });
-    },
     fun_date: function(date2, aa) { //查看几天前的日期
       function PrefixInteger(num, n) { //在数值前面加个0
         return(Array(n).join(0) + num).slice(-n);
@@ -1415,13 +535,13 @@ export default {
     },
 
     matchingdata(dayList, dayData) {
-      //								console.log(dayList)
+      								console.log(dayList)
       //				console.log(dayData)
       //				console.log(this.megliast)
       //				console.log(this.megliast.leadTime)
       //				console.log(this.megliast.endTime)
-      var start = this.fun_date(new Date(this.megliast.startTime.substring(0, 10)), this.megliast.leadTime)
-      var end = this.megliast.endTime.substring(0, 10)
+      // var start = this.fun_date(new Date(this.megliast.startTime.substring(0, 10)), this.megliast.leadTime)
+      var end = this.changeTime(this.TimePickervalue1[1]).substring(0, 10)
       //				console.log(start)
       //				console.log(new Date(dayData))
       //				console.log(start)
@@ -1442,250 +562,26 @@ export default {
         return false
       }
       //				console.log(dayList)
-      // return true
+      return true
 
     },
     selectweek() {
       console.log(this.ruleForm.week)
     },
 
-    affirmamend() {
-      var that = this;
-      console.log(this.paiqiID)
 
-      var body = {
-        appointmentDate: this.choicetiem,
-        mjID: this.paiqiID,
-        numberMorning: parseInt(this.modificationM),
-        numberAfternoon: parseInt(this.modificationA),
+    selectDate(val, dataval) {
+      console.log(56565656)
 
-      };
-      this.$api
-        .get("/MSJschedule/setDailySchedule", body)
-        .then(res => {
-          this.isdate = false
-          this.getmessage()
-          console.log(res);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
-    getmessage() {
-      var that = this;
-      var body = {
-        storeId: that.storeId,
-        companyId: that.companyId,
-      };
-      this.$api
-        .get("/MSJschedule/findMSJschedules", body)
-        .then(res => {
-          console.log(res.data)
-          console.log(that.MSJschedules)
-          var taocanTemp = [];
-          that.MSJschedules = [];
-          console.log(that.editableTabs)
-          that.editableTabs = [];
-          //						if(that.MSJschedules.length > 1) {
-          //
-          //							that.MSJschedules.splice(2, that.MSJschedules.length);
-          //						}
-          console.log(that.MSJschedules)
-          that.editableTabs.push({
-            title: '人工排期',
-            name: 'selected',
-          }, {
-            title: '全国单排期干预',
-            name: 'commonality',
-          }),
-
-            console.log(that.activeName)
-          // var taocanTemp = res.data.additional.concat();
-          if(res.data.length > 0) {
-            for(var i = 0; i < res.data.length; i++) {
-              const newObj = JSON.parse(JSON.stringify(res.data[i]));
-              taocanTemp.push(newObj)
-
-            }
-          }
-
-          console.log(taocanTemp)
-
-          var tempArray = [];
-          if(taocanTemp.length > 0) {
-            for(var i = 0; i < taocanTemp.length; i++) {
-              tempArray.push(taocanTemp[i].scheduleName)
-
-              if(taocanTemp[i].scheduleName != "selected" && taocanTemp[i].scheduleName != "commonality") {
-                //								console.log(taocanTemp[i])
-
-                if(taocanTemp[i].scheduleName) {
-                  //										that.MSJschedules.push(taocanTemp[i])
-                  var tablist = {
-                    title: taocanTemp[i].scheduleName,
-                    name: taocanTemp[i].scheduleName,
-                  }
-
-                  that.editableTabs.push(tablist)
-                }
-
-                //								console.log(that.editableTabs)
-                if(that.activeName == taocanTemp[i].scheduleName) {
-                  console.log(1111111111111)
-                  that.days = taocanTemp[i].showDays
-                  that.megliast = taocanTemp[i]
-                  that.paiqiID = taocanTemp[i].id
-                  that.selectPhysical.selectProjectList = taocanTemp[i].containingProjects
-                  that.whetherOpen = taocanTemp[i].whetherOpen.toString()
-                }
-              } else if(taocanTemp[i].scheduleName == "selected" || taocanTemp[i].scheduleName == "commonality") {
-
-                if(that.activeName == "selected") {
-                  if(taocanTemp[i].scheduleName == "selected") {
-
-                    //										that.MSJschedules.splice(, 1);
-                    console.log(that.MSJschedules)
-                    //											that.MSJschedules.push(taocanTemp[i])
-                    console.log(that.MSJschedules)
-                    console.log(22222222222222)
-                    that.days = taocanTemp[i].showDays
-                    that.megliast = taocanTemp[i]
-                    that.paiqiID = taocanTemp[i].id
-                    that.selectPhysical.selectProjectList = taocanTemp[i].containingProjects
-                    that.whetherOpen = taocanTemp[i].whetherOpen.toString()
-                    console.log(that.megliast)
-                  }
-
-                } else if(that.activeName == "commonality") {
-
-                  if(taocanTemp[i].scheduleName == "commonality") {
-                    //										that.MSJschedules.splice(1, 1);
-                    //											that.MSJschedules.push(taocanTemp[i])
-                    console.log(33333333333333)
-                    that.days = taocanTemp[i].showDays
-                    that.megliast = taocanTemp[i]
-                    that.paiqiID = taocanTemp[i].id
-                    that.selectPhysical.selectProjectList = taocanTemp[i].containingProjects
-                    that.whetherOpen = taocanTemp[i].whetherOpen.toString()
-                    console.log(that.megliast)
-                  }
-
-                }
-
-              }
-
-            }
-
-            for(var i = 0; i < tempArray.length; i++) {
-              if(tempArray.indexOf("selected") == -1) {
-                taocanTemp.push({
-                  scheduleName: "selected",
-                  id: '',
-                  whetherOpen: '2',
-                  storeId: "",
-                  schedulingType: 1,
-                  containingProjects: [],
-                  leadTime: "",
-                  startTime: "",
-                  endTime: "",
-                  numberMorning: "",
-                  remarksMon: "",
-                  numberAfternoon: "",
-                  remarksAft: "",
-                  weekS: [1, 2, 3, 4, 5],
-                })
-              }
-              if(tempArray.indexOf("commonality") == -1) {
-                taocanTemp.push({
-                  scheduleName: "commonality",
-                  id: '',
-                  whetherOpen: '2',
-                  storeId: "",
-                  schedulingType: 2,
-                  containingProjects: [],
-                  leadTime: "",
-                  startTime: "",
-                  endTime: "",
-                  numberMorning: "",
-                  remarksMon: "",
-                  numberAfternoon: "",
-                  remarksAft: "",
-                  weekS: [1, 2, 3, 4, 5],
-                })
-              }
-
-            }
-          } else {
-            taocanTemp.push({
-              scheduleName: "selected",
-              id: '',
-              whetherOpen: '2',
-              storeId: "",
-              schedulingType: 1,
-              containingProjects: [],
-              leadTime: "",
-              startTime: "",
-              endTime: "",
-              numberMorning: "",
-              remarksMon: "",
-              numberAfternoon: "",
-              remarksAft: "",
-              weekS: [1, 2, 3, 4, 5],
-            }, {
-              scheduleName: "commonality",
-              id: '',
-              whetherOpen: '2',
-              storeId: "",
-              schedulingType: 2,
-              containingProjects: [],
-              leadTime: "",
-              startTime: "",
-              endTime: "",
-              numberMorning: "",
-              remarksMon: "",
-              numberAfternoon: "",
-              remarksAft: "",
-              weekS: [1, 2, 3, 4, 5],
-            })
-          }
-          that.MSJschedules = taocanTemp
-          console.log(that.MSJschedules)
-          var obj = {};
-          that.MSJschedules = that.MSJschedules.reduce(function(item, next) {
-            obj[next.scheduleName] ? '' : obj[next.scheduleName] = true && item.push(next);
-            return item;
-          }, []);
-
-          var obj_editableTabs = {};
-          that.editableTabs = that.editableTabs.reduce(function(item, next) {
-            obj_editableTabs[next.name] ? '' : obj_editableTabs[next.name] = true && item.push(next);
-            return item;
-          }, []);
-
-          console.log(that.selectPhysical.selectProjectList)
-          console.log(that.MSJschedules)
-          console.log(that.editableTabs)
-
-          console.log(res);
-          console.log(that.megliast);
-          console.log(that.days);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
-    selectDate(val, dataval, id) {
-      this.paiqiID = id
       console.log(val)
       console.log(dataval)
-      console.log(id)
-      console.log(this.paiqiID)
+
       if(val.type == "current-month") {
         this.timechina = val.day.substring(0, 4) + '年' + val.day.substring(5, 7) + '月' + val.day.substring(8, 10) + '日'
         this.choicetiem = val.day
-        if(this.matchingdata(this.days, val.day)) {
-          this.modificationM = dataval.numberMorning
-          this.modificationA = dataval.numberAfternoon
+        if(this.matchingdata(this.AllHospitalMsg.days, val.day)) {
+          this.modificationM = dataval.limit_mor
+          this.modificationA = dataval.limit_aft
           this.isdate = true
         }
 
@@ -1728,55 +624,96 @@ export default {
       console.log(this.editableTabs)
       // this.affirmadd()
     },
+    calculateDays(e){
+      console.log(e)
+      var startDate=e[0]
+      var stopDate=e[1]
+      Date.prototype.addDays = function (days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+      }
+
+      Date.prototype.shortDate = function () {
+        return `${this.getFullYear()}-${(this.getMonth() + 1).toString().padStart(2, '0')}-${this.getDate().toString().padStart(2, '0')}`;
+      }
+
+      console.log(new Date("2020-01-01").shortDate());
+
+
+        var dateArray = new Array();
+        var currentDate = startDate;
+        while (currentDate <= stopDate) {
+          dateArray.push(new Date(currentDate).shortDate());
+          currentDate = currentDate.addDays(1);
+        }
+       console.log(dateArray)
+       this.combinSchedule(dateArray)
+        // return dateArray;
+
+    },
+    combinSchedule(dateArray){
+      console.log(this.AllHospitalMsg.maxHC_mor)
+      console.log(this.AllHospitalMsg.maxHC_aft)
+      var schedule=[];
+      if(dateArray.length>0){
+        var obj1={};
+        var obj2={};
+        dateArray.map((item,index)=>{
+
+          obj1={
+            date:item,
+            session:1,
+            headcount:Number(this.AllHospitalMsg.maxHC_mor)
+          }
+          obj2={
+            date:item,
+            session:2,
+            headcount:Number(this.AllHospitalMsg.maxHC_aft)
+          }
+          schedule.push(obj1)
+          schedule.push(obj2)
+
+         })
+        this.AllHospitalMsg.schedule=schedule;
+        console.log(schedule)
+        console.log(this.AllHospitalMsg.schedule)
+
+
+      }
+    },
     generate(e) {
       var that = this;
+
+      console.log(this.TimePickervalue1)
+
+      // this.changeTime(this.TimePickervalue1[0])
+
       console.log(11111111111)
       var index = "";
       console.log(e)
 
-      for(var i = 0; i < this.MSJschedules.length; i++) {
-        console.log(this.MSJschedules[i].scheduleName)
-        if(e == this.MSJschedules[i].scheduleName) {
-          index = i
-
-        }
-
-      }
-      console.log(this.MSJschedules[index])
-
-      console.log(this.MSJschedules[index].numberAfternoon.toString())
-      console.log(this.MSJschedules[index].numberMorning)
       console.log(11111111111)
-      if(this.MSJschedules[index].weekS.length == 0) {
+      if(!this.AllHospitalMsg.hospitalCode) {
         that.$message({
           type: 'info',
-          message: '请输入每周可约天数！'
-        });
-        return;
-      }
-      if(!this.MSJschedules[index].leadTime) {
-        that.$message({
-          type: 'info',
-          message: '提前可约天数需为2-30之间的整数！'
-        });
-        return;
-      }
-      if(!this.MSJschedules[index].startTime) {
-        that.$message({
-          type: 'info',
-          message: '请输入预约开始时间！'
-        });
-        return;
-      }
-      if(!this.MSJschedules[index].endTime) {
-        that.$message({
-          type: 'info',
-          message: '请输入预约结束时间！'
+          message: '请选择分院!'
         });
         return;
       }
 
-      if(!this.MSJschedules[index].numberMorning.toString()) {
+      if(this.TimePickervalue1_model.length==0) {
+        that.$message({
+          type: 'info',
+          message: '请输入配置日期！'
+        });
+        return;
+      }else{
+
+      }
+
+
+      if(!this.AllHospitalMsg.maxHC_mor.toString()) {
         console.log(11111111111)
         that.$message({
           type: 'info',
@@ -1784,7 +721,7 @@ export default {
         });
         return;
       }
-      if(!this.MSJschedules[index].numberAfternoon.toString()) {
+      if(!this.AllHospitalMsg.maxHC_aft.toString()) {
         console.log(2222222222222)
         that.$message({
           type: 'info',
@@ -1792,57 +729,16 @@ export default {
         });
         return;
       }
-      console.log(this.MSJschedules)
+
       this.$confirm('确定立即生效吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.calculateDays(this.TimePickervalue1_model)
 
-        //					var body = {
-        //						phone: e.phone,
-        //
-        //					};
-        //					this.$api
-        //						.post("/schindler/removeSchindler", body)
-        //						.then(res => {
-        //							console.log(res)
-        //							if(res.code == 200) { 
+        this.generate_add(index);
 
-        console.log(this.MSJschedules)
-
-        console.log(index)
-        console.log(11111111111)
-        console.log(this.MSJschedules[index])
-        console.log(this.MSJschedules[index].id)
-
-        var MSJschedulesTemp = []
-        if(this.selectPhysical.selectProjectList_show.length >= 0) {
-          this.selectPhysical.selectProjectList_show.map(item => {
-            MSJschedulesTemp.push(item.value)
-          })
-          this.MSJschedules[index].containingProjects = MSJschedulesTemp
-        }
-
-        console.log(this.MSJschedules[index].containingProjects)
-
-        //					return;
-        if(this.MSJschedules[index].id) {
-          this.generate_edit(index);
-          console.log(33333333333333)
-        } else {
-          this.generate_add(index);
-          console.log(55555555555555)
-        }
-        console.log(index)
-        console.log(this.MSJschedules[index])
-        //
-        //							}
-        //
-        //						})
-        //						.catch(err => {
-        //							console.log(err);
-        //						});
 
       }).catch(() => {
         this.$message({
@@ -1854,71 +750,294 @@ export default {
     },
     generate_add(index) {
       console.log(index)
+      console.log(this.AllHospitalMsg.hospitalCode)
+      console.log(this.AllHospitalMsg.schedule)
       var that = this;
 
       var body = {
-        MSJschedules: [{
-          whetherOpen: Number(this.whetherOpen),
-          storeId: this.storeId,
-          schedulingType: this.MSJschedules[index].schedulingType,
-          containingProjects: this.MSJschedules[index].containingProjects,
-          leadTime: Number(this.MSJschedules[index].leadTime),
-          startTime: this.MSJschedules[index].startTime,
-          endTime: this.MSJschedules[index].endTime,
-          numberMorning: Number(this.MSJschedules[index].numberMorning),
-          remarksMon: this.MSJschedules[index].remarksMon,
-          numberAfternoon: Number(this.MSJschedules[index].numberAfternoon),
-          remarksAft: this.MSJschedules[index].remarksAft,
-          scheduleName: that.activeName,
-          weekS: this.MSJschedules[index].weekS,
-        }]
+        hospitalCode:this.AllHospitalMsg.hospitalCode,
+        schedules:this.AllHospitalMsg.schedule,
+
       };
-      this.$api
-        .post("/MSJschedule/insertMSJschedules", body)
+      this.$network3
+        .post("/mnoracle/schedule/Config", body)
         .then(res => {
           console.log(res);
-          that.getmessage()
+          that.getCalendar()
         })
         .catch(err => {
           console.log(err);
         });
     },
-    generate_edit(index) {
-      console.log(index)
-      console.log(this.MSJschedules[index])
-
+    getCalendar(){
       var that = this;
+      var tt=this.changeTime(this.value);
 
+      console.log(tt)
+      var end = tt.substring(0, 7)
+      console.log(end)
+      this.AllHospitalMsg.current_month=end
       var body = {
-        MSJschedules: [{
-          whetherOpen: Number(this.whetherOpen),
-          storeId: this.storeId,
-          id: this.MSJschedules[index].id,
-          schedulingType: this.MSJschedules[index].schedulingType,
-          containingProjects: this.MSJschedules[index].containingProjects,
-          leadTime: Number(this.MSJschedules[index].leadTime),
-          startTime: this.MSJschedules[index].startTime,
-          //                      startTime: "2020-04-25 23:16:36",
-          //						endTime: "2020-04-30 23:16:36",
-          endTime: this.MSJschedules[index].endTime,
-          numberMorning: Number(this.MSJschedules[index].numberMorning),
-          remarksMon: this.MSJschedules[index].remarksMon,
-          numberAfternoon: Number(this.MSJschedules[index].numberAfternoon),
-          remarksAft: this.MSJschedules[index].remarksAft,
-          scheduleName: that.activeName,
-          weekS: this.MSJschedules[index].weekS,
-          dayS: this.MSJschedules[index].dayS,
-        }]
+        hospitalCode:this.AllHospitalMsg.hospitalCode,
+        month:this.AllHospitalMsg.current_month,
+        startDate: "",
+        endDate: "",
+        // startDate:this.changeTime(this.TimePickervalue1[0]),
+        // endDate:this.changeTime(this.TimePickervalue1[1]),
+
       };
-      this.$api
-        .post("/MSJschedule/updateMSJschedules", body)
+      this.$network3
+        .post("/mnoracle/schedule/Calendar", body)
         .then(res => {
           console.log(res);
-          that.getmessage()
+          console.log(res.data)
+          if (res.data) {
+            console.log(res.data.length-1)
+            console.log(res.data[res.data.length-1].date)
+
+            // this.TimePickervalue1[0]=res.data[0].date
+            // this.TimePickervalue1[1]=res.data[res.data.length-1].date
+            this.AllHospitalMsg.days=[];
+            var taocanTemp = [];
+
+            for (var i = 0; i < res.data.length; i++) {
+              const newObj = JSON.parse(JSON.stringify(res.data[i]));
+              taocanTemp.push(newObj)
+
+            }
+          var days=[];
+            let tempArr = [], newArr = [] ,anArray=[],suplusArray=[]
+            for (let i = 0; i < taocanTemp.length; i++) {
+              // console.log(that.TimePickervalue1)
+              // console.log(typeof that.TimePickervalue1)
+              that.TimePickervalue1.push(taocanTemp[0].date)
+              that.TimePickervalue1.push(taocanTemp[taocanTemp.length-1].date)
+
+              if (tempArr.indexOf(taocanTemp[i].date) === -1) {
+
+
+
+                newArr.push(taocanTemp[i])
+                tempArr.push(taocanTemp[i].date);
+              } else {
+                suplusArray.push(taocanTemp[i].date)
+                anArray.push(taocanTemp[i])
+
+              }
+
+              // newArr.push(obj)
+            }
+            console.log(tempArr)
+            console.log(newArr)
+            console.log(anArray)
+            var obj={
+              date:'',
+              limit_mor:'',
+              limit_aft:'',
+              sched_mor:'',
+              sched_aft:'',
+              indSched_mor:'',
+              indSched_aft:'',
+              remain_mor:'',
+              remain_aft:'',
+              descs_mor:'',
+              descs_aft:'',
+            }
+            let daysArray=[]
+            for (var i = 0; i < newArr.length;i++){
+              for (var j = 0; j < anArray.length;j++){
+                // console.log(suplusArray);
+                // console.log(newArr[i].date);
+                if(suplusArray.indexOf(newArr[i].date) == -1){
+                  console.log(newArr[i].date);
+                  var obj={
+                    date:'',
+                    limit_mor:'',
+                    limit_aft:'',
+                    sched_mor:'',
+                    sched_aft:'',
+                    indSched_mor:'',
+                    indSched_aft:'',
+                    remain_mor:'',
+                    remain_aft:'',
+                    descs_mor:'',
+                    descs_aft:'',
+                  }
+
+                    if(newArr[i].session===1){
+
+                      obj.date=newArr[i].date
+                      obj.limit_mor=newArr[i].limit
+                      obj.sched_mor=newArr[i].sched
+                      obj.indSched_mor=newArr[i].indSched
+                      obj.remain_mor=newArr[i].remain
+                      obj. descs_mor=newArr[i].descs
+                      obj.limit_aft=""
+                      obj.sched_aft=""
+                      obj.indSched_aft=""
+                      obj.remain_aft=""
+                      obj. descs_aft=""
+
+                    }else if(newArr[i].session===2){
+                      obj.date=newArr[i].date
+                      obj.limit_mor=""
+                      obj.sched_mor=""
+                      obj.indSched_mor=""
+                      obj.remain_mor=""
+                      obj. descs_mor=""
+                      obj.limit_aft=newArr[i].limit
+                      obj.sched_aft=newArr[i].sched
+                      obj.indSched_aft=newArr[i].indSched
+                      obj.remain_aft=newArr[i].remain
+                      obj. descs_aft=newArr[i].descs
+                    }
+                    console.log(obj);
+                    daysArray.push(obj)
+
+
+                }
+                if(newArr[i].date==anArray[j].date){
+                  // console.log(newArr[i]);
+                  var obj={
+                    date:'',
+                    limit_mor:'',
+                    limit_aft:'',
+                    sched_mor:'',
+                    sched_aft:'',
+                    indSched_mor:'',
+                    indSched_aft:'',
+                    remain_mor:'',
+                    remain_aft:'',
+                    descs_mor:'',
+                    descs_aft:'',
+                  }
+                  if(newArr[i].session===1){
+
+                    obj.date=newArr[i].date
+                    obj.limit_mor=newArr[i].limit
+                    obj.sched_mor=newArr[i].sched
+                    obj.indSched_mor=newArr[i].indSched
+                    obj.remain_mor=newArr[i].remain
+                    obj. descs_mor=newArr[i].descs
+                    obj.limit_aft=anArray[j].limit
+                    obj.sched_aft=anArray[j].sched
+                    obj.indSched_aft=anArray[j].indSched
+                    obj.remain_aft=anArray[j].remain
+                    obj. descs_aft=anArray[j].descs
+
+                  }else if(newArr[i].session===2){
+                    obj.date=newArr[i].date
+                    obj.limit_mor=anArray[j].limit
+                    obj.sched_mor=anArray[j].sched
+                    obj.indSched_mor=anArray[j].indSched
+                    obj.remain_mor=anArray[j].remain
+                    obj. descs_mor=anArray[j].descs
+                    obj.limit_aft=newArr[i].limit
+                    obj.sched_aft=newArr[i].sched
+                    obj.indSched_aft=newArr[i].indSched
+                    obj.remain_aft=newArr[i].remain
+                    obj. descs_aft=newArr[i].descs
+                  }
+                  daysArray.push(obj)
+                }
+
+              }
+            }
+            console.log(daysArray);
+
+            var obj_days= {};
+            daysArray =  daysArray.reduce(function(item, next) {
+              obj_days[next.date] ?  '' : obj_days[next.date] = true && item.push(next);
+              return item;
+            }, []);
+            console.log(daysArray);
+            this.AllHospitalMsg.days=daysArray;
+            console.log(this.AllHospitalMsg.days);
+
+          }else{
+            this.AllHospitalMsg.days=[];
+          }
         })
         .catch(err => {
           console.log(err);
         });
+
+    },
+    affirmamend() {
+      var that = this;
+      console.log(this.paiqiID)
+      this.AllHospitalMsg.schedules_modify=[];
+      var Obj_schedules_modify_mor={
+        date:this.choicetiem,
+        session:1,
+        headcount:this.modificationM
+      }
+      var Obj_schedules_modify_aft={
+        date:this.choicetiem,
+        session:2,
+        headcount:this.modificationA
+      }
+      this.AllHospitalMsg.schedules_modify.push(Obj_schedules_modify_mor)
+      this.AllHospitalMsg.schedules_modify.push(Obj_schedules_modify_aft)
+      console.log(this.AllHospitalMsg.schedules_modify)
+      var body = {
+        hospitalCode: this.AllHospitalMsg.hospitalCode,
+        schedules: this.AllHospitalMsg.schedules_modify,
+
+
+      };
+      this.$network3
+        .post("/mnoracle/schedule/Config", body)
+        .then(res => {
+          this.isdate = false
+          that.getCalendar()
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    changeTime(day){
+      console.log(day)
+      // console.log(day1)
+      var dayString=day.toString();
+      if(dayString.indexOf("中国标准时间")==-1){
+        console.log(dayString)
+        var day1 = new Date(day);
+        day=day1
+      }
+
+
+      console.log(day)
+
+      var Year = 0;
+      var Month = 0;
+      var Day = 0;
+      var CurrentDate = "";
+      //初始化时间
+      //Year= day.getYear();//有火狐下2008年显示108的bug
+      Year = day.getFullYear(); //ie火狐下都可以
+      Month = day.getMonth() + 1;
+      Day = day.getDate();
+      CurrentDate += Year + "-";
+      if (Month >= 10)
+      {
+        CurrentDate += Month + "-";
+      }
+      else
+      {
+        CurrentDate += "0" + Month + "-";
+      }
+      if (Day >= 10)
+      {
+        CurrentDate += Day;
+      }
+      else
+      {
+        CurrentDate += "0" + Day;
+      }
+      console.log(CurrentDate)
+      return CurrentDate
     },
     goback() { //返回
       this.$router.go(-1);
@@ -2071,7 +1190,21 @@ export default {
       return NumberToChinese(num);
     },
   },
-  watch: {}
+  watch: {
+    value: {
+      handler(newName, oldName) {
+        console.log(this.value)
+
+          this.getCalendar();
+
+           console.log(this.value)
+        　　},
+        immediate: true
+      }
+
+
+
+  }
 };
 </script>
 <style lang="scss">
