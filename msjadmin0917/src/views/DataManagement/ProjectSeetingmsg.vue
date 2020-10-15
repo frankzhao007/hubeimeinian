@@ -4,21 +4,7 @@
 			<i @click="gotoback" class="el-icon-my-back backbtn"></i><span>&nbsp&nbsp&nbsp新增/编辑项目</span>
 		</div>
 		<div style="margin-top:20px">
-
 			<el-form :model="projectmsgobj" label-position='right' label-width="150px" size="medium">
-
-				<el-form-item label="* 一级类目：">
-					<el-select v-model="projectmsgobj.checktypefirst" clearable @visible-change="CheckTypeFirs_CHANGE(projectmsgobj.checktypefirst)" placeholder="请选择一级类目" style="width:200px">
-						<el-option v-for="item in CheckTypeFirstArray" :key="item.value" :label="item.label" :value="item.value">
-						</el-option>
-					</el-select>
-				</el-form-item>
-				<el-form-item label="* 二级类目：">
-					<el-select v-model="projectmsgobj.checktypesec" clearable :disabled="projectmsgobj.ChooseCheckTypeSecondShow" @change="CheckTypeSecond" @visible-change="CheckTypeSecond" placeholder="请选择二级类目" style="width:200px">
-						<el-option v-for="item in CheckTypeSecondArray" :key="item.value" :label="item.label" :value="item.value">
-						</el-option>
-					</el-select>
-				</el-form-item>
 				<el-form-item label="* 项目代码：">
 					<el-input v-model="projectmsgobj.ITEM_ID" placeholder="请填写" style="width:200px" clearable></el-input>
 				</el-form-item>
@@ -27,29 +13,29 @@
 				</el-form-item>
 				<!--* 指标代码changToWord(index+1)-->
 				<div style=" ">
-					<div v-if="projectmsgobj.SUBITEM.length==1" style="margin-right: 15px; float: left;margin-bottom: 20px" v-for="(item,index) in projectmsgobj.SUBITEM">
-						<div style="width:350px;margin-right: 15px; float: left;">
+				<div v-if="projectmsgobj.SUBITEM.length==1" style="margin-right: 15px; float: left;margin-bottom: 20px" v-for="(item,index) in projectmsgobj.SUBITEM">
+					<div style="width:350px;margin-right: 15px; float: left;">
 							<el-form-item :label="'* 指标代码'+' '+changToWord(index+1)+':'">
-								<el-input v-model="item.CHECK_ID" placeholder="请填写" style="width:200px"></el-input>
+							<el-input v-model="item.CHECK_ID" placeholder="请填写" style="width:200px"></el-input>
 							</el-form-item>
 							<el-form-item :label="'* 明细指标名称'+' '+changToWord(index+1)+':'">
 								<el-input v-model="item.CHECK_ITEM" placeholder="请填写" style="width:200px"></el-input>
 							</el-form-item>
-						</div>
-
-					</div>
-					<div v-if="projectmsgobj.SUBITEM.length>1" style="margin-right: 15px; float: left;margin-bottom: 20px;" v-for="(item,index) in projectmsgobj.SUBITEM">
-						<div style="width:350px;margin-right: 15px; float: left;">
+					</div>		
+				  
+				</div>
+				<div v-if="projectmsgobj.SUBITEM.length>1" style="margin-right: 15px; float: left;margin-bottom: 20px;" v-for="(item,index) in projectmsgobj.SUBITEM">
+					<div style="width:350px;margin-right: 15px; float: left;">
 							<el-form-item :label="'* 指标代码'+' '+changToWord(index+1)+':'">
-								<el-input v-model="item.CHECK_ID" placeholder="请填写" style="width:200px"></el-input>
+							<el-input v-model="item.CHECK_ID" placeholder="请填写" style="width:200px"></el-input>
 							</el-form-item>
 							<el-form-item :label="'* 明细指标名称'+' '+changToWord(index+1)+':'">
 								<el-input v-model="item.CHECK_ITEM" placeholder="请填写" style="width:200px"></el-input>
 							</el-form-item>
-						</div>
-						<div @click="decreaseItem(index)" style="cursor:pointer;border-radius:2px;width: 30px;height: 30px;background: #BC1E21;color: #FFFFFF;line-height: 30px;text-align: center;font-size: 26px;float: left;">-</div>
-					</div>
-
+					</div>		
+					<div @click="decreaseItem(index)"   style="cursor:pointer;border-radius:2px;width: 30px;height: 30px;background: #BC1E21;color: #FFFFFF;line-height: 30px;text-align: center;font-size: 26px;float: left;">-</div>
+				</div>
+				
 				</div>
 				<!--v-if="projectmsgobj.SUBITEM.length>0"-->
 				<div v-if="projectmsgobj.SUBITEM.length>0" @click="addItem" style="cursor:pointer;border-radius:2px;width: 30px;height: 30px;background: #2299DD;color: #FFFFFF;line-height: 30px;text-align: center;font-size: 26px;float: left;">+</div>
@@ -154,30 +140,20 @@
 		},
 		data() {
 			return {
-				val1: '',
-				value1: '',
-				isEditCode: "",
-				isEditProject: true,
+				isEditCode:"",
+				isEditProject:true,
 				effectiveTimeShow: false,
-				effectiveTimeLastLegth: 0,
+				effectiveTimeLastLegth:0,
 				endTimeShow: false,
-				endTimeLastLegth: 0,
-				ChooseCheckTypeSecondShow: true,
+				endTimeLastLegth:0,
+
 				effectiveTime: '',
 				endTime: '',
 				isadd: false,
-				CheckTypeFirstArray: [],
-				CheckTypeSecondArray: [],
-				checktypefirst_old:'',
 				projectmsgobj: {
-					ChooseCheckTypeSecondShow: true,
-					checktypesec: '',
-					//					CheckTypeSecond: [],
-					checktypefirst: '',
-					//					CheckTypeFirstArray: [],
-					targetCode: '',
-					//					effectiveTime: '',
-					//					endTime: '',
+					targetCode:'',
+//					effectiveTime: '',
+//					endTime: '',
 					MSJID: "",
 					CHECK_ITEM: "",
 					CREATETIME: "",
@@ -188,19 +164,19 @@
 					ITEM_NAME: "",
 					MUTEX_ITEM: [], //互斥项
 					PRICE: "",
-					RELATED_ITEM: [], //关联项
+					RELATED_ITEM: [],//关联项
 					SERIALNUMBER: "",
 					SIGNIFICANCE: "",
 					XB: "",
-					SUBITEM: [{
-						CHECK_ITEM: '',
-						CHECK_ID: ''
-					}]
-
+					SUBITEM:[{
+						CHECK_ITEM:'',
+						CHECK_ID:''
+					} ]
+					
 				},
 				isshowselectItem: false,
 				selectlist: [],
-				chooseItem: [],
+				chooseItem:[],
 				tag: "",
 				ischange: false
 			};
@@ -212,10 +188,6 @@
 
 		},
 		watch: {
-			val1(val, oval) {
-				this.value1 = val
-			},
-
 			effectiveTime(val) {
 				console.log(val)
 				console.log(this.effectiveTime)
@@ -224,11 +196,9 @@
 		},
 		mounted() {
 			console.log(this.$route.query.isadd);
-
 			if(this.$route.query.isadd == "true") {
 				this.isadd = true;
 				this.ischange = false;
-				this.CheckTypeFirst()
 			} else {
 				this.isadd = false;
 				this.projectmsgobj.MSJID = this.$route.query.MSJID;
@@ -236,284 +206,198 @@
 			}
 		},
 		methods: {
-			CheckTypeFirs_CHANGE(val) {
-				console.log(val)
-				console.log(this.projectmsgobj)
-				console.log(this.projectmsgobj.CheckTypeFirstArray)
-				console.log(this.projectmsgobj.checktypefirst)
-				if(this.projectmsgobj.checktypefirst) {
-					console.log(this.projectmsgobj.checktypefirst)
-					console.log(this.checktypefirst_old)
-						if(this.projectmsgobj.checktypefirst!=this.checktypefirst_old){
-					       this.projectmsgobj.checktypesec=""
-						}
-					
-					this.projectmsgobj.ChooseCheckTypeSecondShow = false;
-				} else {
-					this.projectmsgobj.ChooseCheckTypeSecondShow = true;
-				}
+			decreaseItem(index){
+				this.projectmsgobj.SUBITEM.splice(index,1)
 				
-				this.checktypefirst_old=this.projectmsgobj.checktypefirst
- 
-
 			},
-			CheckTypeSecond() {
-				console.log('checktypesec')
-				if(this.projectmsgobj.checktypefirst) {
-					var body = {
-
-						firstName: this.projectmsgobj.checktypefirst
-					}
-					this.$api
-						.get("/QueryCheckTypeSecondList", body)
-						.then(res => {
-							console.log(res);
-							if(res.code == 200) {
-								this.CheckTypeSecondArray = [];
-								//							this.projectmsgobj.CheckTypeFirst = res.data || [];
-
-								if(res.data.length > 0) {
-									res.data.forEach((item, index) => {
-										var obj = {}
-										obj.label = item
-										obj.value = item
-										this.CheckTypeSecondArray.push(obj)
-									})
-								}
-								console.log(this.projectmsgobj.CheckTypeSecondArray);
-							} else {
-								this.$message.error(err.msg);
-							}
-						})
-						.catch(err => {
-							console.log(err);
-							this.$message.error(err.msg);
-						});
-
-				} else {
-					this.$message.error("请先选择一级类目");
-					return;
-				}
-
-			},
-			CheckTypeFirst() {
-				this.$api
-					.get("/QueryCheckTypeFirstList")
-					.then(res => {
-						console.log(res);
-						if(res.code == 200) {
-							this.projectmsgobj.CheckTypeFirstArray = [];
-							var CheckTypeFirstArray = [];
-							//							this.projectmsgobj.CheckTypeFirst = res.data || [];
-
-							if(res.data.length > 0) {
-								res.data.forEach((item, index) => {
-									var obj = {}
-									obj.label = item
-									obj.value = item
-									CheckTypeFirstArray.push(obj)
-								})
-							}
-							this.CheckTypeFirstArray = CheckTypeFirstArray;
-							console.log(this.projectmsgobj.CheckTypeFirstArray);
-						} else {
-							this.$message.error(err.msg);
-						}
-					})
-					.catch(err => {
-						console.log(err);
-						this.$message.error(err.msg);
-					});
-
-			},
-			decreaseItem(index) {
-				this.projectmsgobj.SUBITEM.splice(index, 1)
-
-			},
-			addItem() {
-
+			addItem(){
+				
 				this.projectmsgobj.SUBITEM.push({
-					CHECK_ITEM: '',
-					CHECK_ID: ''
+					CHECK_ITEM:'',
+					CHECK_ID:''
 				})
 			},
 			changToWord(section) {
-				var chnNumChar = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
-				var chnUnitSection = ["", "万", "亿", "万亿", "亿亿"];
-				var chnUnitChar = ["", "十", "百", "千"];
-				var strIns = '',
-					chnStr = '';
-				var unitPos = 0;
-				var zero = true;
-				console.log(section)
-				if(section > 9 && section <= 19) {
-					var chnStrTemp = ""
-					while(section > 0) {
-						var v = section % 10;
-						if(v === 0) {
-							if(!zero) {
-								zero = true;
-								chnStr = chnNumChar[v] + chnStr;
-								console.log(chnStr)
-							}
-						} else {
-
-							zero = false;
-							console.log(section)
-							strIns = chnNumChar[v];
-							strIns += chnUnitChar[unitPos];
-							console.log(strIns)
-							console.log(chnStr)
-							chnStr = strIns + chnStr;
-							console.log(chnStr)
-							console.log(chnStr.length)
-							var str = chnStr.substr(0, 1)
-							var str1 = chnStr.substr(1, chnStr.length)
-
-							console.log(str1)
-							chnStrTemp = str1
-							console.log(chnStr)
-
-						}
-						unitPos++;
-						section = Math.floor(section / 10);
-					}
-					chnStr = chnStrTemp
-				} else {
-					while(section > 0) {
-						var v = section % 10;
-						if(v === 0) {
-							if(!zero) {
-								zero = true;
-								chnStr = chnNumChar[v] + chnStr;
-								console.log(chnStr)
-							}
-						} else {
-							zero = false;
-							console.log(section)
-							strIns = chnNumChar[v];
-							strIns += chnUnitChar[unitPos];
-							chnStr = strIns + chnStr;
-							console.log(chnStr)
-
-						}
-						unitPos++;
-						section = Math.floor(section / 10);
-					}
-
-				}
-
-				console.log(chnStr)
-				return chnStr;
-			},
-			endTimeinput(e) {
-				var endTime = this.endTime;
-				var eTemp = e
-				console.log(this.endTimeLastLegth)
+                var chnNumChar = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+                var chnUnitSection = ["", "万",  "亿", "万亿",  "亿亿"];
+                var chnUnitChar = ["", "十", "百", "千"];
+                var strIns = '',
+                    chnStr = '';
+                var unitPos = 0;
+                var zero = true;
+                console.log(section)
+                if(section>9&&section<=19){
+                   var chnStrTemp=""
+                  while(section > 0) {
+                    var v = section % 10;
+                    if(v === 0) {
+                        if(!zero) {
+                            zero = true;
+                            chnStr =  chnNumChar[v] + chnStr;
+                            console.log(chnStr)
+                        }
+                    }
+                    else {
+                       
+                            zero = false;
+                            console.log(section)
+                        strIns = chnNumChar[v];
+                        strIns +=  chnUnitChar[unitPos];
+                        console.log(strIns)
+                        console.log(chnStr)
+                        chnStr = strIns +  chnStr;
+                        console.log(chnStr)
+                        console.log(chnStr.length)
+                        var str=chnStr.substr(0,1)
+                        var  str1=chnStr.substr(1,chnStr.length)
+                        
+                        console.log(str1)
+                        chnStrTemp=str1
+                        console.log(chnStr)
+                         
+                    }
+                    unitPos++;
+                    section = Math.floor(section  / 10);
+                }
+                  chnStr=chnStrTemp
+                }else{
+                   while(section > 0) {
+                    var v = section % 10;
+                    if(v === 0) {  
+                        if(!zero) {
+                            zero = true;
+                            chnStr =  chnNumChar[v] + chnStr;
+                            console.log(chnStr)
+                        }
+                    }
+                    else {
+                            zero = false;
+                            console.log(section)
+                        strIns = chnNumChar[v];
+                        strIns +=  chnUnitChar[unitPos];
+                        chnStr = strIns +  chnStr;
+                        console.log(chnStr)
+                        
+                    }
+                    unitPos++;
+                    section = Math.floor(section  / 10);
+                }
+                  
+                }
+                
+                console.log(chnStr)
+                return chnStr;
+            },
+			endTimeinput(e){
+				var endTime= this.endTime;
+		        var eTemp=e
+		        console.log(this.endTimeLastLegth)
 				console.log(endTime.length)
-				if(this.endTimeLastLegth < endTime.length) {
-					this.endTimeShow = false
-				} else {
-					this.endTimeShow = true
-				}
+		        if(this.endTimeLastLegth<endTime.length){
+		        	this.endTimeShow = false
+		        }else{
+		        	this.endTimeShow = true
+		        }
 				console.log(e)
 				console.log(this.endTimeShow)
 				console.log(e.length)
-
+ 				
 				if(this.endTimeShow == false) {
 					if(e.length == 5) {
 						this.endTime = this.endTime.substring(0, 4) + "-";
 
 					} else if(e.length == 8) {
-						var temp = e;
+						var temp=e;
 						console.log(88888888888888)
-						this.endTime = temp.substring(0, 4) + "-" + temp.substring(5, 7) + "-";
-					} else if(e.length >= 10) {
-						this.endTime = this.endTime.substring(0, 4) + "-" + this.endTime.substring(5, 7) + "-" + this.endTime.substring(8, 10);
-						if(Number(this.effectiveTime.substring(8, 10)) > 31) {
-							this.effectiveTime = this.effectiveTime.substring(0, 4) + "-" + this.effectiveTime.substring(5, 7) + "-"
+						this.endTime = temp.substring(0, 4) + "-"+temp.substring(5, 7)+ "-";
+					} else if(e.length >=10) {
+						this.endTime = this.endTime.substring(0, 4) + "-"+this.endTime.substring(5, 7)+ "-"+this.endTime.substring(8, 10);
+					    if(Number(this.effectiveTime.substring(8, 10))>31){
+							this.effectiveTime = this.effectiveTime.substring(0, 4) + "-"+this.effectiveTime.substring(5, 7)+ "-"
 						}
 					}
 
 				} else {
 					console.log(e.length)
-					if(e.length == 8) {
-						//this.effectiveTime=this.effectiveTime.substring(0,7)
+					if(e.length==8){
+					//this.effectiveTime=this.effectiveTime.substring(0,7)
 					}
-					if(e.length == 5) {
-						// this.effectiveTime=this.effectiveTime.substring(0,4)
+					if(e.length==5){
+					// this.effectiveTime=this.effectiveTime.substring(0,4)
 					}
 
 				}
 				if(e.length > 10) {
 					// this.effectiveTimeShow = true
 					this.endTime = e.substring(0, 10)
-					if(Number(this.effectiveTime.substring(8, 10)) > 31) {
-						this.effectiveTime = this.effectiveTime.substring(0, 4) + "-" + this.effectiveTime.substring(5, 7) + "-"
-					}
+					if(Number(this.effectiveTime.substring(8, 10))>31){
+							this.effectiveTime = this.effectiveTime.substring(0, 4) + "-"+this.effectiveTime.substring(5, 7)+ "-"
+						}
 				}
-				this.endTimeLastLegth = this.endTime.length
+				this.endTimeLastLegth=this.endTime.length
 				console.log(e)
 				console.log(this.endTime)
-
+				
 			},
 			effectiveTimeinput(e) {
-				var effectiveTime = this.effectiveTime;
-				var eTemp = e
-				console.log(this.effectiveTimeLastLegth)
-				console.log(effectiveTime.length)
-				if(this.effectiveTimeLastLegth < effectiveTime.length) {
-					this.effectiveTimeShow = false
-				} else {
-					this.effectiveTimeShow = true
-				}
+		        var effectiveTime= this.effectiveTime;
+		        var eTemp=e
+		        console.log(this.effectiveTimeLastLegth)
+						console.log(effectiveTime.length)
+		        if(this.effectiveTimeLastLegth<effectiveTime.length){
+		        	this.effectiveTimeShow = false
+		        }else{
+		        	this.effectiveTimeShow = true
+		        }
 				console.log(e)
 				console.log(this.effectiveTimeShow)
 				console.log(e.length)
-
+				
+				 
 				if(this.effectiveTimeShow == false) {
 					console.log(this.effectiveTime)
 					console.log(e.length)
 					console.log(this.effectiveTime.substring(4, 5))
 					if(e.length == 5) {
-						this.effectiveTime = this.effectiveTime.substring(0, 4) + "-" + this.effectiveTime.substring(4, 5);
+						this.effectiveTime = this.effectiveTime.substring(0, 4) + "-"+this.effectiveTime.substring(4, 5);
 
 					} else if(e.length == 8) {
-						var temp = e;
+						var temp=e;
 						console.log(88888888888888)
-						this.effectiveTime = temp.substring(0, 4) + "-" + temp.substring(5, 7) + "-" + temp.substring(7, 8);
-						if(Number(this.effectiveTime.substring(5, 7)) > 12) {
-							this.effectiveTime = temp.substring(0, 4) + "-"
+						this.effectiveTime = temp.substring(0, 4) + "-"+temp.substring(5, 7)+ "-"+temp.substring(7, 8);
+						if(Number(this.effectiveTime.substring(5, 7))>12){
+							this.effectiveTime = temp.substring(0, 4)+ "-"
 						}
-					} else if(e.length >= 10) {
+					} else if(e.length >=10) {
 						console.log(88888888888888)
-						this.effectiveTime = this.effectiveTime.substring(0, 4) + "-" + this.effectiveTime.substring(5, 7) + "-" + this.effectiveTime.substring(8, 10);
-						if(Number(this.effectiveTime.substring(8, 10)) > 31) {
-							this.effectiveTime = this.effectiveTime.substring(0, 4) + "-" + this.effectiveTime.substring(5, 7) + "-"
+						this.effectiveTime = this.effectiveTime.substring(0, 4) + "-"+this.effectiveTime.substring(5, 7)+ "-"+this.effectiveTime.substring(8, 10);
+					   if(Number(this.effectiveTime.substring(8, 10))>31){
+							this.effectiveTime = this.effectiveTime.substring(0, 4) + "-"+this.effectiveTime.substring(5, 7)+ "-"
 						}
 					}
 
 				} else {
 					console.log(e.length)
-					if(e.length == 8) {
-						// this.effectiveTime=this.effectiveTime.substring(0,7)
+					if(e.length==8){
+					// this.effectiveTime=this.effectiveTime.substring(0,7)
 					}
-					if(e.length == 5) {
-						// this.effectiveTime=this.effectiveTime.substring(0,4)
+					if(e.length==5){
+					// this.effectiveTime=this.effectiveTime.substring(0,4)
 					}
+   
 
 				}
 				if(e.length > 10) {
 					console.log(this.effectiveTime)
 					// this.effectiveTimeShow = true
 					this.effectiveTime = e.substring(0, 10)
-					if(Number(this.effectiveTime.substring(8, 10)) > 31) {
-						this.effectiveTime = this.effectiveTime.substring(0, 4) + "-" + this.effectiveTime.substring(5, 7) + "-"
-					}
+					if(Number(this.effectiveTime.substring(8, 10))>31){
+						 this.effectiveTime = this.effectiveTime.substring(0, 4) + "-"+this.effectiveTime.substring(5, 7)+ "-"
+						}
 				}
-				this.effectiveTimeLastLegth = this.effectiveTime.length
-				console.log(e)
-				console.log(this.effectiveTime)
+					this.effectiveTimeLastLegth=this.effectiveTime.length
+					console.log(e)
+					console.log(this.effectiveTime)
 
 			},
 			delprojectitem(index) {
@@ -539,10 +423,10 @@
 				this.isshowselectItem = data;
 			},
 			selectglbtn() {
-				console.log(this.projectmsgobj.RELATED_ITEM);
-				console.log(this.projectmsgobj.MUTEX_ITEM);
+				 console.log(this.projectmsgobj.RELATED_ITEM);
+				 console.log(this.projectmsgobj.MUTEX_ITEM);
 
-				this.chooseItem = this.projectmsgobj.MUTEX_ITEM;
+				this.chooseItem=this.projectmsgobj.MUTEX_ITEM;
 				this.selectlist = this.projectmsgobj.RELATED_ITEM;
 				console.log(this.projectmsgobj.RELATED_ITEM);
 				this.isshowselectItem = true;
@@ -553,28 +437,14 @@
 				console.log(this.selectlist)
 				console.log(this.projectmsgobj.MUTEX_ITEM);
 				console.log(this.projectmsgobj.RELATED_ITEM);
-				this.chooseItem = this.projectmsgobj.RELATED_ITEM;
+				this.chooseItem=this.projectmsgobj.RELATED_ITEM;
 				this.selectlist = this.projectmsgobj.MUTEX_ITEM;
 				this.isshowselectItem = true;
 				this.tag = "hc";
 				console.log(this.selectlist)
 			},
 			verify() {
-				var that = this;
-				if(!this.projectmsgobj.checktypefirst) {
-					this.$message({
-						message: '请输入一级类目',
-						type: 'warning'
-					});
-					return false;
-				}
-				if(!this.projectmsgobj.checktypesec) {
-					this.$message({
-						message: '请输入二级类目',
-						type: 'warning'
-					});
-					return false;
-				}
+				var that=this;
 				if(!this.projectmsgobj.ITEM_ID) {
 					this.$message({
 						message: '请输入项目代码',
@@ -589,44 +459,44 @@
 					});
 					return false;
 				}
-				//				if(!this.projectmsgobj.targetCode) {
-				//					this.$message({
-				//						message: '请输入指标代码',
-				//						type: 'warning'
-				//					});
-				//					return false;
-				//				}
-				if(this.projectmsgobj.SUBITEM.length > 0) {
-
-					for(var i = 0; i < this.projectmsgobj.SUBITEM.length; i++) {
-						if(!this.projectmsgobj.SUBITEM[i].CHECK_ITEM) {
-							var index = that.changToWord(i + 1)
+//				if(!this.projectmsgobj.targetCode) {
+//					this.$message({
+//						message: '请输入指标代码',
+//						type: 'warning'
+//					});
+//					return false;
+//				}
+				if(this.projectmsgobj.SUBITEM.length>0){
+				 
+					for(var i=0;i<this.projectmsgobj.SUBITEM.length;i++){
+						if(!this.projectmsgobj.SUBITEM[i].CHECK_ITEM){
+							var index=that.changToWord(i+1)
 							this.$message({
-								message: '请输入明细指标名称' + index,
-								type: 'warning'
-							});
-
-							return false;
+							message: '请输入明细指标名称'+index,
+							type: 'warning'
+						});
+						 
+						return false;
 						}
-						if(!this.projectmsgobj.SUBITEM[i].CHECK_ID) {
-							var index = that.changToWord(i + 1)
+						if(!this.projectmsgobj.SUBITEM[i].CHECK_ID){
+							var index=that.changToWord(i+1)
 							this.$message({
-								message: '请输入指标代码' + index,
-								type: 'warning'
-							});
-
-							return false;
+							message: '请输入指标代码'+index,
+							type: 'warning'
+						});
+				 
+						return false;
 						}
 					}
-
+					 
 				}
-				//				if(!this.projectmsgobj.targetName) {
-				//					this.$message({
-				//						message: '请输入明细指标名称',
-				//						type: 'warning'
-				//					});
-				//					return false;
-				//				}
+//				if(!this.projectmsgobj.targetName) {
+//					this.$message({
+//						message: '请输入明细指标名称',
+//						type: 'warning'
+//					});
+//					return false;
+//				}
 				if(!this.projectmsgobj.DRCC) {
 					this.$message({
 						message: '请输入成本系数',
@@ -668,10 +538,10 @@
 				if(this.isadd) {
 					//新增时
 					var body = {
-						//						targetName:this.projectmsgobj.targetName,
-						//						targetCode:this.projectmsgobj.targetCode,
-						effectiveTime: this.effectiveTime,
-						endTime: this.endTime,
+//						targetName:this.projectmsgobj.targetName,
+//						targetCode:this.projectmsgobj.targetCode,
+						effectiveTime:this.effectiveTime,
+						endTime:this.endTime,
 						CHECK_ITEM: this.projectmsgobj.CHECK_ITEM,
 						DRCC: this.projectmsgobj.DRCC,
 						HYZK: this.projectmsgobj.HYZK,
@@ -683,9 +553,7 @@
 						// SERIALNUMBER: this.projectmsgobj.SERIALNUMBER,
 						SIGNIFICANCE: this.projectmsgobj.SIGNIFICANCE,
 						XB: this.projectmsgobj.XB,
-						SUBITEM: this.projectmsgobj.SUBITEM,
-						checktypefirst: this.projectmsgobj.checktypefirst,
-						checktypesec: this.projectmsgobj.checktypesec
+						SUBITEM:this.projectmsgobj.SUBITEM
 					};
 					this.projectmsgobj.MUTEX_ITEM.map(item => {
 						body.MUTEXS.push(item.ITEM_ID);
@@ -696,10 +564,10 @@
 				} else {
 					//编辑时
 					var body = {
-						//						targetName:this.projectmsgobj.targetName,
-						//						targetCode:this.projectmsgobj.targetCode,
-						effectiveTime: this.effectiveTime,
-						endTime: this.endTime,
+//						targetName:this.projectmsgobj.targetName,
+//						targetCode:this.projectmsgobj.targetCode,
+						effectiveTime:this.effectiveTime,
+						endTime:this.endTime,
 						MSJID: this.projectmsgobj.MSJID,
 						CHECK_ITEM: this.projectmsgobj.CHECK_ITEM,
 						CREATETIME: this.projectmsgobj.CREATETIME,
@@ -714,9 +582,7 @@
 						SERIALNUMBER: this.projectmsgobj.SERIALNUMBER,
 						SIGNIFICANCE: this.projectmsgobj.SIGNIFICANCE,
 						XB: this.projectmsgobj.XB,
-						SUBITEM: this.projectmsgobj.SUBITEM,
-						checktypefirst: this.projectmsgobj.checktypefirst,
-						checktypesec: this.projectmsgobj.checktypesec
+						SUBITEM:this.projectmsgobj.SUBITEM
 					};
 					console.log(this.projectmsgobj.MUTEX_ITEM);
 					console.log(this.projectmsgobj.RELATED_ITEM);
@@ -753,14 +619,10 @@
 						console.log(res);
 						if(res.code == 200) {
 							this.projectmsgobj = res.data;
-							if(this.projectmsgobj.checktypefirst == "") {
-								this.projectmsgobj.ChooseCheckTypeSecondShow = true
-							}
-							this.checktypefirst_old=this.projectmsgobj.checktypefirst
-							this.effectiveTime = res.data.effectiveTime;
-							this.isEditCode = res.data.ITEM_ID;
-							this.endTime = res.data.endTime;
-							this.CheckTypeFirst();
+							this.effectiveTime= res.data.effectiveTime;
+							this.isEditCode=res.data.ITEM_ID;
+				      this.endTime= res.data.endTime;
+ 
 							setTimeout(() => {
 								this.ischange = false;
 								console.log("-----------------");
@@ -832,33 +694,6 @@
 			// RELATED_ITEM
 			// SIGNIFICANCE
 			// XB
-			"projectmsgobj.checktypesec": {
-				handler(newval) {
-					console.log('改变了');
-					console.log(newval);
-					console.log(this.projectmsgobj.checktypefirst);
-					if(this.projectmsgobj.checktypefirst) {
-						this.projectmsgobj.ChooseCheckTypeSecondShow = false
-					}
-				},
-				deep: true,
-				immediate: true,
-
-			},
-			"projectmsgobj.checktypefirst": {
-				handler(newval) {
-					console.log('改变了');
-					console.log(newval);
-//					this.projectmsgobj.checktypesec=""
-					console.log(this.projectmsgobj.checktypefirst);
-					if(this.projectmsgobj.checktypefirst) {
-						this.projectmsgobj.ChooseCheckTypeSecondShow = false
-					}
-				},
-				deep: true,
-				immediate: true,
-
-			},
 			"projectmsgobj.CHECK_ITEM": {
 				handler(nvl, ovl) {
 					console.log(nvl);

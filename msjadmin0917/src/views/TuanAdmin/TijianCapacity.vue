@@ -701,7 +701,6 @@ export default {
         });
         return;
       }
-
       if(this.TimePickervalue1_model.length==0) {
         that.$message({
           type: 'info',

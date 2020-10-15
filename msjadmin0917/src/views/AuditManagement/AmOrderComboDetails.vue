@@ -18,10 +18,10 @@
       <el-table :data="tableobj1.list" style="width: 100%" v-loading="tableobj1.loading" max-height="500px" ref="singleTable" highlight-current-row @current-change="handleCurrentChange">
         <el-table-column prop="ID" label="序号" width="80px"></el-table-column>
         <el-table-column prop="GROUPNAME" label="套餐名称"></el-table-column>
-        <el-table-column label="性别">
+        <el-table-column label="类别">
           <template slot-scope="scope">
             <el-select v-model="scope.row.OP_DATETIME" placeholder="" :disabled="true" style="width:100%" size="mini">
-              <el-option label="通用" value="0"></el-option>
+              <el-option label="全部" value="0"></el-option>
               <el-option label="男" value="1"></el-option>
               <el-option label="女" value="2"></el-option>
             </el-select>
@@ -37,38 +37,16 @@
             </el-select>
           </template>
         </el-table-column>
-        <el-table-column prop="OLDPRICE" label="原价">
-          <template slot-scope="scope">
-            <div style="max-width: 200px;border: 1px solid #E4E7ED;background-color:#F5F7FA;padding-left: 10px ;color: #C0C4CC;">
-              {{scope.row.calculateOldprice}}
-            </div>
-<!--            <el-input v-model="scope.row.OLDPRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>-->
-          </template>
-        </el-table-column>
-        <el-table-column prop="PRICE" label="结算价">
+        <el-table-column prop="PRICE" label="成交价">
           <template slot-scope="scope">
             <el-input v-model="scope.row.PRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
           </template>
         </el-table-column>
-        <el-table-column prop="OLDPRICE" label="套餐折扣率">
+        <el-table-column prop="OLDPRICE" label="原价">
           <template slot-scope="scope">
-            <div style="max-width: 200px;border: 1px solid #E4E7ED;background-color:#F5F7FA;padding-left: 10px ;color: #C0C4CC;">
-              {{toFixed((scope.row.PRICE/scope.row.calculateOldprice)*100)}}%
-            </div>
-<!--            <el-input v-model="toFixed(scope.row.PRICE/yuanjiachange(scope.row.details)*100)" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>-->
+            <el-input v-model="scope.row.OLDPRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
           </template>
         </el-table-column>
-        <el-table-column prop="costCoefficient" v-if="role=='财务'" label="成本系数">
-        	<template slot-scope="scope">
-            <el-input  v-model="scope.row.costCoefficient" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
-          </template>
-        </el-table-column>
-        <el-table-column prop="costCoefficientRate" v-if="role=='财务'" label="成本系数率">
-        	<template slot-scope="scope">
-            <el-input v-model="scope.row.costCoefficientRate" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
-          </template>
-        </el-table-column>
-
       </el-table>
       <!-- <div style="height:30px;margin-top:20px;">
         <el-pagination style="float:right" @size-change="" @current-change="" :current-page="tableobj1.pageindex" :page-sizes="[10, 20, 30, 40]" :page-size="tableobj1.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="tableobj1.total">
@@ -80,7 +58,7 @@
         <span style="font-size:20px;line-height:40px">套餐明细</span>
         <span style="margin-left:20px">总计：{{tableobj2.list.length||0}}&nbsp&nbsp项</span>
         <span style="margin-left:20px">原价：{{yuanjiachange()}}&nbsp&nbsp元</span>
-        <span style="margin-left:20px">结算价：{{chengjiaochange()}}&nbsp&nbsp元</span>
+        <span style="margin-left:20px">成交价：{{chengjiaochange()}}&nbsp&nbsp元</span>
         <!--<div style="float:right">
           <el-button type="text" icon="el-icon-plus" @click="addcombodetail" :disabled="tableobj1.loading">新增</el-button>
           <el-button type="text" icon="el-icon-plus">下载美年项目表</el-button>
@@ -142,9 +120,9 @@
         <el-table-column label="性别">
           <template slot-scope="scope">
             <el-select v-model="scope.row.XB" placeholder="" :disabled="true" style="width:100%" size="mini">
-              <el-option label="男" value="2"></el-option>
+              <el-option label="男" value="0"></el-option>
               <el-option label="女" value="1"></el-option>
-              <el-option label="通用" value="0"></el-option>
+              <el-option label="未知" value="3"></el-option>
             </el-select>
           </template>
         </el-table-column>
@@ -156,9 +134,9 @@
         <el-table-column label="婚否">
           <template slot-scope="scope">
             <el-select v-model="scope.row.HYZK" placeholder=""  :disabled="true" style="width:100%" size="mini">
-              <el-option label="已婚" value="01"></el-option>
-              <el-option label="未婚" value="02"></el-option>
-               <el-option label="未知" value="03"></el-option>
+              <el-option label="已婚" value="0001"></el-option>
+              <el-option label="未婚" :value="null"></el-option>
+              <!-- <el-option label="" value="3"></el-option> -->
             </el-select>
           </template>
         </el-table-column>
@@ -298,7 +276,6 @@ export default {
   components: {},
   data() {
     return {
-    	role:'',
       isyuangong: false,
       excelselectSheetNames: "",
       excelSheetNames: [],
@@ -354,12 +331,8 @@ export default {
       this.addcomboobj.MsjBILLCODE = this.$route.query.MsjBILLCODE;
     }
     this.GetCombo();
-    this.role = this.$store.getters.getrolemsg
   },
   methods: {
-    toFixed(value){
-      return value.toFixed(2)
-    },
     importcombo(str) {
       if (str == "员工") {
         this.isyuangong = true;
@@ -593,16 +566,11 @@ export default {
       return price;
     },
     chengjiaochange() {
-    	console.log(this.currentRow);
-//    var price = 0;
-//    this.tableobj1.list.map(item => {
-//      price += Number(item.PRICE);
-//    });
-//    return price;
-     if(this.currentRow){
-     	 return this.currentRow.PRICE;
-     }
-
+      var price = 0;
+      this.tableobj1.list.map(item => {
+        price += Number(item.PRICE);
+      });
+      return price;
     },
     combonamechange(item) {
       console.log(item);
@@ -1032,22 +1000,6 @@ export default {
             this.tableobj1.list = res.data;
             this.tableobj1.loading = false;
             if (this.tableobj1.list.length > 0) {
-              this.tableobj1.list.map((item, index) => {
-
-                if(item.details.length>0){
-                  var calculateOldprice=0;
-                  for(var i=0;i<item.details.length;i++){
-
-                    calculateOldprice+=Number(item.details[i].PRICE)
-
-                  }
-                  console.log(calculateOldprice);
-                  item.calculateOldprice=calculateOldprice
-                }
-
-                console.log(this.tableobj1.list);
-              });
-
               if (this.currentRow && this.currentRow != "") {
                 this.tableobj1.list.map((item, index) => {
                   if (item.ID == this.currentRow.ID) {
@@ -1055,9 +1007,7 @@ export default {
                       this.tableobj1.list[index]
                     );
                   }
-
                 });
-
               } else {
                 this.$refs.singleTable.setCurrentRow(this.tableobj1.list[0]);
               }

@@ -190,7 +190,7 @@
             size="medium"
           >
             <el-form-item label="ID：" prop="ID">
-              <el-input v-model.trim="addEmployee.ID" placeholder="请填写" style="width:280px" ></el-input>
+              <el-input v-model="addEmployee.ID" placeholder="请填写" style="width:280px"></el-input>
             </el-form-item>
             <el-form-item label="姓名：" prop="Name">
               <el-input v-model="addEmployee.Name" placeholder="请填写" style="width:280px"></el-input>
@@ -1216,7 +1216,6 @@ export default {
     },
     //确认添加员工btn
     addEmployeeconfirmbtn() {
-    	console.log(this.addEmployee.ID)
       this.$refs["myaddEmployee"].validate(valid => {
         if (valid) {
           // alert("submit!");
