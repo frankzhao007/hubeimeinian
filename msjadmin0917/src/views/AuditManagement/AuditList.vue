@@ -570,9 +570,7 @@
 
 							})
 							if(list.length > 0) {
-                console.log(list)
 								for(var i = 0; i < list.length; i++) {
-
 									if(list[i].logs.length > 0) {
 										for(var j = 0; j < list[i].logs.length; j++) {
 											if(list[i].logs[j].type === 0) {
@@ -585,7 +583,7 @@
 													list[i].ShowStatus = list[i].logs[j].userName + "  审核拒绝"
 												}
 
-											} else if(list[i].logs[j].type === -1) {
+											} else if(list[i].logs[j].type === 1) {
 
 												list[i].ShowStatus = ""
 											}

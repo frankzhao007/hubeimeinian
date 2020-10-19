@@ -10,13 +10,13 @@
         size="medium"
       >
         <el-form-item label="单位名称：">
-          <el-input v-model="seekobj.DWMC" placeholder="请输入"></el-input>
+          <el-input v-model="seekobj.DWMC" placeholder="请输入" clearable></el-input>
         </el-form-item>
         <el-form-item label="单位代码：">
-          <el-input v-model="seekobj.DWDM" placeholder="请输入"></el-input>
+          <el-input v-model="seekobj.DWDM" placeholder="请输入" clearable></el-input>
         </el-form-item>
         <el-form-item label="排期状态：">
-          <el-select v-model="seekobj.auditStatus" placeholder="请选择">
+          <el-select v-model="seekobj.auditStatus" placeholder="请选择" >
             <el-option
               v-for="item in Status"
               :key="item.value"
@@ -53,7 +53,7 @@
       >
         >
         <el-table-column
-          prop="BILLCODE"
+          prop="MsjBILLCODE"
           label="单据号"
           min-width="140px"
         ></el-table-column>
@@ -96,11 +96,11 @@
             {{ ZXFWchange(scope.row.ZXFW) }}
           </template>
         </el-table-column>
-        <el-table-column
-          prop="DJSJ"
-          label="排期人数"
-          min-width="110px"
-        ></el-table-column>
+<!--        <el-table-column-->
+<!--          prop="DJSJ"-->
+<!--          label="排期人数"-->
+<!--          min-width="110px"-->
+<!--        ></el-table-column>-->
         <!-- <el-table-column prop="YWY_ZG_SHSJ" label="内勤审核时间" min-width="110px"></el-table-column>
         <el-table-column prop="LCDJR" label="财务审核人" min-width="100px"></el-table-column>
         <el-table-column prop="ZXWCSJ" label="财务审核时间" min-width="110px"></el-table-column>-->
@@ -199,6 +199,7 @@ export default {
         pageindex: 1,
         pagesize: 10,
       };
+      this.GetDWList();
     },
     toPQ(val) {
       this.$router.push("/ScheduleManagement/OrderSchedule?id=" + val.MsjBILLCODE);
@@ -227,6 +228,7 @@ export default {
     },
     seekbtn() {
       this.seekobj.pageindex = 1;
+      this.GetDWList();
     },
     handleCurrentTableobjChange(val) {
       console.log(val.MsjBILLCODE);

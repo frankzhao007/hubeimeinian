@@ -1,20 +1,26 @@
 <template>
-  <div style="margin:20px">
-    <div style="font-size:20px">
+  <div style="margin: 20px">
+    <div style="font-size: 20px">
       <i @click="gotoOML()" class="el-icon-my-back backbtn"></i>
       <span>&nbsp&nbsp&nbsp订单套餐信息</span>
     </div>
 
-    <div style="margin:10px 0">
+    <div style="margin: 10px 0">
       <el-button
         type="primary"
         @click="addcombo()"
-        :disabled="tableobj1.loading||auditStatus==1"
-      >新 增</el-button>
+        :disabled="tableobj1.loading || auditStatus == 1"
+        >新 增</el-button
+      >
       <!-- <el-button type="primary" @click="importcombo()" :disabled="tableobj1.loading">导入套餐</el-button> -->
       <!-- <el-button type="primary" @click="importcombo('员工')" :disabled="tableobj1.loading">导入人员</el-button> -->
       <!-- <el-button type="primary" :disabled="tableobj1.loading">审 核</el-button> -->
-      <el-button type="primary" @click="open()" :disabled="tableobj1.loading||auditStatus==1">保 存</el-button>
+      <el-button
+        type="primary"
+        @click="open()"
+        :disabled="tableobj1.loading || auditStatus == 1"
+        >保 存</el-button
+      >
 
       <!-- <el-button
         type="primary"
@@ -43,7 +49,8 @@
               v-model="scope.row.OP_DATETIME"
               @change="UpdateCombo"
               placeholder
-              style="width:100%"
+              :disabled="scope.row.locked == true"
+              style="width: 100%"
               size="mini"
             >
               <el-option label="通用" value="0"></el-option>
@@ -58,7 +65,8 @@
               v-model="scope.row.TRANS_STATUS"
               @change="UpdateCombo"
               placeholder
-              style="width:100%"
+              :disabled="scope.row.locked == true"
+              style="width: 100%"
               size="mini"
             >
               <el-option label="是" value="Y"></el-option>
@@ -70,15 +78,7 @@
         </el-table-column>
         <el-table-column prop="OLDPRICE" label="原价">
           <template slot-scope="scope">
-            <!-- <el-input
-              v-model="scope.row.OLDPRICE"
-              @blur="UpdateCombo"
-              placeholder="请填写"
-              :disabled="true"
-              style="width:100%"
-              size="mini"
-            ></el-input>-->
-            <div>{{yuanjiachange(scope.row.details)}}</div>
+            <div>{{ yuanjiachange(scope.row.details) }}</div>
           </template>
         </el-table-column>
         <el-table-column prop="PRICE" label="结算价">
@@ -87,21 +87,42 @@
               v-model="scope.row.PRICE"
               @blur="UpdateCombo"
               placeholder="请填写"
-              style="width:100%"
+              :disabled="scope.row.locked == true"
+              style="width: 100%"
               size="mini"
             ></el-input>
           </template>
         </el-table-column>
-        <el-table-column prop="costCoefficient" v-if="role=='财务'||role=='湖北销售主管'" label="成本系数"></el-table-column>
-        <el-table-column prop="costCoefficientRate" v-if="role=='财务'||role=='湖北销售主管'" label="成本系数率"></el-table-column>
+        <el-table-column prop="OLDPRICE" label="套餐折扣率">
+          <template slot-scope="scope">
+            <div>
+              {{toFixed(scope.row.PRICE / yuanjiachange(scope.row.details)*100)}}%
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="costCoefficient"
+          v-if="role == '财务' || role == '湖北销售主管'"
+          label="成本系数"
+        ></el-table-column>
+        <el-table-column
+          prop="costCoefficientRate"
+          v-if="role == '财务' || role == '湖北销售主管'"
+          label="成本系数率"
+        ></el-table-column>
         <el-table-column prop="ID" label="操作">
           <template slot-scope="scope">
             <el-button
               size="mini"
               type="text"
-              :disabled="tableobj1.loading||auditStatus==1"
+              :disabled="
+                tableobj1.loading ||
+                auditStatus == 1 ||
+                scope.row.locked == true
+              "
               @click="DeleteCombo(scope.row.ID)"
-            >删 除</el-button>
+              >删 除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -111,33 +132,59 @@
       </div>-->
     </div>
     <div>
-      <div style="margin:20px 0  0">
-        <span style="font-size:20px;line-height:40px">套餐明细</span>
-        <span style="margin-left:20px">总计：{{tableobj2.list.length||0}}&nbsp&nbsp项</span>
-        <span style="margin-left:20px">原价：{{yuanjiachange()}}&nbsp&nbsp元</span>
-        <span style="margin-left:20px" v-if="currentRow!=''">结算价：{{currentRow.PRICE}}&nbsp&nbsp元</span>
-        <span style="margin-left:20px" v-else>结算价：0&nbsp&nbsp元</span>
-        <div style="float:right">
+      <div style="margin: 20px 0 0">
+        <span style="font-size: 20px; line-height: 40px">套餐明细</span>
+        <span style="margin-left: 20px"
+          >总计：{{ tableobj2.list.length || 0 }}&nbsp&nbsp项</span
+        >
+        <span style="margin-left: 20px"
+          >原价：{{ yuanjiachange() }}&nbsp&nbsp元</span
+        >
+        <span style="margin-left: 20px" v-if="currentRow != ''"
+          >结算价：{{ currentRow.PRICE }}&nbsp&nbsp元</span
+        >
+        <span style="margin-left: 20px" v-else>结算价：0&nbsp&nbsp元</span>
+        <div style="float: right">
           <el-button
             type="primary"
             @click="selectxmobjbtn"
-            :disabled="tableobj1.loading&&tableobj1.length==0||auditStatus==1"
-          >选择体检项目</el-button>
+            :disabled="
+              (tableobj1.loading && tableobj1.length == 0) ||
+              auditStatus == 1 ||
+              currentRow.locked == true
+            "
+            >选择体检项目</el-button
+          >
           <el-button
             type="primary"
             @click="importProject()"
-            :disabled="tableobj1.loading&&tableobj1.length==0||auditStatus==1"
-          >项目导入</el-button>
+            :disabled="
+              (tableobj1.loading && tableobj1.length == 0) ||
+              auditStatus == 1 ||
+              currentRow.locked == true
+            "
+            >项目导入</el-button
+          >
           <el-button
             type="primary"
             @click="selectComboTemplate"
-            :disabled="tableobj1.loading&&tableobj1.length==0||auditStatus==1"
-          >从套餐模板中选</el-button>
+            :disabled="
+              (tableobj1.loading && tableobj1.length == 0) ||
+              auditStatus == 1 ||
+              currentRow.locked == true
+            "
+            >从套餐模板中选</el-button
+          >
           <el-button
             type="primary"
             @click="deleteClistEven"
-            :disabled="tableobj1.loading&&tableobj1.length==0||auditStatus==1"
-          >批量删除</el-button>
+            :disabled="
+              (tableobj1.loading && tableobj1.length == 0) ||
+              auditStatus == 1 ||
+              currentRow.locked == true
+            "
+            >批量删除</el-button
+          >
           <!-- <el-button type="text" icon="el-icon-plus" @click="addcombodetail" :disabled="tableobj1.loading">新增</el-button>
           <el-button type="text" icon="el-icon-plus">下载美年项目表</el-button>
           <el-button type="text" icon="el-icon-plus" @click="downloadXM()">下载项目模板</el-button>-->
@@ -154,33 +201,54 @@
         @select="handleDeleteSelectionChange"
         border
       >
-        <el-table-column type="selection" width="55" align="center" :selectable="isDel"></el-table-column>
+        <el-table-column
+          type="selection"
+          width="55"
+          align="center"
+          :selectable="isDel"
+        ></el-table-column>
         <el-table-column label="序号" align="center" width="55">
-          <template slot-scope="scope">{{scope.$index+1}}</template>
+          <template slot-scope="scope">{{ scope.$index + 1 }}</template>
         </el-table-column>
         <el-table-column label="项目代码" align="center">
           <template slot-scope="scope">
-            {{scope.row.ITEM_ID}}
+            {{ scope.row.ITEM_ID }}
             <!-- <el-select v-model="scope.row.ITEM_ID" placeholder="" style="width:200px" size="mini" filterable @change="GetComboItemDetail1(scope.row,scope.$index)">
               <el-option v-for="item in ITEM_IDlist" :label="item.ITEM_ID+'-'+item.ITEM_NAME" :value="item.ITEM_ID" :key="item.ITEM_ID"></el-option>
             </el-select>-->
             <!-- <el-input v-model="scope.row.ITEM_ID" placeholder="请填写" style="width:200px" size="mini" @change="GetComboItemDetail(scope.row,scope.$index)"></el-input> -->
           </template>
         </el-table-column>
-        <el-table-column prop="ITEM_NAME" label="项目名称" align="center"></el-table-column>
+        <el-table-column
+          prop="ITEM_NAME"
+          label="项目名称"
+          align="center"
+        ></el-table-column>
         <el-table-column prop="SUBITEM" label="详细描述" align="center">
           <template slot-scope="scope">
-            <span v-if="scope.row.SUBITEM!=null&&scope.row.SUBITEM.length!=0">
-              <span v-for="item in scope.row.SUBITEM">{{item.CHECK_ITEM}}</span>
+            <span
+              v-if="scope.row.SUBITEM != null && scope.row.SUBITEM.length != 0"
+            >
+              <span v-for="item in scope.row.SUBITEM">{{
+                item.CHECK_ITEM
+              }}</span>
             </span>
             <span v-else>无</span>
           </template>
         </el-table-column>
-        <el-table-column prop="PRICE" label="项目价格" align="center"></el-table-column>
-        <el-table-column label="成本系数" v-if="role=='财务'||role=='湖北销售主管'" align="center">
+        <el-table-column
+          prop="PRICE"
+          label="项目价格"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          label="成本系数"
+          v-if="role == '财务' || role == '湖北销售主管'"
+          align="center"
+        >
           <template slot-scope="scope">
-            <span v-if="scope.row.DRCC">{{scope.row.DRCC}}</span>
-            <span v-else>{{scope.row.costCoefficient}}</span>
+            <span v-if="scope.row.DRCC">{{ scope.row.DRCC }}</span>
+            <span v-else>{{ scope.row.costCoefficient }}</span>
           </template>
         </el-table-column>
 
@@ -189,9 +257,14 @@
             <el-button
               size="mini"
               type="text"
-              @click="delcombodetail(scope.row,scope.$index)"
-              :disabled="auditStatus==1||scope.row.tag==true"
-            >删除</el-button>
+              @click="delcombodetail(scope.row, scope.$index)"
+              :disabled="
+                auditStatus == 1 ||
+                scope.row.tag == true ||
+                currentRow.locked == true
+              "
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -202,25 +275,30 @@
     </div>
     <div>
       <!-- <div style="margin:20px 0 0 0 ;border-top:1px solid #cccccc"> -->
-      <div style="margin:20px 0 0 0">
-        <span style="font-size:20px;line-height:40px">人员明细</span>
-        <div style="float:right">
-          <el-button type="primary" :disabled="auditStatus==1">生成预约信息</el-button>
+      <div style="margin: 20px 0 0 0">
+        <span style="font-size: 20px; line-height: 40px">人员明细</span>
+        <div style="float: right">
+          <el-button type="primary" @click="creatInfo()"
+            >生成预约信息</el-button
+          >
           <el-button
             type="primary"
             @click="openGuest()"
-            :disabled="tableobj1.loading&&tableobj1.length==0||auditStatus==1"
-          >新增/编辑人员</el-button>
+            :disabled="tableobj1.loading && tableobj1.length == 0"
+            >新增/编辑人员</el-button
+          >
           <el-button
             type="primary"
             @click="downloadRY()"
-            :disabled="tableobj1.loading&&tableobj1.length==0||auditStatus==1"
-          >人员导入</el-button>
+            :disabled="tableobj1.loading && tableobj1.length == 0"
+            >人员导入</el-button
+          >
           <el-button
             type="primary"
             @click="DeleteGlsitEven"
-            :disabled="tableobj1.loading&&tableobj1.length==0||auditStatus==1"
-          >批量删除</el-button>
+            :disabled="tableobj1.loading && tableobj1.length == 0"
+            >批量删除</el-button
+          >
         </div>
       </div>
     </div>
@@ -236,14 +314,24 @@
         @selection-change="handleSelectionChange"
       >
         >
-        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column
+          type="selection"
+          width="55"
+          :selectable="isLocked"
+        ></el-table-column>
         <el-table-column label="序号" width="80px">
-          <template slot-scope="scope">{{scope.$index+1}}</template>
+          <template slot-scope="scope">{{ scope.$index + 1 }}</template>
         </el-table-column>
         <el-table-column label="姓名" prop="XM"></el-table-column>
         <el-table-column label="性别">
           <template slot-scope="scope">
-            <el-select v-model="scope.row.XB" disabled placeholder style="width:100%" size="mini">
+            <el-select
+              v-model="scope.row.XB"
+              disabled
+              placeholder
+              style="width: 100%"
+              size="mini"
+            >
               <el-option label="男" value="2"></el-option>
               <el-option label="女" value="1"></el-option>
               <el-option label="通用" value="0"></el-option>
@@ -253,7 +341,13 @@
         <el-table-column label="身份号" prop="SFZHM"></el-table-column>
         <el-table-column label="婚否">
           <template slot-scope="scope" prop="HYZK">
-            <el-select v-model="scope.row.HYZK" disabled placeholder style="width:100%" size="mini">
+            <el-select
+              v-model="scope.row.HYZK"
+              disabled
+              placeholder
+              style="width: 100%"
+              size="mini"
+            >
               <el-option label="已婚" value="01"></el-option>
               <el-option label="未婚" value="02"></el-option>
               <!-- <el-option label="" value="3"></el-option> -->
@@ -268,9 +362,10 @@
             <el-button
               size="mini"
               type="text"
-              @click="delGuestdetail(scope.row,scope.$index)"
-              :disabled="auditStatus==1"
-            >删除</el-button>
+              @click="delGuestdetail(scope.row, scope.$index)"
+              :disabled="scope.row.locked == true"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -282,20 +377,41 @@
 
     <!-- 新增套餐弹窗 -->
     <div>
-      <el-dialog title="新增套餐" :visible.sync="addcomboobj.isshow" width="450px">
-        <el-form :model="addcomboobj" label-position="right" label-width="120px" size="medium">
+      <el-dialog
+        title="新增套餐"
+        :visible.sync="addcomboobj.isshow"
+        width="450px"
+      >
+        <el-form
+          :model="addcomboobj"
+          label-position="right"
+          label-width="120px"
+          size="medium"
+        >
           <el-form-item label="套餐名称：">
-            <el-input v-model="addcomboobj.GROUPNAME" placeholder="请填写" style="width:200px"></el-input>
+            <el-input
+              v-model="addcomboobj.GROUPNAME"
+              placeholder="请填写"
+              style="width: 200px"
+            ></el-input>
           </el-form-item>
           <el-form-item label="性别">
-            <el-select v-model="addcomboobj.OP_DATETIME" placeholder style="width:200px">
+            <el-select
+              v-model="addcomboobj.OP_DATETIME"
+              placeholder
+              style="width: 200px"
+            >
               <el-option label="通用" value="0"></el-option>
               <el-option label="男" value="1"></el-option>
               <el-option label="女" value="2"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="自选项否：">
-            <el-select v-model="addcomboobj.TRANS_STATUS" placeholder style="width:200px">
+            <el-select
+              v-model="addcomboobj.TRANS_STATUS"
+              placeholder
+              style="width: 200px"
+            >
               <el-option label="是" value="Y"></el-option>
               <el-option label="否" value="N"></el-option>
               <el-option label="检验阳性" value="1"></el-option>
@@ -303,7 +419,11 @@
             </el-select>
           </el-form-item>
           <el-form-item label="结算价：">
-            <el-input v-model="addcomboobj.PRICE" placeholder="请填写" style="width:200px"></el-input>
+            <el-input
+              v-model="addcomboobj.PRICE"
+              placeholder="请填写"
+              style="width: 200px"
+            ></el-input>
           </el-form-item>
           <!-- <el-form-item label="原价：">
             <el-input v-model="addcomboobj.OLDPRICE" placeholder="请填写" style="width:200px"></el-input>
@@ -317,14 +437,19 @@
     </div>
     <!-- 新增员工弹窗 -->
     <div>
-      <el-dialog title="新增/编辑员工" :visible.sync="isaddGuest" width="1250px">
+      <el-dialog
+        title="新增/编辑员工"
+        :visible.sync="isaddGuest"
+        width="1250px"
+      >
         <el-button
           type="primary"
           icon="el-icon-plus"
           @click="addGuestdetail"
-          style="float:right"
-          :disabled="tableobj1.loading&&tableobj1.length==0"
-        >新增</el-button>
+          style="float: right"
+          :disabled="tableobj1.loading && tableobj1.length == 0"
+          >新增</el-button
+        >
         <el-table
           :data="guestList.list"
           style="width: 100%"
@@ -333,16 +458,28 @@
           border
         >
           <el-table-column label="序号" width="80px">
-            <template slot-scope="scope">{{scope.$index+1}}</template>
+            <template slot-scope="scope">{{ scope.$index + 1 }}</template>
           </el-table-column>
           <el-table-column label="姓名">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.XM" placeholder="请填写" style="width:100%" size="mini"></el-input>
+              <el-input
+                v-model="scope.row.XM"
+                placeholder="请填写"
+                :disabled="scope.row.locked == true"
+                style="width: 100%"
+                size="mini"
+              ></el-input>
             </template>
           </el-table-column>
           <el-table-column label="性别">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.XB" placeholder style="width:100%" size="mini">
+              <el-select
+                v-model="scope.row.XB"
+                placeholder
+                :disabled="scope.row.locked == true"
+                style="width: 100%"
+                size="mini"
+              >
                 <el-option label="男" value="2"></el-option>
                 <el-option label="女" value="1"></el-option>
                 <el-option label="通用" value="0"></el-option>
@@ -351,12 +488,24 @@
           </el-table-column>
           <el-table-column label="身份号">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.SFZHM" placeholder="请填写" style="width:100%" size="mini"></el-input>
+              <el-input
+                v-model="scope.row.SFZHM"
+                placeholder="请填写"
+                :disabled="scope.row.locked == true"
+                style="width: 100%"
+                size="mini"
+              ></el-input>
             </template>
           </el-table-column>
           <el-table-column label="婚否">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.HYZK" placeholder style="width:100%" size="mini">
+              <el-select
+                v-model="scope.row.HYZK"
+                placeholder
+                :disabled="scope.row.locked == true"
+                style="width: 100%"
+                size="mini"
+              >
                 <el-option label="已婚" value="01"></el-option>
                 <el-option label="未婚" value="02"></el-option>
                 <!-- <el-option label="" value="3"></el-option> -->
@@ -367,9 +516,10 @@
           <el-table-column label="部门2">
             <template slot-scope="scope">
               <el-input
+                :disabled="scope.row.locked == true"
                 v-model="scope.row.K3_ITEM"
                 placeholder="请填写"
-                style="width:100%"
+                style="width: 100%"
                 size="mini"
               ></el-input>
             </template>
@@ -377,7 +527,13 @@
           <el-table-column prop="CW" label="所属套餐"></el-table-column>
           <el-table-column label="操作" width="80px">
             <template slot-scope="scope">
-              <el-button size="mini" type="text" @click="delGuestdetail(scope.row,scope.$index)">删除</el-button>
+              <el-button
+                size="mini"
+                type="text"
+                :disabled="scope.row.locked == true"
+                @click="delGuestdetail(scope.row, scope.$index)"
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -389,15 +545,32 @@
     </div>
     <!-- pdf样式 -->
     <div v-show="isshowpdf" class="pdfclass">
-      <div id="approvaContent_pdf" style="padding:20px">
+      <div id="approvaContent_pdf" style="padding: 20px">
         <div class="pdfhead">
           <div>套餐信息</div>
           <div>
-            <el-table :data="tableobj1.list" style="width: 100%" v-loading="tableobj1.loading">
-              <el-table-column prop="ID" label="套餐ID" width="80px"></el-table-column>
-              <el-table-column prop="GROUPNAME" label="套餐名称"></el-table-column>
-              <el-table-column prop="OP_DATETIME" label="类别"></el-table-column>
-              <el-table-column prop="TRANS_STATUS" label="自选项否"></el-table-column>
+            <el-table
+              :data="tableobj1.list"
+              style="width: 100%"
+              v-loading="tableobj1.loading"
+            >
+              <el-table-column
+                prop="ID"
+                label="套餐ID"
+                width="80px"
+              ></el-table-column>
+              <el-table-column
+                prop="GROUPNAME"
+                label="套餐名称"
+              ></el-table-column>
+              <el-table-column
+                prop="OP_DATETIME"
+                label="类别"
+              ></el-table-column>
+              <el-table-column
+                prop="TRANS_STATUS"
+                label="自选项否"
+              ></el-table-column>
               <el-table-column prop="PRICE" label="成交价"></el-table-column>
               <el-table-column prop="OLDPRICE" label="原价"></el-table-column>
             </el-table>
@@ -405,16 +578,26 @@
         </div>
         <div class="pdfbody">
           <div>项目详情</div>
-          <div v-for="item in tableobj6.list" style="font-size:20px">
-            {{combonamechange(item)}}
-            <el-table :data="combonamechange1(item) " style="width: 100%">
+          <div v-for="item in tableobj6.list" style="font-size: 20px">
+            {{ combonamechange(item) }}
+            <el-table :data="combonamechange1(item)" style="width: 100%">
               <el-table-column label="序号" width="80px">
-                <template slot-scope="scope">{{scope.$index+1}}</template>
+                <template slot-scope="scope">{{ scope.$index + 1 }}</template>
               </el-table-column>
-              <el-table-column prop="ITEM_ID" label="项目代码"></el-table-column>
-              <el-table-column prop="ITEM_NAME" label="项目名称"></el-table-column>
+              <el-table-column
+                prop="ITEM_ID"
+                label="项目代码"
+              ></el-table-column>
+              <el-table-column
+                prop="ITEM_NAME"
+                label="项目名称"
+              ></el-table-column>
               <el-table-column prop="PRICE" label="金额"></el-table-column>
-              <el-table-column prop="ID" label="所属套餐" width="100px"></el-table-column>
+              <el-table-column
+                prop="ID"
+                label="所属套餐"
+                width="100px"
+              ></el-table-column>
             </el-table>
           </div>
         </div>
@@ -423,16 +606,21 @@
           <div>
             <el-table :data="tableobj5.list" style="width: 100%">
               <el-table-column label="序号" width="80px">
-                <template slot-scope="scope">{{scope.$index+1}}</template>
+                <template slot-scope="scope">{{ scope.$index + 1 }}</template>
               </el-table-column>
               <el-table-column label="姓名" prop="XM"></el-table-column>
               <el-table-column label="性别" prop="XB">
-                <template slot-scope="scope">{{scope.row.XB=='1'?'男':'女'}}</template>
+                <template slot-scope="scope">{{
+                  scope.row.XB == "1" ? "男" : "女"
+                }}</template>
               </el-table-column>
               <el-table-column label="身份号" prop="SFZHM"></el-table-column>
               <el-table-column label="婚否" prop="HYZK"></el-table-column>
               <el-table-column label="部门2" prop="K3_ITEM"></el-table-column>
-              <el-table-column prop="K3_ZG_ITEM" label="套餐名称"></el-table-column>
+              <el-table-column
+                prop="K3_ZG_ITEM"
+                label="套餐名称"
+              ></el-table-column>
               <el-table-column prop="CW" label="所属套餐"></el-table-column>
             </el-table>
           </div>
@@ -441,25 +629,38 @@
     </div>
     <!-- excel导入选择工作表 -->
     <div>
-      <el-dialog title="该excel存在多个工作表，请选择" :visible.sync="excelselectobj.isshow" width="400px">
+      <el-dialog
+        title="该excel存在多个工作表，请选择"
+        :visible.sync="excelselectobj.isshow"
+        width="400px"
+      >
         <el-radio-group v-model="excelselectSheetNames">
           <el-radio
             v-for="item in excelSheetNames"
             :key="item"
             :label="item"
-            style="line-height:36px;width:100%"
-          >{{item}}</el-radio>
+            style="line-height: 36px; width: 100%"
+            >{{ item }}</el-radio
+          >
         </el-radio-group>
         <div slot="footer" class="dialog-footer">
           <el-button @click="excelselectobj.isshow = false">取 消</el-button>
-          <el-button type="primary" @click="excelparse(excelwbobj[excelselectSheetNames])">确 定</el-button>
+          <el-button
+            type="primary"
+            @click="excelparse(excelwbobj[excelselectSheetNames])"
+            >确 定</el-button
+          >
         </div>
       </el-dialog>
     </div>
     <!-- 选择体检项目 -->
     <div class="sxmobj">
-      <el-dialog title="选择项目" :visible.sync="selectxmobj.isshow" width="800px">
-        <div style="position: relative;">
+      <el-dialog
+        title="选择项目"
+        :visible.sync="selectxmobj.isshow"
+        width="800px"
+      >
+        <div style="position: relative">
           <div class="sxmclass">
             未选套餐：
             <div class="sxmmainclass">
@@ -469,36 +670,36 @@
                   prefix-icon="el-icon-search"
                   placeholder="输入项目代码或检查项名称"
                   size="small"
-                  style="width:80%;margin-left:10px"
+                  style="width: 80%; margin-left: 10px"
                 ></el-input>
               </div>
-              <div style="height:30px"></div>
+              <div style="height: 30px"></div>
               <el-checkbox-group
                 v-model="selectxmobj.checkList"
-                style="margin-top:10px"
+                style="margin-top: 10px"
                 @change="checkListchange"
               >
                 <el-checkbox
-                  style="min-width:100%;margin:5px 0 0 0"
+                  style="min-width: 100%; margin: 5px 0 0 0"
                   v-for="item in dimchange"
                   :key="item.ITEM_ID"
-                  :label="item.ITEM_ID+' - '+item.ITEM_NAME"
+                  :label="item.ITEM_ID + ' - ' + item.ITEM_NAME"
                 ></el-checkbox>
               </el-checkbox-group>
             </div>
           </div>
-          <div class="sxmclass" style="position: absolute;right: 0%;top: 0%">
+          <div class="sxmclass" style="position: absolute; right: 0%; top: 0%">
             已选套餐：
             <div class="sxmmainclass">
-              <div style="margin-top:10px">
+              <div style="margin-top: 10px">
                 <div
                   class="sxmmainclassdiv"
-                  v-for="(item,index) in selectxmobj.checkList1"
+                  v-for="(item, index) in selectxmobj.checkList1"
                   :key="item.ITEM_ID"
                 >
-                  {{item.ITEM_ID+' - '+item.ITEM_NAME}}
+                  {{ item.ITEM_ID + " - " + item.ITEM_NAME }}
                   <i
-                    @click="delcheckList(item,index)"
+                    @click="delcheckList(item, index)"
                     class="el-icon-circle-close"
                   ></i>
                 </div>
@@ -508,7 +709,9 @@
         </div>
         <div slot="footer" class="dialog-footer">
           <el-button @click="selectxmobj.isshow = false">取 消</el-button>
-          <el-button type="primary" @click="selectxmobj.isshow = false">确 定</el-button>
+          <el-button type="primary" @click="selectxmobj.isshow = false"
+            >确 定</el-button
+          >
         </div>
       </el-dialog>
     </div>
@@ -526,7 +729,11 @@
 
     <!-- 选择套餐模板弹窗 -->
     <div>
-      <el-dialog title="选择套餐模板" :visible.sync="selectComboTemplateObj.isShow" width="1200px">
+      <el-dialog
+        title="选择套餐模板"
+        :visible.sync="selectComboTemplateObj.isShow"
+        width="1200px"
+      >
         <el-form
           :inline="true"
           :model="selectComboTemplateObj"
@@ -538,33 +745,43 @@
             <el-input
               v-model="selectComboTemplateObj.GROUPNAME"
               placeholder="请填写"
-              style="width:200px"
+              style="width: 200px"
             ></el-input>
           </el-form-item>
           <el-form-item label="婚姻状态：">
-            <el-select v-model="selectComboTemplateObj.HYZK" placeholder style="width:200px">
+            <el-select
+              v-model="selectComboTemplateObj.HYZK"
+              placeholder
+              style="width: 200px"
+            >
               <el-option label="已婚" value="01"></el-option>
               <el-option label="未婚" value="02"></el-option>
               <el-option label="通用" value="03"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="性别：">
-            <el-select v-model="selectComboTemplateObj.XB" style="width:200px">
+            <el-select v-model="selectComboTemplateObj.XB" style="width: 200px">
               <el-option
-                v-if="currentRow.OP_DATETIME=='0'||currentRow.OP_DATETIME=='1'"
+                v-if="
+                  currentRow.OP_DATETIME == '0' || currentRow.OP_DATETIME == '1'
+                "
                 label="男"
                 value="1"
               ></el-option>
               <el-option
-                v-if="currentRow.OP_DATETIME=='0'||currentRow.OP_DATETIME=='2'"
+                v-if="
+                  currentRow.OP_DATETIME == '0' || currentRow.OP_DATETIME == '2'
+                "
                 label="女"
                 value="2"
               ></el-option>
               <el-option label="通用" value="0"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item style="float:right">
-            <el-button type="primary" @click="selectComboTemplateBtn()">搜 索</el-button>
+          <el-form-item style="float: right">
+            <el-button type="primary" @click="selectComboTemplateBtn()"
+              >搜 索</el-button
+            >
           </el-form-item>
         </el-form>
         <div>
@@ -575,18 +792,25 @@
             highlight-current-row
             @current-change="handleCurrentChange1"
           >
-            <el-table-column prop="GROUPNAME" label="套餐名称"></el-table-column>
+            <el-table-column
+              prop="GROUPNAME"
+              label="套餐名称"
+            ></el-table-column>
             <el-table-column label="性别">
-              <template slot-scope="scope">{{XBchange(scope.row.XB)}}</template>
+              <template slot-scope="scope">{{
+                XBchange(scope.row.XB)
+              }}</template>
             </el-table-column>
             <el-table-column label="婚否">
-              <template slot-scope="scope">{{HYZkchange(scope.row.HYZK)}}</template>
+              <template slot-scope="scope">{{
+                HYZkchange(scope.row.HYZK)
+              }}</template>
             </el-table-column>
             <el-table-column prop="PRICE" label="价格"></el-table-column>
           </el-table>
-          <div style="height:30px;margin-top:20px;">
+          <div style="height: 30px; margin-top: 20px">
             <el-pagination
-              style="float:right"
+              style="float: right"
               @size-change
               @current-change
               :current-page="selectComboTemplateObj.pageIndex"
@@ -598,7 +822,9 @@
           </div>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="selectComboTemplateObj.isShow = false">取 消</el-button>
+          <el-button @click="selectComboTemplateObj.isShow = false"
+            >取 消</el-button
+          >
           <el-button type="primary" @click="confirmslectobj">确 定</el-button>
         </div>
       </el-dialog>
@@ -606,7 +832,7 @@
     <input
       ref="inputer"
       id="upload"
-      style="display:none"
+      style="display: none"
       type="file"
       @change="importfxx()"
       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
@@ -614,7 +840,11 @@
 
     <!-- 项目导入 -->
     <div class="ygplcz">
-      <el-dialog title="项目批量导入" :visible.sync="dialogImportEmployee" width="800px">
+      <el-dialog
+        title="项目批量导入"
+        :visible.sync="dialogImportEmployee"
+        width="800px"
+      >
         <div
           v-loading="updataobj.isshow"
           :element-loading-text="updataobj.loadingtext"
@@ -625,7 +855,7 @@
                 <el-option v-for="(item,index) in ygplczobj.companyList" :key="index" :label="item" :value="item"></el-option>
           </el-select>-->
           <el-steps
-            style="margin-top:10px"
+            style="margin-top: 10px"
             :active="ygplczobj.drobj.active"
             finish-status="success"
             process-status="finish"
@@ -635,93 +865,138 @@
             <el-step title="执行导入" icon="el-icon-s-platform"></el-step>
             <el-step title="导入完成" icon="el-icon-success"></el-step>
           </el-steps>
-          <div v-if="ygplczobj.drobj.active==0">
+          <div v-if="ygplczobj.drobj.active == 0">
             <el-card>
               <div class="box-card">
                 <div>
-                  <i style="font-size:50px;margin:10px" class="el-icon-my-download"></i>
+                  <i
+                    style="font-size: 50px; margin: 10px"
+                    class="el-icon-my-download"
+                  ></i>
                 </div>
-                <div style="width:100%;margin-left:20px">
+                <div style="width: 100%; margin-left: 20px">
                   <div style>
-                    <div style="font-size:18px;">请按照模板填写信息后导入</div>
-                    <div style="font-size:14px; color:#ccc">为提高导入的成功率，请下载并使用系统提供的模板。单次导入不超过5000条</div>
+                    <div style="font-size: 18px">请按照模板填写信息后导入</div>
+                    <div style="font-size: 14px; color: #ccc">
+                      为提高导入的成功率，请下载并使用系统提供的模板。单次导入不超过5000条
+                    </div>
                   </div>
                   <el-button
                     class="carbtn"
                     type="primary"
                     size="small"
                     @click="DownloadTemplate"
-                  >下载模板</el-button>
+                    >下载模板</el-button
+                  >
                 </div>
               </div>
             </el-card>
             <el-card>
               <div class="box-card">
                 <div>
-                  <i style="font-size:50px;margin:10px" class="el-icon-my-upload"></i>
+                  <i
+                    style="font-size: 50px; margin: 10px"
+                    class="el-icon-my-upload"
+                  ></i>
                 </div>
-                <div style="width:100%;margin-left:20px">
+                <div style="width: 100%; margin-left: 20px">
                   <div style>
-                    <div style="font-size:18px;">上传数据</div>
-                    <div style="font-size:14px; color:#9E9E9E">仅支持xlsx或xls（即Excel格式），文件大小≤4M。</div>
-                    <div style="font-size:14px; color:#3A83FF">{{filename}}</div>
+                    <div style="font-size: 18px">上传数据</div>
+                    <div style="font-size: 14px; color: #9e9e9e">
+                      仅支持xlsx或xls（即Excel格式），文件大小≤4M。
+                    </div>
+                    <div style="font-size: 14px; color: #3a83ff">
+                      {{ filename }}
+                    </div>
                   </div>
-                  <el-button class="carbtn" type="primary" size="small" @click="returnAllUsers">上传文件</el-button>
+                  <el-button
+                    class="carbtn"
+                    type="primary"
+                    size="small"
+                    @click="returnAllUsers"
+                    >上传文件</el-button
+                  >
                 </div>
               </div>
             </el-card>
-            <div style="text-align:center;margin-top:20px">
+            <div style="text-align: center; margin-top: 20px">
               <el-button type="primary" @click="verifyImport">确定</el-button>
             </div>
           </div>
-          <div v-if="ygplczobj.drobj.active==1">
+          <div v-if="ygplczobj.drobj.active == 1">
             <el-card>
               <div class="box-card">
-                <div style="width:100%;margin-left:20px">
+                <div style="width: 100%; margin-left: 20px">
                   <div style>
-                    <div style="font-size:16px;">正确数据条数</div>
-                    <div style="font-size:14px; color:#4CCA32 ">{{goodXlsx.length-badXlsx.length}}条</div>
+                    <div style="font-size: 16px">正确数据条数</div>
+                    <div style="font-size: 14px; color: #4cca32">
+                      {{ goodXlsx.length - badXlsx.length }}条
+                    </div>
                   </div>
                 </div>
               </div>
             </el-card>
             <el-card>
               <div class="box-card">
-                <div style="width:100%;margin-left:20px">
+                <div style="width: 100%; margin-left: 20px">
                   <div style>
-                    <div style="font-size:16px;">异常数据条数</div>
-                    <div style="font-size:14px; color:#F63649  ">{{badXlsx.length}}条</div>
+                    <div style="font-size: 16px">异常数据条数</div>
+                    <div style="font-size: 14px; color: #f63649">
+                      {{ badXlsx.length }}条
+                    </div>
                   </div>
                   <!--<el-button class="carbtn" type="primary" size="small" @click="downloadfaildata">下载异常数据</el-button>-->
                 </div>
               </div>
             </el-card>
-            <div style="margin-top:20px">
-              <el-button type="primary" @click="confirmimport">确认导入</el-button>
-              <el-button style="float:right" @click="resetupload">重新上传</el-button>
+            <div style="margin-top: 20px">
+              <el-button type="primary" @click="confirmimport"
+                >确认导入</el-button
+              >
+              <el-button style="float: right" @click="resetupload"
+                >重新上传</el-button
+              >
             </div>
-            <div style="margin-top: 20px;" v-if="badXlsx.length>0">
+            <div style="margin-top: 20px" v-if="badXlsx.length > 0">
               无效数据：
               <div
-                style="text-align: left;position: relative;margin-top: 20px;"
+                style="text-align: left; position: relative; margin-top: 20px"
                 v-for="item in badXlsx"
               >
-                <div style="float:left;margin-left: 0px; ">门店编码：{{item.localCenterCode||"无门店编码"}}</div>
+                <div style="float: left; margin-left: 0px">
+                  门店编码：{{ item.localCenterCode || "无门店编码" }}
+                </div>
 
                 <div
-                  style="max-width:200px;float:left;color: red;margin-left: 30px;"
-                >错误提示：第{{item.serialNumber}}行，{{item.misdescription}}</div>
-                <div style="clear: both;"></div>
+                  style="
+                    max-width: 200px;
+                    float: left;
+                    color: red;
+                    margin-left: 30px;
+                  "
+                >
+                  错误提示：第{{ item.serialNumber }}行，{{
+                    item.misdescription
+                  }}
+                </div>
+                <div style="clear: both"></div>
               </div>
             </div>
           </div>
-          <div v-if="ygplczobj.drobj.active==2">
-            <div style="text-align:center">
-              <div style="font-size:28px;color:#00000;margin:20px">批量导入完成</div>
-              <div
-                style="font-size:16px;color:#4CCA32;margin-bottom:20px"
-              >成功导入数量{{goodXlsx.length-badXlsx.length}}条</div>
-              <el-button type="primary" style="margin:20pxl.;padding:15px 50px" @click="okBtn()">完 成</el-button>
+          <div v-if="ygplczobj.drobj.active == 2">
+            <div style="text-align: center">
+              <div style="font-size: 28px; color: #00000; margin: 20px">
+                批量导入完成
+              </div>
+              <div style="font-size: 16px; color: #4cca32; margin-bottom: 20px">
+                成功导入数量{{ goodXlsx.length - badXlsx.length }}条
+              </div>
+              <el-button
+                type="primary"
+                style="margin: 20pxl.; padding: 15px 50px"
+                @click="okBtn()"
+                >完 成</el-button
+              >
             </div>
           </div>
         </div>
@@ -740,7 +1015,7 @@
                 <el-option v-for="(item,index) in ygplczobj.companyList" :key="index" :label="item" :value="item"></el-option>
           </el-select>-->
           <el-steps
-            style="margin-top:10px"
+            style="margin-top: 10px"
             :active="ygplczobj.drobj.active"
             finish-status="success"
             process-status="finish"
@@ -750,93 +1025,138 @@
             <el-step title="执行导入" icon="el-icon-s-platform"></el-step>
             <el-step title="导入完成" icon="el-icon-success"></el-step>
           </el-steps>
-          <div v-if="ygplczobj.drobj.active==0">
+          <div v-if="ygplczobj.drobj.active == 0">
             <el-card>
               <div class="box-card">
                 <div>
-                  <i style="font-size:50px;margin:10px" class="el-icon-my-download"></i>
+                  <i
+                    style="font-size: 50px; margin: 10px"
+                    class="el-icon-my-download"
+                  ></i>
                 </div>
-                <div style="width:100%;margin-left:20px">
+                <div style="width: 100%; margin-left: 20px">
                   <div style>
-                    <div style="font-size:18px;">请按照模板填写信息后导入</div>
-                    <div style="font-size:14px; color:#ccc">为提高导入的成功率，请下载并使用系统提供的模板。单次导入不超过5000条</div>
+                    <div style="font-size: 18px">请按照模板填写信息后导入</div>
+                    <div style="font-size: 14px; color: #ccc">
+                      为提高导入的成功率，请下载并使用系统提供的模板。单次导入不超过5000条
+                    </div>
                   </div>
                   <el-button
                     class="carbtn"
                     type="primary"
                     size="small"
                     @click="DownloadTemplate2"
-                  >下载模板</el-button>
+                    >下载模板</el-button
+                  >
                 </div>
               </div>
             </el-card>
             <el-card>
               <div class="box-card">
                 <div>
-                  <i style="font-size:50px;margin:10px" class="el-icon-my-upload"></i>
+                  <i
+                    style="font-size: 50px; margin: 10px"
+                    class="el-icon-my-upload"
+                  ></i>
                 </div>
-                <div style="width:100%;margin-left:20px">
+                <div style="width: 100%; margin-left: 20px">
                   <div style>
-                    <div style="font-size:18px;">上传数据</div>
-                    <div style="font-size:14px; color:#9E9E9E">仅支持xlsx或xls（即Excel格式），文件大小≤4M。</div>
-                    <div style="font-size:14px; color:#3A83FF">{{filename}}</div>
+                    <div style="font-size: 18px">上传数据</div>
+                    <div style="font-size: 14px; color: #9e9e9e">
+                      仅支持xlsx或xls（即Excel格式），文件大小≤4M。
+                    </div>
+                    <div style="font-size: 14px; color: #3a83ff">
+                      {{ filename }}
+                    </div>
                   </div>
-                  <el-button class="carbtn" type="primary" size="small" @click="returnAllUsers">上传文件</el-button>
+                  <el-button
+                    class="carbtn"
+                    type="primary"
+                    size="small"
+                    @click="returnAllUsers"
+                    >上传文件</el-button
+                  >
                 </div>
               </div>
             </el-card>
-            <div style="text-align:center;margin-top:20px">
+            <div style="text-align: center; margin-top: 20px">
               <el-button type="primary" @click="verifyImport">确定</el-button>
             </div>
           </div>
-          <div v-if="ygplczobj.drobj.active==1">
+          <div v-if="ygplczobj.drobj.active == 1">
             <el-card>
               <div class="box-card">
-                <div style="width:100%;margin-left:20px">
+                <div style="width: 100%; margin-left: 20px">
                   <div style>
-                    <div style="font-size:16px;">正确数据条数</div>
-                    <div style="font-size:14px; color:#4CCA32 ">{{goodXlsx.length-badXlsx.length}}条</div>
+                    <div style="font-size: 16px">正确数据条数</div>
+                    <div style="font-size: 14px; color: #4cca32">
+                      {{ goodXlsx.length - badXlsx.length }}条
+                    </div>
                   </div>
                 </div>
               </div>
             </el-card>
             <el-card>
               <div class="box-card">
-                <div style="width:100%;margin-left:20px">
+                <div style="width: 100%; margin-left: 20px">
                   <div style>
-                    <div style="font-size:16px;">异常数据条数</div>
-                    <div style="font-size:14px; color:#F63649  ">{{badXlsx.length}}条</div>
+                    <div style="font-size: 16px">异常数据条数</div>
+                    <div style="font-size: 14px; color: #f63649">
+                      {{ badXlsx.length }}条
+                    </div>
                   </div>
                   <!--<el-button class="carbtn" type="primary" size="small" @click="downloadfaildata">下载异常数据</el-button>-->
                 </div>
               </div>
             </el-card>
-            <div style="margin-top:20px">
-              <el-button type="primary" @click="confirmimport">确认导入</el-button>
-              <el-button style="float:right" @click="resetupload">重新上传</el-button>
+            <div style="margin-top: 20px">
+              <el-button type="primary" @click="confirmimport"
+                >确认导入</el-button
+              >
+              <el-button style="float: right" @click="resetupload"
+                >重新上传</el-button
+              >
             </div>
-            <div style="margin-top: 20px;" v-if="badXlsx.length>0">
+            <div style="margin-top: 20px" v-if="badXlsx.length > 0">
               无效数据：
               <div
-                style="text-align: left;position: relative;margin-top: 20px;"
+                style="text-align: left; position: relative; margin-top: 20px"
                 v-for="item in badXlsx"
               >
-                <div style="float:left;margin-left: 0px; ">门店编码：{{item.localCenterCode||"无门店编码"}}</div>
+                <div style="float: left; margin-left: 0px">
+                  门店编码：{{ item.localCenterCode || "无门店编码" }}
+                </div>
 
                 <div
-                  style="max-width:200px;float:left;color: red;margin-left: 30px;"
-                >错误提示：第{{item.serialNumber}}行，{{item.misdescription}}</div>
-                <div style="clear: both;"></div>
+                  style="
+                    max-width: 200px;
+                    float: left;
+                    color: red;
+                    margin-left: 30px;
+                  "
+                >
+                  错误提示：第{{ item.serialNumber }}行，{{
+                    item.misdescription
+                  }}
+                </div>
+                <div style="clear: both"></div>
               </div>
             </div>
           </div>
-          <div v-if="ygplczobj.drobj.active==2">
-            <div style="text-align:center">
-              <div style="font-size:28px;color:#00000;margin:20px">批量导入完成</div>
-              <div
-                style="font-size:16px;color:#4CCA32;margin-bottom:20px"
-              >成功导入数量{{goodXlsx.length-badXlsx.length}}条</div>
-              <el-button type="primary" style="margin:20pxl.;padding:15px 50px" @click="okBtn()">完 成</el-button>
+          <div v-if="ygplczobj.drobj.active == 2">
+            <div style="text-align: center">
+              <div style="font-size: 28px; color: #00000; margin: 20px">
+                批量导入完成
+              </div>
+              <div style="font-size: 16px; color: #4cca32; margin-bottom: 20px">
+                成功导入数量{{ goodXlsx.length - badXlsx.length }}条
+              </div>
+              <el-button
+                type="primary"
+                style="margin: 20pxl.; padding: 15px 50px"
+                @click="okBtn()"
+                >完 成</el-button
+              >
             </div>
           </div>
         </div>
@@ -1123,6 +1443,9 @@ export default {
     isDel(row) {
       return !row.tag;
     },
+    isLocked(row) {
+      return !row.locked;
+    },
     handleCurrentChange1(val) {
       console.log(val);
       this.selectComboTemplateObj.selectobj = val;
@@ -1298,6 +1621,7 @@ export default {
                 K3_ZG_ITEM: this.currentRow.GROUPNAME,
                 K3_ITEM: "",
                 CW: this.currentRow.ID,
+                locked: false,
               };
               tableobj2temp.push(codenum);
             }
@@ -1308,10 +1632,10 @@ export default {
             const element = val[key];
             console.log(key, element);
             //身份证
-            if (String(key).substring(0, 1) == "H" && key != "H1") {
+            if (String(key).substring(0, 1) == "C" && key != "C1") {
               for (let i = 0; i < tableobj2temp.length; i++) {
                 if (tableobj2temp[i].index == String(key).substring(1)) {
-                  tableobj2temp[i].SFZHM = element.v;
+                  tableobj2temp[i].SFZHM = element.v.trim();
                   if (tableobj2temp[i].SFZHM.length == 18) {
                     if (
                       parseInt(
@@ -1338,7 +1662,7 @@ export default {
               }
             }
             //婚姻状况
-            if (String(key).substring(0, 1) == "I" && key != "I1") {
+            if (String(key).substring(0, 1) == "F" && key != "F1") {
               for (let i = 0; i < tableobj2temp.length; i++) {
                 if (tableobj2temp[i].index == String(key).substring(1)) {
                   if (element.v == "已婚") {
@@ -1350,7 +1674,7 @@ export default {
               }
             }
             //部门2
-            if (String(key).substring(0, 1) == "F" && key != "F1") {
+            if (String(key).substring(0, 1) == "E" && key != "E1") {
               for (let i = 0; i < tableobj2temp.length; i++) {
                 if (tableobj2temp[i].index == String(key).substring(1)) {
                   tableobj2temp[i].K3_ITEM = element.v + "";
@@ -1359,6 +1683,7 @@ export default {
             }
           }
         }
+        tableobj2temp.pop();
         console.log(tableobj2temp);
         this.guestList.list = this.tableobj3.list.concat(tableobj2temp);
       } else {
@@ -1437,6 +1762,9 @@ export default {
     openGuest() {
       this.isaddGuest = true;
       this.guestList.list = JSON.parse(JSON.stringify(this.tableobj3.list));
+    },
+    toFixed(value) {
+      return value.toFixed(2)
     },
     yuanjiachange(data) {
       var price = 0;
@@ -1526,6 +1854,50 @@ export default {
           console.log(err);
         });
     },
+    creatInfo() {
+      this.$confirm(
+        "生成预约信息后当前人员信息将无法修改，是否要生成预约信息",
+        "",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+          center: true,
+        }
+      )
+        .then(() => {
+          var body = {
+            MsjBILLCODE: this.currentRow.MsjBILLCODE,
+            comboID: this.currentRow.ID,
+          };
+          this.$network3
+            .post("/mnoracle/msj/PreOrderGuestInfoLock", body)
+            .then((res) => {
+              console.log(res);
+              if (res.code == 200) {
+                this.$message({
+                  type: "success",
+                  message: "人员信息生成预约成功！",
+                });
+                this.GetCombo();
+                this.GetDetail();
+                this.GetGuestDetail();
+              } else {
+                this.$message.error(res.msg);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              this.$message.error(err.msg);
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+    },
     UpdateCombo() {
       this.tableobj1.list.map((item) => {
         item.PRICE = parseFloat(item.PRICE);
@@ -1547,33 +1919,11 @@ export default {
     open() {
       console.log(this.tableobj2.list);
       console.log(this.tableobj3.list);
-      if (this.currentRow.OLDPRICE != this.yuanjiachange()) {
-        var verfityJudge = this.verfity();
-        if (verfityJudge == false) {
-          return;
-        }
-        this.$confirm("您输入的原价和系统计算原价不同您确定要保存吗", "", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-          center: true,
-        })
-          .then(() => {
-            this.$message({
-              type: "success",
-              message: "保存成功!",
-            });
-            this.savecombomsgbtn();
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消保存",
-            });
-          });
-      } else {
-        this.savecombomsgbtn();
-      }
+      this.$message({
+        type: "success",
+        message: "保存成功!",
+      });
+      this.savecombomsgbtn();
     },
     verfity() {
       if (this.tableobj1.list.length == 0) {
@@ -1623,7 +1973,8 @@ export default {
           !this.tableobj3.list[i].XM ||
           !this.tableobj3.list[i].XB ||
           !this.tableobj3.list[i].SFZHM ||
-          !this.tableobj3.list[i].K3_ITEM
+          !this.tableobj3.list[i].K3_ITEM ||
+          !this.tableobj3.list[i].HYZK
         ) {
           this.$message.error("请将人员明细信息填写完整");
           return;
@@ -1667,7 +2018,7 @@ export default {
             ID: this.currentRow.ID,
             SXH: item.SXH,
             PRICE: item.PRICE,
-            SIGNIFICANCE:item.SIGNIFICANCE,
+            SIGNIFICANCE: item.SIGNIFICANCE,
             ITEM_ID: item.ITEM_ID,
             ITEM_NAME: item.ITEM_NAME,
             costCoefficient: parseFloat(item.costCoefficient),
@@ -1681,7 +2032,7 @@ export default {
             ITEM_ID: item.ITEM_ID,
             ITEM_NAME: item.ITEM_NAME,
             PRICE: item.PRICE,
-            SIGNIFICANCE:item.SIGNIFICANCE,
+            SIGNIFICANCE: item.SIGNIFICANCE,
             costCoefficient: parseFloat(item.costCoefficient),
             SUBITEM: item.SUBITEM,
           };
@@ -1722,6 +2073,7 @@ export default {
                         CW: item.CW,
                         K3_ITEM: item.K3_ITEM,
                         K3_ZG_ITEM: item.K3_ZG_ITEM,
+                        locked: item.locked,
                       };
                       body3.push(obj);
                     } else {
@@ -1805,6 +2157,7 @@ export default {
                     CW: item.CW,
                     K3_ITEM: item.K3_ITEM,
                     K3_ZG_ITEM: item.K3_ZG_ITEM,
+                    locked: item.locked,
                   };
                   body3.push(obj);
                 } else {
@@ -1886,7 +2239,7 @@ export default {
             ITEM_ID: item.ITEM_ID,
             ITEM_NAME: item.ITEM_NAME,
             PRICE: item.PRICE,
-            SIGNIFICANCE:item.SIGNIFICANCE,
+            SIGNIFICANCE: item.SIGNIFICANCE,
             costCoefficient: parseFloat(item.DRCC),
             SUBITEM: item.SUBITEM,
           };
@@ -1897,7 +2250,7 @@ export default {
             ITEM_ID: item.ITEM_ID,
             ITEM_NAME: item.ITEM_NAME,
             PRICE: item.PRICE,
-            SIGNIFICANCE:item.SIGNIFICANCE,
+            SIGNIFICANCE: item.SIGNIFICANCE,
             costCoefficient: parseFloat(item.costCoefficient),
             SUBITEM: item.SUBITEM,
           };
@@ -2127,6 +2480,7 @@ export default {
         K3_ZG_ITEM: this.currentRow.GROUPNAME,
         K3_ITEM: "",
         CW: this.currentRow.ID,
+        locked: false,
       });
     },
     handleCurrentChange(val) {
@@ -2223,6 +2577,7 @@ export default {
           USER_PASSWORD: "394702",
           PASSWORD_XGSJ: "2020-01-01 00:00:00",
           ZZHS: "8S",
+          locked: item.locked,
         };
         body2.push(obj);
       });
@@ -2231,7 +2586,8 @@ export default {
           !this.guestList.list[i].XM ||
           !this.guestList.list[i].XB ||
           !this.guestList.list[i].SFZHM ||
-          !this.guestList.list[i].K3_ITEM
+          !this.guestList.list[i].K3_ITEM ||
+          !this.guestList.list[i].HYZK
         ) {
           this.$message.error("身份信息请填写完整");
           return;

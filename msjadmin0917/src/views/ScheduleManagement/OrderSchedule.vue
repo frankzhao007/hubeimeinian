@@ -15,10 +15,10 @@
 				 </div>
 
 				<el-form-item label="单据号：">
-			         <el-input  v-model="AllHospitalMsg.orderID" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
+			         <el-input  v-model="AllHospitalMsg.id" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
        			 </el-form-item>
        			 <el-form-item label="提交时间：">
-			         <el-input  v-model="AllHospitalMsg.submitAt" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
+			         <el-input  v-model="AllHospitalMsg.submitAt" :disabled="true" placeholder="0000000000000" style="width:200px" size="mini"></el-input>
        			 </el-form-item>
        			 <el-form-item label="* 选择分院：">
                <el-select v-model="AllHospitalMsg.HospitalShow" @change="selectChange" placeholder="请选择分院" style="width:200px">
@@ -27,10 +27,10 @@
        			 </el-form-item>
        			 <el-form-item label="* 排期时间：">
        			 	 <div class="timeChoose" v-if="AllHospitalMsg.choiceTime" @click="chooseSchedule">{{AllHospitalMsg.choiceTime}}</div>
-               <div class="timeChoose" v-else @click="chooseSchedule">日期控件(可选时间)</div>
+               <div class="timeChoose" style="color:#C0C4CC;" v-else @click="chooseSchedule">请选择时间</div>
        			 </el-form-item>
           <el-form-item label="* 排期场次：">
-            <el-select v-model="AllHospitalMsg.PQCCtitle" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
+            <el-select v-model="AllHospitalMsg.PQCCtitle" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
               <el-option v-for="item in AllHospitalMsg.PQCCList" :key="item.PQCCtitle" :label="item.PQCCtitle" :value="item.PQCCtitle"></el-option>
             </el-select>
           </el-form-item>
@@ -39,7 +39,7 @@
           </el-form-item>
           <div style="margin-top: 30px">
             <el-button type="primary" @click="submit">提交审核</el-button>
-            <el-button type="primary">取消</el-button>
+            <el-button type="primary" @click="goback">取消</el-button>
           </div>
 
 
@@ -127,7 +127,7 @@
         </el-calendar>
 			</div>
             <span slot="footer" class="dialog-footer">
-    <el-button @click="operate.dialogFormVisible = false">取 消</el-button>
+    <el-button @click="operate.dialogFormVisible=false">取 消</el-button>
     <el-button type="primary" @click="confirm_kuang">确 定</el-button>
   </span>
 			</el-dialog>
@@ -160,6 +160,7 @@
           choiceTime:'',
           PQRS:'',
           session:1,
+          comparePQRS:''
         },
 				 activeNames: ['1'],
 				operate:{
@@ -168,14 +169,34 @@
 
 			}
 		},
+    create(){
+      console.log(this.$route.query.id);
+      this.AllHospitalMsg.id=this.$route.query.id
+    },
 		mounted() {
       console.log(this.$route.query.id);
       this.AllHospitalMsg.id=this.$route.query.id
       this.GetAllHospital();
-      this.getRequestDetail()
+      // this.getRequestDetail()
 
     },
 		methods: {
+      goback() {
+        // if(this.ischange) {
+          console.log("++++++++++++++++++");
+          this.$confirm("您还未保存，离开将不保存该数据", "提示", {
+            confirmButtonText: "确认",
+            cancelButtonText: "取消",
+            type: "warning"
+          })
+            .then(() => {
+              this.$router.go(-1);
+            })
+            .catch(() => {});
+        // } else {
+        //   this.$router.go(-1);
+        // }
+      },
 		  getRequestDetail(){
         var body={
           id:this.AllHospitalMsg.id,
@@ -219,15 +240,21 @@
           type: 'warning'
         }).then(() => {
           var body={
-            id:this.AllHospitalMsg.id,
+            MsjBILLCODE:this.AllHospitalMsg.id,
             hospitalCode:this.AllHospitalMsg.hospitalCode,//分院代码
             date:this.AllHospitalMsg.choiceTime,//日期
             session: this.AllHospitalMsg.session, // 场次
             quota:Number(this.AllHospitalMsg.PQRS)  // 人数
           };
           this.$network3
-            .post("/mnoracle/schedule/UpdateAndAllowRequest",body)
+            .post("/mnoracle/schedule/Request",body)
             .then((res)=>{
+              if(res.code==200){
+                that.$router.push('/ScheduleManagement/ScheduleList')
+              }else if(res.code==600){
+                this.$message.error('排期失败');
+
+              }
 
             })
             .catch((err)=>{
@@ -269,6 +296,14 @@
             message: '请选择排期人数!'
           });
           return true;
+        }else{
+          if(Number(this.AllHospitalMsg.comparePQRS)<Number(this.AllHospitalMsg.PQRS)){
+            that.$message({
+              type: 'info',
+              message: '超出当天排期人数，无法进行排期!'
+            });
+            return true;
+          }
         }
       },
       submitToFWQ(){
@@ -303,10 +338,40 @@
         console.log(this.AllHospitalMsg.PQRS)
 
       },
+      cancel(){
+         this.$router.push('/ScheduleManagement/ScheduleList')
+      },
       confirm_kuang(){
         console.log(this.choicetiem)
         console.log(this.AllHospitalMsg.choiceTime)
-        this.operate.dialogFormVisible = false
+        console.log(this.AllHospitalMsg.days);
+        if(this.AllHospitalMsg.days.length>0){
+          if(this.AllHospitalMsg.days.length>0){
+            this.AllHospitalMsg.days.map((item,index)=>{
+              if(item.date==this.choicetiem){
+                if(Number(item.remain_aft)===0&&Number(item.remain_mor)===0){
+                  this.choicetiem=""
+                  this.$message({
+                    type: 'info',
+                    message: '当天无排期!'
+                  });
+                  return;
+                }else{
+                  this.operate.dialogFormVisible = false
+                }
+              }
+            })
+          }
+
+        }else{
+          this.choicetiem=""
+          this.$message({
+            type: 'info',
+            message: '当天无排期!'
+          });
+          return;
+        }
+        // this.operate.dialogFormVisible = false
 
         if(this.choicetiem!=this.AllHospitalMsg.choiceTime){
           console.log(this.AllHospitalMsg.PQCCtitle)
@@ -319,13 +384,19 @@
         console.log(this.AllHospitalMsg.PQCCtitle)
 
       },
+      visibleChange(){
+        console.log(787878788787)
+
+      },
       selectPQCCChange(e){
         console.log(e)
+        console.log(this.AllHospitalMsg.choiceTime)
         this.AllHospitalMsg.PQCCtitle=e
         if(this.AllHospitalMsg.PQCCList.length>0){
           this.AllHospitalMsg.PQCCList.map((item,index)=>{
             if(item.PQCCtitle==e){
               this.AllHospitalMsg.session=item.session
+              this.AllHospitalMsg.comparePQRS=item.remain
             }
           })
         }
@@ -342,6 +413,7 @@
         console.log(e)
       },
       PQCClook(){
+        var that=this;
         var body={
           code:this.AllHospitalMsg.hospitalCode,//分院代码
           date:this.AllHospitalMsg.choiceTime,//日期
@@ -350,22 +422,36 @@
           .post("/mnoracle/schedule/CheckHospitalQuota",body)
           .then((res)=>{
             console.log(res.data);
-            res.data.map((item)=>{
-              if(item.session==1){
-                if(this.AllHospitalMsg.session&&this.AllHospitalMsg.choiceTime){
-                  this.AllHospitalMsg.PQCCtitle=item.date+"上午"+"（剩余"+item.remain+")";
-                }
+            if(res.data){
+              if(res.data.length==0){
 
-                item.PQCCtitle= item.date+"上午"+"（剩余"+item.remain+")";
-              }else if(item.session==2){
-                if(this.AllHospitalMsg.session&&this.AllHospitalMsg.choiceTime){
-                  this.AllHospitalMsg.PQCCtitle=item.date+"上午"+"（剩余"+item.remain+")";
-                }
-                item.PQCCtitle=item.date+"下午"+"（剩余"+item.remain+")";
+                console.log("当天无排期!")
+                that.$message({
+                  type: 'info',
+                  message: '当天无排期!'
+                });
+                return;
               }
-            });
-            this.AllHospitalMsg.PQCCList=res.data;
-            console.log(this.AllHospitalMsg.PQCCList);
+              res.data.map((item)=>{
+                if(item.session==1){
+                  if(this.AllHospitalMsg.session&&this.AllHospitalMsg.choiceTime){
+                    this.AllHospitalMsg.PQCCtitle=item.date+"上午"+"（剩余"+item.remain+")";
+                  }
+
+                  item.PQCCtitle= item.date+"上午"+"（剩余"+item.remain+")";
+                }else if(item.session==2){
+                  if(this.AllHospitalMsg.session&&this.AllHospitalMsg.choiceTime){
+                    this.AllHospitalMsg.PQCCtitle=item.date+"上午"+"（剩余"+item.remain+")";
+                  }
+                  item.PQCCtitle=item.date+"下午"+"（剩余"+item.remain+")";
+                }
+              });
+              this.AllHospitalMsg.PQCCList=res.data;
+              console.log(this.AllHospitalMsg.PQCCList);
+            }else{
+              this.AllHospitalMsg.choiceTime=""
+            }
+
           })
           .catch((err)=>{
             console.log(err);
@@ -418,11 +504,7 @@
         if(val.type == "current-month") {
           this.timechina = val.day.substring(0, 4) + '年' + val.day.substring(5, 7) + '月' + val.day.substring(8, 10) + '日'
           this.choicetiem = val.day
-          // if(this.matchingdata(this.AllHospitalMsg.days, val.day)) {
-          //   this.modificationM = dataval.limit_mor
-          //   this.modificationA = dataval.limit_aft
-          //   this.isdate = true
-          // }
+
 
         } else {
 
@@ -440,32 +522,27 @@
 				return time2
 			},
 			matchingdata(dayList, dayData) {
-				//								console.log(dayList)
+												// console.log(dayList)
 				//				console.log(dayData)
 				//				console.log(this.megliast)
 				//				console.log(this.megliast.leadTime)
 				//				console.log(this.megliast.endTime)
 				// var start = this.fun_date(new Date(this.megliast.startTime.substring(0, 10)), this.megliast.leadTime)
-        var end = this.changeTime(this.TimePickervalue1[1]).substring(0, 10)
-				//				console.log(start)
-				//				console.log(new Date(dayData))
-				//				console.log(start)
-				//				console.log(new Date(end))
-				//				if(start < new Date(dayData) && new Date(dayData) < new Date(end))
-				//				if(new Date(dayData) <= new Date(end))
-				if(new Date(dayData) <= new Date(end)) {
+        // console.log(this.TimePickervalue1)
+        // var end = this.changeTime(this.TimePickervalue1[1]).substring(0, 10)
+				// if(new Date(dayData) <= new Date(end)) {
 					for(var i = 0; i < dayList.length; i++) {
 						if(dayData == dayList[i].date) {
 							var mes = dayList[i]
-							//							console.log(mes)
+														// console.log(mes)
 							return mes
 						} else if(i == dayList.length - 1) {
 							return false
 						}
 					}
-				} else {
-					return false
-				}
+				// } else {
+				// 	return false
+				// }
 				//				console.log(dayList)
 				// return true
 
@@ -656,6 +733,10 @@
               console.log(this.AllHospitalMsg.days);
 
             }else{
+              console.log(5656656566556)
+              this.AllHospitalMsg.choiceTime=""
+              this.AllHospitalMsg.PQCCtitle=""
+              this.AllHospitalMsg.PQCCList=[];
               this.AllHospitalMsg.days=[];
             }
           })
