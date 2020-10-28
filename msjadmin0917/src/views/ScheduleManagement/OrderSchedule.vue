@@ -18,7 +18,7 @@
 			         <el-input  v-model="AllHospitalMsg.id" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
        			 </el-form-item>
        			 <el-form-item label="提交时间：">
-			         <el-input  v-model="AllHospitalMsg.submitAt" :disabled="true" placeholder="0000000000000" style="width:200px" size="mini"></el-input>
+			         <el-input  v-model="AllHospitalMsg.submitAt" :disabled="true" placeholder="0000-00-00 00：00：00" style="width:200px" size="mini"></el-input>
        			 </el-form-item>
        			 <el-form-item label="* 选择分院：">
                <el-select v-model="AllHospitalMsg.HospitalShow" @change="selectChange" placeholder="请选择分院" style="width:200px">
@@ -27,9 +27,14 @@
        			 </el-form-item>
        			 <el-form-item label="* 排期时间：">
        			 	 <div class="timeChoose" v-if="AllHospitalMsg.choiceTime" @click="chooseSchedule">{{AllHospitalMsg.choiceTime}}</div>
-               <div class="timeChoose" style="color:#C0C4CC;" v-else @click="chooseSchedule">请选择时间</div>
+               <div class="timeChoose" style="color:#c0c4cc;" v-else @click="chooseSchedule">请选择时间</div>
        			 </el-form-item>
           <el-form-item label="* 排期场次：">
+            <div class="schedulePart">
+               <div style="float: left;margin-left: 15px">排期场次</div>
+               <div style="float: left;margin-left: 405px">排期人数</div>
+            </div>
+          <div></div>
             <el-select v-model="AllHospitalMsg.PQCCtitle" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
               <el-option v-for="item in AllHospitalMsg.PQCCList" :key="item.PQCCtitle" :label="item.PQCCtitle" :value="item.PQCCtitle"></el-option>
             </el-select>
@@ -48,12 +53,12 @@
 
 
 
-          <el-dialog title="排期时间" :visible.sync="operate.dialogFormVisible" >
-			<div style="margin:20px"   >
+          <el-dialog  width="77%" title="排期时间" :visible.sync="operate.dialogFormVisible" >
+			<div style="margin:20px;min-width: 550px"   >
 
         <el-calendar v-model="value">
-          <template slot="dateCell" slot-scope="{date, data}" class="kalendar">
-            <div style="width:100%;height:100%" @click="selectDate(data,matchingdata(AllHospitalMsg.days,data.day))">
+          <template slot="dateCell" slot-scope="{date, data}" class="kalendar" >
+            <div :class="matchingdata(AllHospitalMsg.days,data.day).isSelected?'isSelectchoose':'isSelectchoose_false'"  @click="selectDate(data,matchingdata(AllHospitalMsg.days,data.day))">
               <div style="font-size: 15px;">{{data.day.split('-').slice(2).join('-')}}</div>
               <div style=" font-size: 10px;float:right;width:calc(100% - 24px);overflow: hidden;">
                 <div style="float:left;width:33%;text-align: center;">总数</div>
@@ -131,7 +136,8 @@
     <el-button type="primary" @click="confirm_kuang">确 定</el-button>
   </span>
 			</el-dialog>
-		</div>
+
+    </div>
 	</div>
 </template>
 
@@ -139,7 +145,8 @@
 	export default {
 		data() {
 			return {
-
+			  compareTime:[],
+        data:{},
         value: new Date(),
         TimePickervalue1:[],
         TimePickervalue1_model:[],
@@ -172,6 +179,11 @@
     create(){
       console.log(this.$route.query.id);
       this.AllHospitalMsg.id=this.$route.query.id
+
+
+
+
+
     },
 		mounted() {
       console.log(this.$route.query.id);
@@ -179,8 +191,24 @@
       this.GetAllHospital();
       // this.getRequestDetail()
 
+
+      Date.prototype.addDays = function (days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+      }
+
+      Date.prototype.shortDate = function () {
+        return `${this.getFullYear()}-${(this.getMonth() + 1).toString().padStart(2, '0')}-${this.getDate().toString().padStart(2, '0')}`;
+      }
+
+      console.log(new Date("2020-01-01").shortDate());
+
+
+
     },
 		methods: {
+
       goback() {
         // if(this.ischange) {
           console.log("++++++++++++++++++");
@@ -316,10 +344,10 @@
         var eString = e.toString()
         console.log(eString)
 
-        if(eString == "0" || eString == "00" || eString == "000" || eString == "0000" || eString == "1") {
+        if(eString == "0" || eString == "00" || eString == "000" || eString == "0000") {
           console.log(5555555)
-          this.AllHospitalMsg.PQRS = "1"
-          this.$message.error('请输入整数')
+          // this.AllHospitalMsg.PQRS = "0"
+          this.$message.error('请输入有效人数！')
         }
         console.log(this.AllHospitalMsg.PQRS)
 
@@ -345,21 +373,27 @@
         console.log(this.choicetiem)
         console.log(this.AllHospitalMsg.choiceTime)
         console.log(this.AllHospitalMsg.days);
+        var chooseHospitalMsg=[]
         if(this.AllHospitalMsg.days.length>0){
           if(this.AllHospitalMsg.days.length>0){
             this.AllHospitalMsg.days.map((item,index)=>{
-              if(item.date==this.choicetiem){
-                if(Number(item.remain_aft)===0&&Number(item.remain_mor)===0){
-                  this.choicetiem=""
-                  this.$message({
-                    type: 'info',
-                    message: '当天无排期!'
-                  });
-                  return;
-                }else{
-                  this.operate.dialogFormVisible = false
-                }
+              if(item.isSelected){
+                chooseHospitalMsg.push(item)
+                console.log(item);
               }
+
+              // if(item.date==this.choicetiem){
+              //   if(Number(item.remain_aft)===0&&Number(item.remain_mor)===0){
+              //     this.choicetiem=""
+              //     this.$message({
+              //       type: 'info',
+              //       message: '当天无排期!'
+              //     });
+              //     return;
+              //   }else{
+              //     this.operate.dialogFormVisible = false
+              //   }
+              // }
             })
           }
 
@@ -373,15 +407,76 @@
         }
         // this.operate.dialogFormVisible = false
 
-        if(this.choicetiem!=this.AllHospitalMsg.choiceTime){
-          console.log(this.AllHospitalMsg.PQCCtitle)
-          this.AllHospitalMsg.PQCCtitle=""
-          this.AllHospitalMsg.session=""
+        // if(this.choicetiem!=this.AllHospitalMsg.choiceTime){
+        //   console.log(this.AllHospitalMsg.PQCCtitle)
+        //   this.AllHospitalMsg.PQCCtitle=""
+        //   this.AllHospitalMsg.session=""
+        // }
+        // this.AllHospitalMsg.choiceTime=this.choicetiem
+        // this.PQCClook()
+        // console.log(this.AllHospitalMsg.choiceTime)
+        // console.log(this.AllHospitalMsg.PQCCtitle)
+        var chooseHospitalMsgTempt_mor=[]
+        var chooseHospitalMsgTempt_aft=[]
+        // chooseHospitalMsg.map((item,index)=>{
+        //   if(item.remain_mor>0){
+        //    console.log(11111111111)
+        //     item.PQCCtitle= item.date+"上午"+"（剩余"+item.remain_mor+")";
+        //     chooseHospitalMsgTempt_mor.push(item)
+        //   }
+        //
+        //
+        // });
+        for(var i=0;i<chooseHospitalMsg.length;i++){
+          if(chooseHospitalMsg[i].remain_mor>0){
+            console.log(1111111)
+            var obj={
+              PQCCtitle:chooseHospitalMsg[i].date+"上午"+"（剩余"+chooseHospitalMsg[i].remain_mor+")",
+              date:chooseHospitalMsg[i].date,
+              descs:chooseHospitalMsg[i].descs_mor,
+              indSched:chooseHospitalMsg[i].indSched_mor,
+              limit:chooseHospitalMsg[i].limit_mor,
+              sched:chooseHospitalMsg[i].sched_mor,
+              session:1,
+
+            }
+            chooseHospitalMsgTempt_mor.push(obj)
+          }
+          if(chooseHospitalMsg[i].remain_aft>0){
+            console.log(2222222222)
+            var obj={
+              PQCCtitle:chooseHospitalMsg[i].date+"下午"+"（剩余"+chooseHospitalMsg[i].remain_aft+")",
+              date:chooseHospitalMsg[i].date,
+              descs:chooseHospitalMsg[i].descs_mor,
+              indSched:chooseHospitalMsg[i].indSched_mor,
+              limit:chooseHospitalMsg[i].limit_mor,
+              sched:chooseHospitalMsg[i].sched_mor,
+              session:2,
+
+            }
+            chooseHospitalMsgTempt_aft.push(obj)
+          }
         }
-        this.AllHospitalMsg.choiceTime=this.choicetiem
-        this.PQCClook()
-        console.log(this.AllHospitalMsg.choiceTime)
-        console.log(this.AllHospitalMsg.PQCCtitle)
+        // for(var i=0;i<chooseHospitalMsg.length;i++){
+        //   if(chooseHospitalMsg[i].remain_aft>0){
+        //     console.log(2222222222)
+        //     chooseHospitalMsg[i].PQCCtitle_aft=chooseHospitalMsg[i].date+"下午"+"（剩余"+chooseHospitalMsg[i].remain_aft+")";
+        //     chooseHospitalMsgTempt_aft.push(chooseHospitalMsg[i])
+        //   }
+        // }
+        // chooseHospitalMsg.map((item,index)=>{
+        //   if(item.remain_aft>0){
+        //     console.log(2222222222)
+        //     item.PQCCtitle=item.date+"下午"+"（剩余"+item.remain_aft+")";
+        //     chooseHospitalMsgTempt_aft.push(item)
+        //   }
+        //
+        // });
+
+        console.log(chooseHospitalMsgTempt_mor);
+        console.log(chooseHospitalMsgTempt_aft);
+        this.AllHospitalMsg.PQCCList=chooseHospitalMsgTempt_mor.concat(chooseHospitalMsgTempt_aft);
+        console.log(this.AllHospitalMsg.PQCCList);
 
       },
       visibleChange(){
@@ -497,14 +592,29 @@
 			},
       selectDate(val, dataval, id) {
         console.log(56565656)
+        console.log(val)
 
         console.log(val)
+
         console.log(dataval)
 
         if(val.type == "current-month") {
           this.timechina = val.day.substring(0, 4) + '年' + val.day.substring(5, 7) + '月' + val.day.substring(8, 10) + '日'
           this.choicetiem = val.day
+          console.log(this.compareTime.length)
+          if(this.compareTime.length>=2){
+            this.compareTime.splice(this.compareTime.length-1,1)
+            this.compareTime.push(val.day)
+            this.getDates()
+          }else if(this.compareTime.length==1){
+            this.compareTime.push(val.day)
+            this.getDates()
+          }else{
+            this.compareTime.push(val.day)
+            this.getDates()
+          }
 
+          this.getDaysFromDuan();
 
         } else {
 
@@ -512,6 +622,75 @@
         console.log(val.day)
         console.log(this.choicetiem)
 
+      },
+      getDaysFromDuan(){
+        console.log(this.compareTime)
+
+      },
+      getDates() {
+        if(this.compareTime.length==1){
+          var startDate= this.compareTime[0]
+          for(var j = 0; j < this.AllHospitalMsg.days.length; j++) {
+            if(startDate == this.AllHospitalMsg.days[j].date) {
+              console.log(this.AllHospitalMsg.days[j])
+              this.AllHospitalMsg.days[j].isSelected = true
+              console.log(this.AllHospitalMsg.days[j])
+
+            }else{
+              // this.AllHospitalMsg.days[j].isSelected = false
+            }
+          }
+
+        }else if(this.compareTime.length==2){
+          var startDate= this.compareTime[0]
+          var stopDate= this.compareTime[1]
+          console.log(Date.parse(this.compareTime[0]))
+          if(Date.parse(this.compareTime[1])>Date.parse(this.compareTime[0])){
+            startDate= this.compareTime[0]
+            stopDate= this.compareTime[1]
+          }else{
+            startDate= this.compareTime[1]
+            stopDate= this.compareTime[0]
+          }
+
+
+          var array=  this.getDateArray(new Date(startDate), new Date(stopDate))
+          console.log(array);
+          for(var j = 0; j < this.AllHospitalMsg.days.length; j++) {
+            this.AllHospitalMsg.days[j].isSelected = false
+          }
+
+          for(var i = 0; i < array.length; i++) {
+            for(var j = 0; j < this.AllHospitalMsg.days.length; j++) {
+
+              if(array[i] == this.AllHospitalMsg.days[j].date) {
+                console.log(this.AllHospitalMsg.days[j])
+                this.AllHospitalMsg.days[j].isSelected = true
+
+
+                console.log(this.AllHospitalMsg.days[j])
+                // return this.AllHospitalMsg.days[j]
+              }else{
+                console.log(this.AllHospitalMsg.days[j])
+                // this.AllHospitalMsg.days[j].isSelected = false
+              }
+            }
+          }
+          console.log(this.AllHospitalMsg.days)
+        }
+
+      },
+      getDateArray(startDate, stopDate) {
+        console.log(startDate)
+        console.log(stopDate)
+        var dateArray = new Array();
+        var currentDate = startDate;
+        while (currentDate <= stopDate) {
+          dateArray.push(new Date(currentDate).shortDate());
+          currentDate = currentDate.addDays(1);
+        }
+        console.log(dateArray);
+        return dateArray;
       },
 			fun_date: function(date2, aa) { //查看几天前的日期
 				function PrefixInteger(num, n) { //在数值前面加个0
@@ -547,6 +726,17 @@
 				// return true
 
 			},
+      compareIsSelect(dayList, dayData){
+        for(var i = 0; i < dayList.length; i++) {
+          if(dayData == dayList[i].date) {
+            var mes = dayList[i]
+            // console.log(mes)
+            return mes
+          } else if(i == dayList.length - 1) {
+            return false
+          }
+        }
+      },
       getCalendar(){
         var that = this;
         var tt=this.changeTime(this.value);
@@ -620,6 +810,7 @@
                 remain_aft:'',
                 descs_mor:'',
                 descs_aft:'',
+                isSelected:false
               }
               let daysArray=[]
               for (var i = 0; i < newArr.length;i++){
@@ -640,6 +831,7 @@
                       remain_aft:'',
                       descs_mor:'',
                       descs_aft:'',
+                      isSelected:false
                     }
 
                     if(newArr[i].session===1){
@@ -655,6 +847,8 @@
                       obj.indSched_aft=""
                       obj.remain_aft=""
                       obj. descs_aft=""
+                      obj. isSelected=false
+
 
                     }else if(newArr[i].session===2){
                       obj.date=newArr[i].date
@@ -668,6 +862,7 @@
                       obj.indSched_aft=newArr[i].indSched
                       obj.remain_aft=newArr[i].remain
                       obj. descs_aft=newArr[i].descs
+                      obj. isSelected=false
                     }
                     // console.log(obj);
                     daysArray.push(obj)
@@ -688,6 +883,7 @@
                       remain_aft:'',
                       descs_mor:'',
                       descs_aft:'',
+                      isSelected:false
                     }
                     if(newArr[i].session===1){
 
@@ -702,6 +898,7 @@
                       obj.indSched_aft=anArray[j].indSched
                       obj.remain_aft=anArray[j].remain
                       obj. descs_aft=anArray[j].descs
+                      obj. isSelected=false
 
                     }else if(newArr[i].session===2){
                       obj.date=newArr[i].date
@@ -715,6 +912,7 @@
                       obj.indSched_aft=newArr[i].indSched
                       obj.remain_aft=newArr[i].remain
                       obj. descs_aft=newArr[i].descs
+                      obj. isSelected=false
                     }
                     daysArray.push(obj)
                   }
@@ -793,7 +991,7 @@
         handler(newName, oldName) {
           console.log(this.value)
 
-          this.getCalendar();
+          // this.getCalendar();
 
           console.log(this.value)
         },
@@ -830,11 +1028,38 @@
 			border-radius: 4px;
 			cursor: pointer;
 		}
+    .isSelectchoose{
+      width:100%;
+      height:100% ;
+      background-color: #f2f8fe;
+    }
+    .isSelectchoose_false{
+      width:100%;
+      height:100% ;
 
+    }
+    .el-dialog{
+      min-width: 1000px;
+    }
+    .el-calendar-day{
+      height: 102px;
+    }
+    .el-calendar-table td.is-selected{
+      background-color: transparent;
+    }
 		.checkSchedule_paiqi{
 			.el-form-item__label{
 				font-size: 24px;
 			}
 		}
+    .schedulePart{
+      //display: flex;
+      width: 1000px;
+      height: 50px;
+      color: #222222;
+      font-size: 16px;
+      line-height: 50px;
+      background-color:#DDDDDD;
+    }
 	}
 </style>
