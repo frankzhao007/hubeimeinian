@@ -34,8 +34,8 @@
         </el-form-item> -->
 				<!-- <el-form-item label="时间范围：">
           <el-date-picker value-format="yyyy-MM-dd" v-model="seekobj.TimeHorizon" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
-          </el-date-picker> -->
-				</el-form-item>
+          </el-date-picker>
+				</el-form-item>-->
 				<el-form-item style="float:right">
 					<!-- <el-button type="primary" icon="el-icon-refresh-right" @click="">重 置</el-button> -->
 					<el-button type="primary" icon="el-icon-search" @click="seekbtn">搜 索</el-button>
@@ -638,7 +638,7 @@
 			},
 			gotoOBD(row) {
 				this.$router.push(
-					"/AuditManagement/AmOrderBasicDetails?MsjBILLCODE=" + row.orderID
+					"/AuditManagement/AmOrderBasicDetails?MsjBILLCODE=" + row.orderID+"&Status=" +row.Status+"&id=" +row.id
 				);
 			}
 		},

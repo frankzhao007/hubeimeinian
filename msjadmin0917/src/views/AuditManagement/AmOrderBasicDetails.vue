@@ -397,10 +397,7 @@ export default {
                 this.$store.commit("setOrderBasicDetailsmsg", {});
                 console.log(res);
                 this.$router.push(
-                  "/AuditManagement/AmOrderComboDetails?MsjBILLCODE=" +
-                    this.$route.query.MsjBILLCODE +
-                    "&DWDM=" +
-                    this.seekobj.DWDM
+                  "/AuditManagement/AmOrderComboDetails?MsjBILLCODE=" + this.$route.query.MsjBILLCODE + "&DWDM=" + this.seekobj.DWDM + "&Status=" + this.$route.query.Status + "&id=" + this.$route.query.id
                 );
                 // this.gotoOCD();
               })
