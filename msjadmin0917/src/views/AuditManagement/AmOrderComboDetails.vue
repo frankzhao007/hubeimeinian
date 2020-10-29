@@ -10,18 +10,35 @@
       <el-button type="primary" @click="importcombo('员工')" :disabled="tableobj1.loading">导入人员</el-button>
       <el-button type="primary" @click="savecombomsgbtn()" :disabled="tableobj1.loading">保 存</el-button>
       <el-button type="primary" :disabled="tableobj1.loading" @click="DeleteCombo()">删 除</el-button> -->
-      <el-button type="primary" icon="el-icon-download" :loading="isshowpdf" @click="exportpdf()">导出PDF</el-button>
+     <div v-if="role=='内勤'||role=='财务'" >
+       <div style="float: left" v-if="STATUSchange(addcomboobj.Status)=='审核通过'||STATUSchange(addcomboobj.Status)=='审核拒绝'">
+         <el-button  type="info" v-if="STATUSchange(addcomboobj.Status)=='审核通过'" >通过审核 </el-button>
+         <el-button  type="primary" v-if="STATUSchange(addcomboobj.Status)=='审核通过'"  @click="rejectRefusetoreview()">拒绝审核 </el-button>
+         <el-button  type="info" v-if="STATUSchange(addcomboobj.Status)=='审核拒绝'"  >通过审核</el-button>
+         <el-button  type="info" v-if="STATUSchange(addcomboobj.Status)=='审核拒绝'"  >拒绝审核</el-button>
+         <el-button type="primary" icon="el-icon-download" :loading="isshowpdf" @click="exportpdf()">导出PDF</el-button>
+       </div>
+       <div style="float: left;margin-right: 20px" v-if="STATUSchange(addcomboobj.Status)!='审核通过'&&STATUSchange(addcomboobj.Status)!='审核拒绝'">
+         <el-button  type="primary" @click="passverification()">通过审核</el-button>
+         <el-button  type="primary" @click="rejectRefusetoreview()">拒绝审核</el-button>
+         <el-button type="primary" icon="el-icon-download" :loading="isshowpdf" @click="exportpdf()">导出PDF</el-button>
+       </div>
 
+     </div>
+
+
+<!--      <el-button type="primary"   :loading="isshowpdf" @click="accept()">通过审核</el-button>-->
+<!--      <el-button type="primary"   :loading="isshowpdf" @click="reject()">审核拒绝</el-button>-->
     </div>
     <!-- 数据列表1 -->
     <div>
       <el-table :data="tableobj1.list" style="width: 100%" v-loading="tableobj1.loading" max-height="500px" ref="singleTable" highlight-current-row @current-change="handleCurrentChange">
         <el-table-column prop="ID" label="序号" width="80px"></el-table-column>
         <el-table-column prop="GROUPNAME" label="套餐名称"></el-table-column>
-        <el-table-column label="类别">
+        <el-table-column label="性别">
           <template slot-scope="scope">
             <el-select v-model="scope.row.OP_DATETIME" placeholder="" :disabled="true" style="width:100%" size="mini">
-              <el-option label="全部" value="0"></el-option>
+              <el-option label="通用" value="0"></el-option>
               <el-option label="男" value="1"></el-option>
               <el-option label="女" value="2"></el-option>
             </el-select>
@@ -37,16 +54,38 @@
             </el-select>
           </template>
         </el-table-column>
-        <el-table-column prop="PRICE" label="成交价">
+        <el-table-column prop="OLDPRICE" label="原价">
+          <template slot-scope="scope">
+            <div style="max-width: 200px;border: 1px solid #E4E7ED;background-color:#F5F7FA;padding-left: 10px ;color: #C0C4CC;">
+              {{scope.row.calculateOldprice}}
+            </div>
+<!--            <el-input v-model="scope.row.OLDPRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>-->
+          </template>
+        </el-table-column>
+        <el-table-column prop="PRICE" label="结算价">
           <template slot-scope="scope">
             <el-input v-model="scope.row.PRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
           </template>
         </el-table-column>
-        <el-table-column prop="OLDPRICE" label="原价">
+        <el-table-column prop="OLDPRICE" label="套餐折扣率">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.OLDPRICE" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
+            <div style="max-width: 200px;border: 1px solid #E4E7ED;background-color:#F5F7FA;padding-left: 10px ;color: #C0C4CC;">
+              {{toFixed((scope.row.PRICE/scope.row.calculateOldprice)*100)}}%
+            </div>
+<!--            <el-input v-model="toFixed(scope.row.PRICE/yuanjiachange(scope.row.details)*100)" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>-->
           </template>
         </el-table-column>
+        <el-table-column prop="costCoefficient" v-if="role=='财务'" label="成本系数">
+        	<template slot-scope="scope">
+            <el-input  v-model="scope.row.costCoefficient" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
+          </template>
+        </el-table-column>
+        <el-table-column prop="costCoefficientRate" v-if="role=='财务'" label="成本系数率">
+        	<template slot-scope="scope">
+            <el-input v-model="scope.row.costCoefficientRate" :disabled="true" placeholder="请填写" style="width:100%" size="mini"></el-input>
+          </template>
+        </el-table-column>
+
       </el-table>
       <!-- <div style="height:30px;margin-top:20px;">
         <el-pagination style="float:right" @size-change="" @current-change="" :current-page="tableobj1.pageindex" :page-sizes="[10, 20, 30, 40]" :page-size="tableobj1.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="tableobj1.total">
@@ -58,7 +97,7 @@
         <span style="font-size:20px;line-height:40px">套餐明细</span>
         <span style="margin-left:20px">总计：{{tableobj2.list.length||0}}&nbsp&nbsp项</span>
         <span style="margin-left:20px">原价：{{yuanjiachange()}}&nbsp&nbsp元</span>
-        <span style="margin-left:20px">成交价：{{chengjiaochange()}}&nbsp&nbsp元</span>
+        <span style="margin-left:20px">结算价：{{chengjiaochange()}}&nbsp&nbsp元</span>
         <!--<div style="float:right">
           <el-button type="text" icon="el-icon-plus" @click="addcombodetail" :disabled="tableobj1.loading">新增</el-button>
           <el-button type="text" icon="el-icon-plus">下载美年项目表</el-button>
@@ -120,9 +159,9 @@
         <el-table-column label="性别">
           <template slot-scope="scope">
             <el-select v-model="scope.row.XB" placeholder="" :disabled="true" style="width:100%" size="mini">
-              <el-option label="男" value="0"></el-option>
+              <el-option label="男" value="2"></el-option>
               <el-option label="女" value="1"></el-option>
-              <el-option label="未知" value="3"></el-option>
+              <el-option label="通用" value="0"></el-option>
             </el-select>
           </template>
         </el-table-column>
@@ -134,9 +173,9 @@
         <el-table-column label="婚否">
           <template slot-scope="scope">
             <el-select v-model="scope.row.HYZK" placeholder=""  :disabled="true" style="width:100%" size="mini">
-              <el-option label="已婚" value="0001"></el-option>
-              <el-option label="未婚" :value="null"></el-option>
-              <!-- <el-option label="" value="3"></el-option> -->
+              <el-option label="已婚" value="01"></el-option>
+              <el-option label="未婚" value="02"></el-option>
+               <el-option label="未知" value="03"></el-option>
             </el-select>
           </template>
         </el-table-column>
@@ -267,7 +306,27 @@
       </el-dialog>
     </div>
     <input ref="inputer" id="upload" style="display:none" type="file" @change="importfxx()" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+
+    <!-- 提交审核弹窗 -->
+    <div>
+      <el-dialog title="订单审核" :visible.sync="addcomboobj.passShow" width="600px">
+        <el-form :model="addcomboobj" label-position='right' label-width="200px" size="medium">
+          <el-form-item label="单据号：">
+            {{addcomboobj.MsjBILLCODE}}
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="addcomboobj.passShow = false">取 消</el-button>
+          <el-button type="primary" @click="confirmAddAudit()">确 定</el-button>
+        </div>
+      </el-dialog>
+    </div>
+
+
   </div>
+
+
+
 </template>
 <script>
 import html2Canvas from "html2canvas";
@@ -276,6 +335,7 @@ export default {
   components: {},
   data() {
     return {
+    	role:'',
       isyuangong: false,
       excelselectSheetNames: "",
       excelSheetNames: [],
@@ -285,6 +345,8 @@ export default {
       },
       isshowpdf: false,
       addcomboobj: {
+        Status:0,
+    	  passShow:false,
         isshow: false,
         MsjBILLCODE: "",
         GROUPNAME: "",
@@ -329,10 +391,98 @@ export default {
   mounted() {
     if (this.$route.query) {
       this.addcomboobj.MsjBILLCODE = this.$route.query.MsjBILLCODE;
+      this.addcomboobj.Status = this.$route.query.Status;
+      this.addcomboobj.id = this.$route.query.id;
     }
+
     this.GetCombo();
+    this.role = this.$store.getters.getrolemsg
+    console.log(this.role)
   },
   methods: {
+    STATUSchange(val) {
+      val=Number(val)
+      switch(val) {
+        case 0:
+           console.log("000000000000")
+          return "审核中";
+          break;
+        case 1:
+          console.log("1111111111111111")
+          return "审核通过";
+          break;
+        case 2:
+          return "审核拒绝";
+          break;
+        default:
+          break;
+      }
+
+    },
+    rejectRefusetoreview(row) {
+      console.log(row);
+      this.$confirm("是否拒绝此单通过审核?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$network3
+            .post("/mnoracle/orderAudit/reject", {
+              id: this.addcomboobj.id,
+              uid: this.$store.getters.getRoleInfo.MNId
+              // ID: row.ID,
+              // YWYDM: this.usermsg.LinkMan,
+              // Remark: ""
+            })
+            .then(res => {
+              console.log(res);
+              if(res.code==600){
+                this.$message.error(res.msg);
+              }
+              this.GetCombo();
+            })
+            .catch(err => {
+              console.log(err);
+              this.$message.error(err.msg);
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        });
+    },
+    passverification(){
+      this.addcomboobj.passShow = true
+    },
+    confirmAddAudit() {
+      var body = {
+        id: this.addcomboobj.id,
+        uid: this.$store.getters.getRoleInfo.MNId
+
+      };
+
+      this.$network3
+        .post("/mnoracle/orderAudit/accept", body)
+        .then(res => {
+          console.log(res);
+          if(res.code == 200) {
+            this.addcomboobj.passShow = false
+            this.GetCombo();
+          } else {
+            this.$message.error(res.msg);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.$message.error(err.msg);
+        });
+    },
+    toFixed(value){
+      return value.toFixed(2)
+    },
     importcombo(str) {
       if (str == "员工") {
         this.isyuangong = true;
@@ -523,36 +673,7 @@ export default {
             console.log(err);
             this.$message.error(err.msg);
           });
-        // for (const key in val) {
-        //   if (val.hasOwnProperty(key)) {
-        //     const element = val[key];
-        //     console.log(key, element);
-        //     if (String(key).substring(0, 1) == "B" && key != "B1") {
-        //       for (let i = 0; i < tableobj2temp.length; i++) {
-        //         if (tableobj2temp[i].index == String(key).substring(1)) {
-        //           tableobj2temp[i].ITEM_NAME = element.v;
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
-        // for (const key in val) {
-        //   if (val.hasOwnProperty(key)) {
-        //     const element = val[key];
-        //     console.log(key, element);
-        //     if (String(key).substring(0, 1) == "G" && key != "G1") {
-        //       for (let i = 0; i < tableobj2temp.length; i++) {
-        //         if (tableobj2temp[i].index == String(key).substring(1)) {
-        //           if (element.v == "免费") {
-        //             tableobj2temp[i].PRICE == 0;
-        //           } else {
-        //             tableobj2temp[i].PRICE =Number(element.v);
-        //           }
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
+
       }
 
       this.excelselectobj.isshow = false;
@@ -566,11 +687,16 @@ export default {
       return price;
     },
     chengjiaochange() {
-      var price = 0;
-      this.tableobj1.list.map(item => {
-        price += Number(item.PRICE);
-      });
-      return price;
+    	console.log(this.currentRow);
+//    var price = 0;
+//    this.tableobj1.list.map(item => {
+//      price += Number(item.PRICE);
+//    });
+//    return price;
+     if(this.currentRow){
+     	 return this.currentRow.PRICE;
+     }
+
     },
     combonamechange(item) {
       console.log(item);
@@ -1000,6 +1126,22 @@ export default {
             this.tableobj1.list = res.data;
             this.tableobj1.loading = false;
             if (this.tableobj1.list.length > 0) {
+              this.tableobj1.list.map((item, index) => {
+
+                if(item.details.length>0){
+                  var calculateOldprice=0;
+                  for(var i=0;i<item.details.length;i++){
+
+                    calculateOldprice+=Number(item.details[i].PRICE)
+
+                  }
+                  console.log(calculateOldprice);
+                  item.calculateOldprice=calculateOldprice
+                }
+
+                console.log(this.tableobj1.list);
+              });
+
               if (this.currentRow && this.currentRow != "") {
                 this.tableobj1.list.map((item, index) => {
                   if (item.ID == this.currentRow.ID) {
@@ -1007,7 +1149,9 @@ export default {
                       this.tableobj1.list[index]
                     );
                   }
+
                 });
+
               } else {
                 this.$refs.singleTable.setCurrentRow(this.tableobj1.list[0]);
               }
