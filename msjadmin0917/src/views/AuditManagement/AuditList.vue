@@ -116,9 +116,9 @@
 						<div v-if="STATUSchange(scope.row.Status)=='审核通过'||STATUSchange(scope.row.Status)=='审核拒绝'">
 							<el-button size="mini" type="text" @click="gotoOBD(scope.row)">查看</el-button>
 							<div></div>
-							<el-button size="mini" type="text" v-if="role!='内勤'&&'财务'" @click="passverification(scope.row)">通过审核</el-button>
+							<el-button size="mini" type="text" v-if="role!='内勤'&&role!='财务'" @click="passverification(scope.row)">通过审核</el-button>
 							<div></div>
-							<el-button size="mini" type="text" v-if="role!='内勤'&&'财务'" @click="Refusetoreview(scope.row)">拒绝审核</el-button>
+							<el-button size="mini" type="text" v-if="role!='内勤'&&role!='财务'" @click="Refusetoreview(scope.row)">拒绝审核</el-button>
 						</div>
 						<div v-if="STATUSchange(scope.row.Status)!='审核通过'&&STATUSchange(scope.row.Status)!='审核拒绝'">
 							<el-button size="mini" type="text" @click="gotoOBD(scope.row)">查看</el-button>

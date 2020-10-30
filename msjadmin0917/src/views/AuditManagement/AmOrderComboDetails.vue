@@ -13,8 +13,8 @@
      <div v-if="role=='内勤'||role=='财务'" >
        <div style="float: left" v-if="STATUSchange(addcomboobj.Status)=='审核通过'||STATUSchange(addcomboobj.Status)=='审核拒绝'">
          <el-button  type="info" v-if="STATUSchange(addcomboobj.Status)=='审核通过'" >通过审核 </el-button>
-         <el-button  type="primary" v-if="STATUSchange(addcomboobj.Status)=='审核通过'"  @click="rejectRefusetoreview()">拒绝审核 </el-button>
-         <el-button  type="info" v-if="STATUSchange(addcomboobj.Status)=='审核拒绝'"  >通过审核</el-button>
+<!--         <el-button  type="primary" v-if="STATUSchange(addcomboobj.Status)=='审核通过'"  @click="rejectRefusetoreview()">拒绝审核 </el-button>-->
+<!--         <el-button  type="info" v-if="STATUSchange(addcomboobj.Status)=='审核拒绝'"  >通过审核</el-button>-->
          <el-button  type="info" v-if="STATUSchange(addcomboobj.Status)=='审核拒绝'"  >拒绝审核</el-button>
          <el-button type="primary" icon="el-icon-download" :loading="isshowpdf" @click="exportpdf()">导出PDF</el-button>
        </div>
