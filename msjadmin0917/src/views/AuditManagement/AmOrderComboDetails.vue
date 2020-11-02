@@ -437,6 +437,12 @@ export default {
             })
             .then(res => {
               console.log(res);
+              if(res.code==200){
+                this.$message({
+                  message: res.msg,
+                  type: 'success'
+                });
+              }
               if(res.code==600){
                 this.$message.error(res.msg);
               }
@@ -471,6 +477,10 @@ export default {
           if(res.code == 200) {
             this.addcomboobj.passShow = false
             this.GetCombo();
+            this.$message({
+              message: res.msg,
+              type: 'success'
+            });
           } else {
             this.$message.error(res.msg);
           }
