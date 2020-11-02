@@ -29,23 +29,57 @@
        			 	 <div class="timeChoose" v-if="AllHospitalMsg.choiceTime" @click="chooseSchedule">{{AllHospitalMsg.choiceTime}}</div>
                <div class="timeChoose" style="color:#c0c4cc;" v-else @click="chooseSchedule">请选择时间</div>
        			 </el-form-item>
-          <el-form-item label="* 排期场次：">
-            <div class="schedulePart">
-               <div style="float: left;margin-left: 15px">排期场次</div>
-               <div style="float: left;margin-left: 405px">排期人数</div>
-            </div>
-          <div></div>
-            <el-select v-model="AllHospitalMsg.PQCCtitle" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
-              <el-option v-for="item in AllHospitalMsg.PQCCList" :key="item.PQCCtitle" :label="item.PQCCtitle" :value="item.PQCCtitle"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="* 排期人数：">
-            <el-input v-model.trim="AllHospitalMsg.PQRS" maxlength=10000 @change="input_change_leadTime(AllHospitalMsg.PQRS)" placeholder="请输入人数" style="width:200px" clearable></el-input>
-          </el-form-item>
+<!--          <el-form-item label="*">-->
+              <div v-if="AllHospitalMsg.PQCCList.length>0">
+                <div class="schedulePart">
+                  <div style="float: left;margin-left: 15px">排期场次</div>
+                  <div style="float: left;margin-left: 405px">排期人数</div>
+                </div>
+                <div>
+<!--                  border-bottom:1px solid #DCDFE6;color: #DCDFE6;-->
+                   <div style="width: 1000px;border-bottom:1px solid #DCDFE6;padding-bottom: 10px" v-for="(itemMsg,indexitemMsg) in AllHospitalMsg.PQCCList">
+                     <div style="width: 1000px">
+                       <div style="float: left;padding-top: 15px;font-size: 16px">{{itemMsg.PQCCtitle}}</div>
+                       <div style="float: left;margin-left: 316px">
+                         <div  v-for="(itemtancan,indexitemtancan) in itemMsg.tancan">
+                           <div style="float: left;padding-top: 10px">
+                             <el-select v-model="AllHospitalMsg.PQCCtitle" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
+                               <el-option v-for="item in AllHospitalMsg.PQCCList" :key="item.PQCCtitle" :label="item.PQCCtitle" :value="item.PQCCtitle"></el-option>
+                             </el-select>
+                           </div>
+                           <div style="float: left;height: 50px;margin-left: 30px;padding-top: 10px">
+                             <el-input v-model.trim="AllHospitalMsg.PQRS" maxlength=10000 @change="input_change_leadTime(AllHospitalMsg.PQRS)" placeholder="请输入人数" style="width:100px" clearable></el-input>
+                           </div>
+                           <div @click="decreaseTancanAndPerson(indexitemMsg,indexitemtancan)" v-if="indexitemtancan!=0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:36px;float: left;width: 35px;height: 35px;line-height:35px;border-radius: 50%;text-align:center;border: 1px solid #DCDFE6;color: #DCDFE6;">-</div>
+                           <div @click="addTancanAndPerson(indexitemMsg)" v-if="indexitemtancan==0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:36px;float: left;width: 35px;height: 35px;line-height:35px;text-align:center;border-radius: 50%;border: 1px solid #DCDFE6;color: #DCDFE6;">+</div>
+                         </div>
+                         <div style="clear: both"></div>
+                       </div>
+
+                       <div style="float: right;cursor: pointer;margin-top: 10px;">删除</div>
+
+
+
+                     </div>
+                     <div style="clear: both"></div>
+                     </div>
+
+                   <div style="clear: both"></div>
+                </div>
+
+
+              </div>
+
+<!--          </el-form-item>-->
+<!--          <el-form-item label="* 排期人数：">-->
+<!--            <el-input v-model.trim="AllHospitalMsg.PQRS" maxlength=10000 @change="input_change_leadTime(AllHospitalMsg.PQRS)" placeholder="请输入人数" style="width:200px" clearable></el-input>-->
+<!--          </el-form-item>-->
           <div style="margin-top: 30px">
             <el-button type="primary" @click="submit">提交审核</el-button>
             <el-button type="primary" @click="goback">取消</el-button>
           </div>
+
+
 
 
 			</el-form>
@@ -208,7 +242,20 @@
 
     },
 		methods: {
-
+      decreaseTancanAndPerson(e,taocanIndex){
+        console.log(e)
+        this.AllHospitalMsg.PQCCList[e].tancan.splice(taocanIndex,1)
+      },
+      addTancanAndPerson(e){
+        console.log(e)
+        this.AllHospitalMsg.PQCCList[e].tancan.push({id:"",personQuantity:''})
+        // for (var i=0;i<this.AllHospitalMsg.PQCCList.length;i++){
+        //       if(i==e){
+        //
+        //         this.AllHospitalMsg.PQCCList[i].tancan.push({id:"",personQuantity:''})
+        //   }
+        // }
+      },
       goback() {
         // if(this.ischange) {
           console.log("++++++++++++++++++");
@@ -438,6 +485,7 @@
               limit:chooseHospitalMsg[i].limit_mor,
               sched:chooseHospitalMsg[i].sched_mor,
               session:1,
+              tancan:[{id:"",personQuantity:''}]
 
             }
             chooseHospitalMsgTempt_mor.push(obj)
@@ -452,6 +500,7 @@
               limit:chooseHospitalMsg[i].limit_mor,
               sched:chooseHospitalMsg[i].sched_mor,
               session:2,
+              tancan:[{id:"",personQuantity:''}]
 
             }
             chooseHospitalMsgTempt_aft.push(obj)
@@ -476,6 +525,8 @@
         console.log(chooseHospitalMsgTempt_mor);
         console.log(chooseHospitalMsgTempt_aft);
         this.AllHospitalMsg.PQCCList=chooseHospitalMsgTempt_mor.concat(chooseHospitalMsgTempt_aft);
+        this.AllHospitalMsg.PQCCList.sort((a, b) => a.date.localeCompare(b.date));
+
         console.log(this.AllHospitalMsg.PQCCList);
 
       },
