@@ -36,27 +36,27 @@
                   <div style="float: left;margin-left: 405px">排期人数</div>
                 </div>
                 <div>
-<!--                  border-bottom:1px solid #DCDFE6;color: #DCDFE6;-->
+
                    <div style="width: 1000px;border-bottom:1px solid #DCDFE6;padding-bottom: 10px" v-for="(itemMsg,indexitemMsg) in AllHospitalMsg.PQCCList">
                      <div style="width: 1000px">
                        <div style="float: left;padding-top: 15px;font-size: 16px">{{itemMsg.PQCCtitle}}</div>
-                       <div style="float: left;margin-left: 316px">
+                       <div style="float: left;margin-left: 293px">
                          <div  v-for="(itemtancan,indexitemtancan) in itemMsg.tancan">
                            <div style="float: left;padding-top: 10px">
-                             <el-select v-model="AllHospitalMsg.PQCCtitle" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
+                             <el-select v-model="itemtancan.id" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
                                <el-option v-for="item in AllHospitalMsg.PQCCList" :key="item.PQCCtitle" :label="item.PQCCtitle" :value="item.PQCCtitle"></el-option>
                              </el-select>
                            </div>
-                           <div style="float: left;height: 50px;margin-left: 30px;padding-top: 10px">
-                             <el-input v-model.trim="AllHospitalMsg.PQRS" maxlength=10000 @change="input_change_leadTime(AllHospitalMsg.PQRS)" placeholder="请输入人数" style="width:100px" clearable></el-input>
+                           <div style="float: left;height: 50px;margin-left: 30px;padding-top: 10px;width: 150px">
+                             <el-input v-model.trim="itemtancan.personQuantity" maxlength=10000 @change="input_change_leadTime(itemtancan.personQuantity)" placeholder="请输入人数" style="width:130px" clearable></el-input>
                            </div>
-                           <div @click="decreaseTancanAndPerson(indexitemMsg,indexitemtancan)" v-if="indexitemtancan!=0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:36px;float: left;width: 35px;height: 35px;line-height:35px;border-radius: 50%;text-align:center;border: 1px solid #DCDFE6;color: #DCDFE6;">-</div>
+                           <div @click="decreaseTancanAndPerson(indexitemMsg,indexitemtancan)" v-if="indexitemtancan!=0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:23px;float: left;width: 35px;height: 35px;line-height:35px;border-radius: 50%;text-align:center;border: 1px solid #DCDFE6;color: #DCDFE6;">—</div>
                            <div @click="addTancanAndPerson(indexitemMsg)" v-if="indexitemtancan==0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:36px;float: left;width: 35px;height: 35px;line-height:35px;text-align:center;border-radius: 50%;border: 1px solid #DCDFE6;color: #DCDFE6;">+</div>
                          </div>
                          <div style="clear: both"></div>
                        </div>
 
-                       <div style="float: right;cursor: pointer;margin-top: 10px;">删除</div>
+                       <div @click="decreaseTancanAndPerson(indexitemMsg)" style="float: right;cursor: pointer;margin-top: 10px;">删除</div>
 
 
 
@@ -304,6 +304,7 @@
       submit(){
         var that=this
        var verify= this.verify();
+        console.log(this.AllHospitalMsg.PQCCList)
         if(verify){
           return
         }
@@ -351,17 +352,51 @@
           });
           return true;
         }
-        if(!this.AllHospitalMsg.choiceTime) {
+        // if(!this.AllHospitalMsg.choiceTime) {
+        //   that.$message({
+        //     type: 'info',
+        //     message: '请选择排期时间!'
+        //   });
+        //   return true;
+        // }
+        console.log(this.AllHospitalMsg.PQCCList.length)
+        if(this.AllHospitalMsg.PQCCList.length>0) {
+          for(var i=0;i<this.AllHospitalMsg.PQCCList.length;i++)
+          {
+            for(var j=0;j<this.AllHospitalMsg.PQCCList[i].tancan.length;j++){
+              if(!this.AllHospitalMsg.PQCCList[i].tancan[j].id){
+                console.log(1111111111111111)
+                that.$message({
+                  type: 'info',
+                  message: '请选择'+this.AllHospitalMsg.PQCCList[i].PQCCtitle.substring(0,12)+'排期套餐!'
+                });
+                return true;
+              }
+              if(!this.AllHospitalMsg.PQCCList[i].tancan[j].personQuantity){
+                that.$message({
+                  type: 'info',
+                  message: '请输入'+this.AllHospitalMsg.PQCCList[i].PQCCtitle.substring(0,12)+'排期人数!'
+                });
+                return true;
+              }
+              console.log(this.AllHospitalMsg.PQCCList[i].remain)
+              console.log(this.AllHospitalMsg.PQCCList[i].tancan[j].personQuantity)
+              if(Number(this.AllHospitalMsg.PQCCList[i].remain)<Number(this.AllHospitalMsg.PQCCList[i].tancan[j].personQuantity)){
+                that.$message({
+                  type: 'info',
+                  message: '超出'+this.AllHospitalMsg.PQCCList[i].PQCCtitle.substring(0,12)+'排期人数，无法进行排期!'
+                });
+                return true;
+              }
+            }
+
+          }
+
+
+        }else{
           that.$message({
             type: 'info',
-            message: '请选择排期时间!'
-          });
-          return true;
-        }
-        if(!this.AllHospitalMsg.session) {
-          that.$message({
-            type: 'info',
-            message: '请选择排期场次!'
+            message: '请添加排期场次!'
           });
           return true;
         }
@@ -483,6 +518,7 @@
               descs:chooseHospitalMsg[i].descs_mor,
               indSched:chooseHospitalMsg[i].indSched_mor,
               limit:chooseHospitalMsg[i].limit_mor,
+              remain:chooseHospitalMsg[i].remain_mor,
               sched:chooseHospitalMsg[i].sched_mor,
               session:1,
               tancan:[{id:"",personQuantity:''}]
@@ -495,10 +531,11 @@
             var obj={
               PQCCtitle:chooseHospitalMsg[i].date+"下午"+"（剩余"+chooseHospitalMsg[i].remain_aft+")",
               date:chooseHospitalMsg[i].date,
-              descs:chooseHospitalMsg[i].descs_mor,
-              indSched:chooseHospitalMsg[i].indSched_mor,
-              limit:chooseHospitalMsg[i].limit_mor,
-              sched:chooseHospitalMsg[i].sched_mor,
+              descs:chooseHospitalMsg[i].descs_aft,
+              indSched:chooseHospitalMsg[i].indSched_aft,
+              limit:chooseHospitalMsg[i].limit_aft,
+              remain:chooseHospitalMsg[i].remain_aft,
+              sched:chooseHospitalMsg[i].sched_aft,
               session:2,
               tancan:[{id:"",personQuantity:''}]
 
