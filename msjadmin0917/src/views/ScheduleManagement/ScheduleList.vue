@@ -202,7 +202,7 @@ export default {
       this.GetDWList();
     },
     toPQ(val) {
-      this.$router.push("/ScheduleManagement/OrderSchedule?id=" + val.MsjBILLCODE);
+      this.$router.push("/ScheduleManagement/OrderSchedule?id=" + val.MsjBILLCODE+"&DWDM=" + val.DWDM+"&YWYDM=" + val.YWYDM);
     },
     GetDWList() {
       this.tableobj.loading = true;

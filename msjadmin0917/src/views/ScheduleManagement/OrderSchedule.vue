@@ -39,16 +39,19 @@
 
                    <div style="width: 1000px;border-bottom:1px solid #DCDFE6;padding-bottom: 10px" v-for="(itemMsg,indexitemMsg) in AllHospitalMsg.PQCCList">
                      <div style="width: 1000px">
-                       <div style="float: left;padding-top: 15px;font-size: 16px">{{itemMsg.PQCCtitle}}</div>
-                       <div style="float: left;margin-left: 293px">
-                         <div  v-for="(itemtancan,indexitemtancan) in itemMsg.tancan">
-                           <div style="float: left;padding-top: 10px">
-                             <el-select v-model="itemtancan.id" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
-                               <el-option v-for="item in AllHospitalMsg.PQCCList" :key="item.PQCCtitle" :label="item.PQCCtitle" :value="item.PQCCtitle"></el-option>
+                       <div style="width: 330px;float: left;padding-top: 15px;font-size: 16px;white-space: normal;overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;word-break: break-all;">{{itemMsg.PQCCtitle}}</div>
+                       <div style="float: left;margin-left: 150px">
+                         <div  v-for="(itemtancan,indexitemtancan) in itemMsg.combos">
+                           <div v-if="AllHospitalMsg.type==1" style="float: left;padding-top: 10px">
+                             <el-select v-model="itemtancan.comboParse" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
+                               <el-option v-for="item in AllHospitalMsg.combos" :key="item.comboID" :label="item.comboName" :value="item.comboParse"></el-option>
                              </el-select>
                            </div>
-                           <div style="float: left;height: 50px;margin-left: 30px;padding-top: 10px;width: 150px">
-                             <el-input v-model.trim="itemtancan.personQuantity" maxlength=10000 @change="input_change_leadTime(itemtancan.personQuantity)" placeholder="请输入人数" style="width:130px" clearable></el-input>
+                           <div v-if="AllHospitalMsg.type==1" style="float: left;height: 50px;margin-left: 30px;padding-top: 10px;width: 150px">
+                             <el-input v-model.trim="itemtancan.quota" maxlength=10000 @change="input_change_leadTime(itemtancan.quota)" placeholder="请输入人数" style="width:130px" clearable></el-input>
+                           </div>
+                           <div v-if="AllHospitalMsg.type==0" style="margin-left:0px;float: left;height: 50px;padding-top: 10px;width: 150px">
+                             <el-input v-model.trim="itemtancan.quota" maxlength=10000 @change="input_change_leadTime(itemtancan.quota)" placeholder="请输入人数" style="width:130px" clearable></el-input>
                            </div>
                            <div @click="decreaseTancanAndPerson(indexitemMsg,indexitemtancan)" v-if="indexitemtancan!=0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:23px;float: left;width: 35px;height: 35px;line-height:35px;border-radius: 50%;text-align:center;border: 1px solid #DCDFE6;color: #DCDFE6;">—</div>
                            <div @click="addTancanAndPerson(indexitemMsg)" v-if="indexitemtancan==0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:36px;float: left;width: 35px;height: 35px;line-height:35px;text-align:center;border-radius: 50%;border: 1px solid #DCDFE6;color: #DCDFE6;">+</div>
@@ -103,16 +106,16 @@
                 <div style="float:left;">上午</div>
                 <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="AllHospitalMsg.days.length>0">
                   <div style="float:left;width:33%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).limit_mor}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).limit_mor">{{matchingdata(AllHospitalMsg.days,data.day).limit_mor}}</span>
                     <span v-else>-</span>
                   </div>
 
                   <div style="float:left;width:34%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).sched_mor}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_mor">{{matchingdata(AllHospitalMsg.days,data.day).sched_mor}}</span>
                     <span v-else>-</span>
                   </div>
                   <div style="float:left;width:33%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).remain_mor}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_mor">{{matchingdata(AllHospitalMsg.days,data.day).remain_mor}}</span>
                     <span v-else>-</span>
                   </div>
                 </div>
@@ -134,15 +137,15 @@
                 <div style="float:left;">下午</div>
                 <div style="width:calc(100% - 24px);float:left;overflow: hidden;" v-if="AllHospitalMsg.days.length>0">
                   <div style="float:left;width:33%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).limit_aft}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).limit_aft">{{matchingdata(AllHospitalMsg.days,data.day).limit_aft}}</span>
                     <span v-else>-</span>
                   </div>
                   <div style="float:left;width:34%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).sched_aft}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_aft">{{matchingdata(AllHospitalMsg.days,data.day).sched_aft}}</span>
                     <span v-else>-</span>
                   </div>
                   <div style="float:left;width:33%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)">{{matchingdata(AllHospitalMsg.days,data.day).remain_aft}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_aft">{{matchingdata(AllHospitalMsg.days,data.day).remain_aft}}</span>
                     <span v-else>-</span>
                   </div>
                 </div>
@@ -185,6 +188,10 @@
         TimePickervalue1:[],
         TimePickervalue1_model:[],
         AllHospitalMsg:{
+			    type:0,
+          combos:[],
+          DWDM:'',
+          YWYDM:'',
           id:'',
           orderID:'',
           submitAt:'',
@@ -222,7 +229,13 @@
 		mounted() {
       console.log(this.$route.query.id);
       this.AllHospitalMsg.id=this.$route.query.id
+      this.AllHospitalMsg.DWDM=this.$route.query.DWDM
+      this.AllHospitalMsg.YWYDM=this.$route.query.YWYDM
       this.GetAllHospital();
+      if(this.AllHospitalMsg.type==1){
+        this.GetCombo()
+      }
+
       // this.getRequestDetail()
 
 
@@ -242,13 +255,44 @@
 
     },
 		methods: {
+      // 03-获取订单套餐信息
+      GetCombo() {
+        var that=this;
+        this.$network3
+          .get("/mnoracle/msj/GetCombo", {
+            MsjBILLCODE: this.AllHospitalMsg.id,
+          })
+          .then((res) => {
+            console.log(res);
+            if (res.code == 200) {
+
+              if (res.data.length > 0&&res.data) {
+                res.data.map((item,index)=>{
+                  var tempGROUPNAME=item.GROUPNAME.replace(" ","")
+                  var IDAndName={
+                    comboName:tempGROUPNAME,
+                    comboID:item.ID,
+                  }
+                  var obj={
+                    comboName:tempGROUPNAME,
+                    comboID:item.ID,
+                    comboParse:JSON.stringify(IDAndName)
+                  }
+                  that.AllHospitalMsg.combos.push(obj)
+                })
+              } else {
+
+              }
+            }
+          });
+      },
       decreaseTancanAndPerson(e,taocanIndex){
         console.log(e)
-        this.AllHospitalMsg.PQCCList[e].tancan.splice(taocanIndex,1)
+        this.AllHospitalMsg.PQCCList[e].combos.splice(taocanIndex,1)
       },
       addTancanAndPerson(e){
         console.log(e)
-        this.AllHospitalMsg.PQCCList[e].tancan.push({id:"",personQuantity:''})
+        this.AllHospitalMsg.PQCCList[e].combos.push({comboID:"",quota:'',comboName:''})
         // for (var i=0;i<this.AllHospitalMsg.PQCCList.length;i++){
         //       if(i==e){
         //
@@ -305,6 +349,12 @@
         var that=this
        var verify= this.verify();
         console.log(this.AllHospitalMsg.PQCCList)
+        console.log(this.AllHospitalMsg.DWDM)
+        console.log(this.AllHospitalMsg.YWYDM)
+
+
+
+        // return
         if(verify){
           return
         }
@@ -315,13 +365,51 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          var body={
-            MsjBILLCODE:this.AllHospitalMsg.id,
-            hospitalCode:this.AllHospitalMsg.hospitalCode,//分院代码
-            date:this.AllHospitalMsg.choiceTime,//日期
-            session: this.AllHospitalMsg.session, // 场次
-            quota:Number(this.AllHospitalMsg.PQRS)  // 人数
-          };
+          var schedules=[];
+          if(this.AllHospitalMsg.PQCCList.length>0){
+            for(var i=0;i<this.AllHospitalMsg.PQCCList.length;i++){
+              var obj={date:'',session:1,quota:0,combos:[]}
+              var item=this.AllHospitalMsg.PQCCList[i]
+              obj.date=item.date
+              obj.session=item.session
+              for(var j=0;j<this.AllHospitalMsg.PQCCList[i].combos.length;j++){
+                var itm=this.AllHospitalMsg.PQCCList[i].combos[j]
+                if(itm.comboParse){
+                  console.log(itm.comboParse)
+                  var comboStringParse=JSON.parse(itm.comboParse)
+                  console.log(comboStringParse)
+                  var combosOBJ={comboID:comboStringParse.comboID, comboName:comboStringParse.comboName, quota:Number(itm.quota)
+                  }
+                  obj.quota+=Number(itm.quota)
+                  obj.combos.push(combosOBJ)
+                }else{
+                  obj.quota+=Number(itm.quota)
+                  obj.combos.push({quota:Number(itm.quota)})
+                }
+              }
+              schedules.push(obj)
+            }
+          }
+          if(this.AllHospitalMsg.type==1){
+            var body={
+              type:1,
+              orderID:this.AllHospitalMsg.id,
+              hospitalCode:this.AllHospitalMsg.hospitalCode,//分院代码
+              DWDM:this.AllHospitalMsg.DWDM,// 单位代码
+              YWYDM: this.AllHospitalMsg.YWYDM, // 业务员代码
+              schedules:schedules  // 排期申请列表
+            };
+          }else if(this.AllHospitalMsg.type==0){
+            var body={
+              type:0,
+              orderID:"",
+              hospitalCode:this.AllHospitalMsg.hospitalCode,//分院代码
+              DWDM:this.AllHospitalMsg.DWDM,// 单位代码
+              YWYDM: this.AllHospitalMsg.YWYDM, // 业务员代码
+              schedules:schedules  // 排期申请列表
+            };
+          }
+
           this.$network3
             .post("/mnoracle/schedule/Request",body)
             .then((res)=>{
@@ -352,27 +440,32 @@
           });
           return true;
         }
-        // if(!this.AllHospitalMsg.choiceTime) {
-        //   that.$message({
-        //     type: 'info',
-        //     message: '请选择排期时间!'
-        //   });
-        //   return true;
-        // }
+        if(!this.AllHospitalMsg.choiceTime) {
+          that.$message({
+            type: 'info',
+            message: '请选择排期时间!'
+          });
+          return true;
+        }
         console.log(this.AllHospitalMsg.PQCCList.length)
         if(this.AllHospitalMsg.PQCCList.length>0) {
           for(var i=0;i<this.AllHospitalMsg.PQCCList.length;i++)
           {
-            for(var j=0;j<this.AllHospitalMsg.PQCCList[i].tancan.length;j++){
-              if(!this.AllHospitalMsg.PQCCList[i].tancan[j].id){
-                console.log(1111111111111111)
-                that.$message({
-                  type: 'info',
-                  message: '请选择'+this.AllHospitalMsg.PQCCList[i].PQCCtitle.substring(0,12)+'排期套餐!'
-                });
-                return true;
+            var TempQuota=0
+            for(var j=0;j<this.AllHospitalMsg.PQCCList[i].combos.length;j++){
+
+              if(this.AllHospitalMsg.type==1){
+                if(!this.AllHospitalMsg.PQCCList[i].combos[j].comboParse){
+                  console.log(1111111111111111)
+                  that.$message({
+                    type: 'info',
+                    message: '请选择'+this.AllHospitalMsg.PQCCList[i].PQCCtitle.substring(0,12)+'排期套餐!'
+                  });
+                  return true;
+                }
               }
-              if(!this.AllHospitalMsg.PQCCList[i].tancan[j].personQuantity){
+
+              if(!this.AllHospitalMsg.PQCCList[i].combos[j].quota){
                 that.$message({
                   type: 'info',
                   message: '请输入'+this.AllHospitalMsg.PQCCList[i].PQCCtitle.substring(0,12)+'排期人数!'
@@ -380,8 +473,19 @@
                 return true;
               }
               console.log(this.AllHospitalMsg.PQCCList[i].remain)
-              console.log(this.AllHospitalMsg.PQCCList[i].tancan[j].personQuantity)
-              if(Number(this.AllHospitalMsg.PQCCList[i].remain)<Number(this.AllHospitalMsg.PQCCList[i].tancan[j].personQuantity)){
+              console.log(this.AllHospitalMsg.PQCCList[i].combos[j].quota)
+
+              TempQuota+=Number(this.AllHospitalMsg.PQCCList[i].combos[j].quota)
+
+            }
+            console.log(TempQuota)
+            if(TempQuota<7){
+              that.$message({
+                type: 'info',
+                message: '排期申请总人数至少7人'
+              });
+              return true;
+              if(Number(this.AllHospitalMsg.PQCCList[i].remain)<TempQuota){
                 that.$message({
                   type: 'info',
                   message: '超出'+this.AllHospitalMsg.PQCCList[i].PQCCtitle.substring(0,12)+'排期人数，无法进行排期!'
@@ -390,6 +494,7 @@
               }
             }
 
+            // if(this.AllHospitalMsg.type==1){
           }
 
 
@@ -400,21 +505,21 @@
           });
           return true;
         }
-        if(!this.AllHospitalMsg.PQRS) {
-          that.$message({
-            type: 'info',
-            message: '请选择排期人数!'
-          });
-          return true;
-        }else{
-          if(Number(this.AllHospitalMsg.comparePQRS)<Number(this.AllHospitalMsg.PQRS)){
-            that.$message({
-              type: 'info',
-              message: '超出当天排期人数，无法进行排期!'
-            });
-            return true;
-          }
-        }
+        // if(!this.AllHospitalMsg.PQRS) {
+        //   that.$message({
+        //     type: 'info',
+        //     message: '请选择排期人数!'
+        //   });
+        //   return true;
+        // }else{
+        //   if(Number(this.AllHospitalMsg.comparePQRS)<Number(this.AllHospitalMsg.PQRS)){
+        //     that.$message({
+        //       type: 'info',
+        //       message: '超出当天排期人数，无法进行排期!'
+        //     });
+        //     return true;
+        //   }
+        // }
       },
       submitToFWQ(){
 
@@ -487,7 +592,7 @@
           });
           return;
         }
-        // this.operate.dialogFormVisible = false
+        this.operate.dialogFormVisible = false
 
         // if(this.choicetiem!=this.AllHospitalMsg.choiceTime){
         //   console.log(this.AllHospitalMsg.PQCCtitle)
@@ -509,19 +614,23 @@
         //
         //
         // });
+        console.log(chooseHospitalMsg)
         for(var i=0;i<chooseHospitalMsg.length;i++){
+          this.AllHospitalMsg.choiceTime=chooseHospitalMsg[0].date+"~"+chooseHospitalMsg[chooseHospitalMsg.length-1].date
           if(chooseHospitalMsg[i].remain_mor>0){
             console.log(1111111)
             var obj={
-              PQCCtitle:chooseHospitalMsg[i].date+"上午"+"（剩余"+chooseHospitalMsg[i].remain_mor+")",
+              PQCCtitle:chooseHospitalMsg[i].date+"上午"+"（排期剩余"+chooseHospitalMsg[i].remain_mor+","+"预排剩余"+chooseHospitalMsg[i].preSchedRemain_mor+")",
               date:chooseHospitalMsg[i].date,
               descs:chooseHospitalMsg[i].descs_mor,
               indSched:chooseHospitalMsg[i].indSched_mor,
               limit:chooseHospitalMsg[i].limit_mor,
               remain:chooseHospitalMsg[i].remain_mor,
               sched:chooseHospitalMsg[i].sched_mor,
+              preSchedRemain:chooseHospitalMsg[i].preSchedRemain_mor,
+              preSched:chooseHospitalMsg[i].preSched_aft,
               session:1,
-              tancan:[{id:"",personQuantity:''}]
+              combos:[{comboID:"",quota:'',comboName:''}]
 
             }
             chooseHospitalMsgTempt_mor.push(obj)
@@ -529,15 +638,17 @@
           if(chooseHospitalMsg[i].remain_aft>0){
             console.log(2222222222)
             var obj={
-              PQCCtitle:chooseHospitalMsg[i].date+"下午"+"（剩余"+chooseHospitalMsg[i].remain_aft+")",
+              PQCCtitle:chooseHospitalMsg[i].date+"下午"+"（排期剩余"+chooseHospitalMsg[i].remain_aft+","+"预排剩余"+chooseHospitalMsg[i].preSchedRemain_aft+")",
               date:chooseHospitalMsg[i].date,
               descs:chooseHospitalMsg[i].descs_aft,
               indSched:chooseHospitalMsg[i].indSched_aft,
               limit:chooseHospitalMsg[i].limit_aft,
               remain:chooseHospitalMsg[i].remain_aft,
               sched:chooseHospitalMsg[i].sched_aft,
+              preSchedRemain:chooseHospitalMsg[i].preSchedRemain_aft,
+              preSched:chooseHospitalMsg[i].preSched_aft,
               session:2,
-              tancan:[{id:"",personQuantity:''}]
+              combos:[{comboID:"",quota:'',comboName:''}]
 
             }
             chooseHospitalMsgTempt_aft.push(obj)
@@ -718,16 +829,20 @@
       getDates() {
         if(this.compareTime.length==1){
           var startDate= this.compareTime[0]
-          for(var j = 0; j < this.AllHospitalMsg.days.length; j++) {
-            if(startDate == this.AllHospitalMsg.days[j].date) {
-              console.log(this.AllHospitalMsg.days[j])
-              this.AllHospitalMsg.days[j].isSelected = true
-              console.log(this.AllHospitalMsg.days[j])
+          console.log(this.AllHospitalMsg.days)
 
-            }else{
-              // this.AllHospitalMsg.days[j].isSelected = false
+            for(var j = 0; j < this.AllHospitalMsg.days.length; j++) {
+              if(startDate == this.AllHospitalMsg.days[j].date) {
+                console.log(this.AllHospitalMsg.days[j])
+                this.AllHospitalMsg.days[j].isSelected = true
+                console.log(this.AllHospitalMsg.days[j])
+
+              }else{
+                // this.AllHospitalMsg.days[j].isSelected = false
+              }
             }
-          }
+
+
 
         }else if(this.compareTime.length==2){
           var startDate= this.compareTime[0]
@@ -744,6 +859,7 @@
 
           var array=  this.getDateArray(new Date(startDate), new Date(stopDate))
           console.log(array);
+          console.log(this.AllHospitalMsg.days);
           for(var j = 0; j < this.AllHospitalMsg.days.length; j++) {
             this.AllHospitalMsg.days[j].isSelected = false
           }
@@ -851,8 +967,7 @@
               console.log(res.data.length-1)
               console.log(res.data[res.data.length-1].date)
 
-              // this.TimePickervalue1[0]=res.data[0].date
-              // this.TimePickervalue1[1]=res.data[res.data.length-1].date
+
               this.AllHospitalMsg.days=[];
               var taocanTemp = [];
 
@@ -861,31 +976,23 @@
                 taocanTemp.push(newObj)
 
               }
+              console.log(taocanTemp)
               var days=[];
               let tempArr = [], newArr = [] ,anArray=[],suplusArray=[]
               for (let i = 0; i < taocanTemp.length; i++) {
-                // console.log(that.TimePickervalue1)
-                // console.log(typeof that.TimePickervalue1)
                 that.TimePickervalue1.push(taocanTemp[0].date)
                 that.TimePickervalue1.push(taocanTemp[taocanTemp.length-1].date)
-
                 if (tempArr.indexOf(taocanTemp[i].date) === -1) {
-
-
-
                   newArr.push(taocanTemp[i])
                   tempArr.push(taocanTemp[i].date);
                 } else {
                   suplusArray.push(taocanTemp[i].date)
                   anArray.push(taocanTemp[i])
-
                 }
-
-                // newArr.push(obj)
               }
-              console.log(tempArr)
-              console.log(newArr)
-              console.log(anArray)
+              // console.log(tempArr)
+              // console.log(newArr)
+              // console.log(anArray)
               var obj={
                 date:'',
                 limit_mor:'',
@@ -898,114 +1005,206 @@
                 remain_aft:'',
                 descs_mor:'',
                 descs_aft:'',
+                preSched_mor:'',
+                preSched_aft:'',
+                preSchedRemain_mor:'',
+                preSchedRemain_aft:'',
                 isSelected:false
               }
               let daysArray=[]
+              console.log(newArr);
+              console.log(anArray);
               for (var i = 0; i < newArr.length;i++){
-                for (var j = 0; j < anArray.length;j++){
-                  // console.log(suplusArray);
-                  // console.log(newArr[i].date);
-                  if(suplusArray.indexOf(newArr[i].date) == -1){
+                if(anArray.length>0){
+                  for (var j = 0; j < anArray.length;j++){
+                    // console.log(newArr);
                     // console.log(newArr[i].date);
-                    var obj={
-                      date:'',
-                      limit_mor:'',
-                      limit_aft:'',
-                      sched_mor:'',
-                      sched_aft:'',
-                      indSched_mor:'',
-                      indSched_aft:'',
-                      remain_mor:'',
-                      remain_aft:'',
-                      descs_mor:'',
-                      descs_aft:'',
-                      isSelected:false
+                    if(suplusArray.indexOf(newArr[i].date) == -1){
+                      // console.log(newArr[i].date);
+                      var obj={
+                        date:'',
+                        limit_mor:'',
+                        limit_aft:'',
+                        sched_mor:'',
+                        sched_aft:'',
+                        indSched_mor:'',
+                        indSched_aft:'',
+                        remain_mor:'',
+                        remain_aft:'',
+                        descs_mor:'',
+                        descs_aft:'',
+                        preSched_mor:'',
+                        preSched_aft:'',
+                        preSchedRemain_mor:'',
+                        preSchedRemain_aft:'',
+                        isSelected:false
+                      }
+
+                      if(newArr[i].session===1){
+
+                        obj.date=newArr[i].date
+                        obj.limit_mor=newArr[i].limit
+                        obj.sched_mor=newArr[i].sched
+                        obj.indSched_mor=newArr[i].indSched
+                        obj.remain_mor=newArr[i].remain
+                        obj.descs_mor=newArr[i].descs
+                        obj.limit_aft=""
+                        obj.sched_aft=""
+                        obj.indSched_aft=""
+                        obj.remain_aft=""
+                        obj.descs_aft=""
+                        obj.preSched_mor=""
+                        obj.preSched_aft=""
+                        obj.preSchedRemain_mor=""
+                        obj.preSchedRemain_aft=""
+                        obj.isSelected=false
+
+
+                      }else if(newArr[i].session===2){
+                        obj.date=newArr[i].date
+                        obj.limit_mor=""
+                        obj.sched_mor=""
+                        obj.indSched_mor=""
+                        obj.remain_mor=""
+                        obj.descs_mor=""
+                        obj.preSched_mor=""
+                        obj.preSchedRemain_mor=""
+                        obj.limit_aft=newArr[i].limit
+                        obj.sched_aft=newArr[i].sched
+                        obj.indSched_aft=newArr[i].indSched
+                        obj.remain_aft=newArr[i].remain
+                        obj.descs_aft=newArr[i].descs
+                        obj.preSched_aft=newArr[i].preSched
+                        obj.preSchedRemain_aft=newArr[i].preSchedRemain
+                        obj.isSelected=false
+                      }
+                      // console.log(obj);
+                      daysArray.push(obj)
+                      console.log(daysArray);
+
                     }
+                    if(newArr[i].date==anArray[j].date){
+                      // console.log(newArr[i]);
+                      var obj={
+                        date:'',
+                        limit_mor:'',
+                        limit_aft:'',
+                        sched_mor:'',
+                        sched_aft:'',
+                        indSched_mor:'',
+                        indSched_aft:'',
+                        remain_mor:'',
+                        remain_aft:'',
+                        descs_mor:'',
+                        descs_aft:'',
+                        preSched_mor:'',
+                        preSched_aft:'',
+                        preSchedRemain_mor:'',
+                        preSchedRemain_aft:'',
+                        isSelected:false
+                      }
+                      if(newArr[i].session===1){
 
-                    if(newArr[i].session===1){
+                        obj.date=newArr[i].date
+                        obj.limit_mor=newArr[i].limit
+                        obj.sched_mor=newArr[i].sched
+                        obj.indSched_mor=newArr[i].indSched
+                        obj.remain_mor=newArr[i].remain
+                        obj.descs_mor=newArr[i].descs
+                        obj.limit_aft=anArray[j].limit
+                        obj.sched_aft=anArray[j].sched
+                        obj.indSched_aft=anArray[j].indSched
+                        obj.remain_aft=anArray[j].remain
+                        obj.descs_aft=anArray[j].descs
+                        obj.preSched_mor=newArr[i].preSched
+                        obj.preSched_aft=anArray[j].preSched
+                        obj.preSchedRemain_mor=newArr[i].preSchedRemain
+                        obj.preSchedRemain_aft=anArray[j].preSchedRemain
+                        obj.isSelected=false
 
-                      obj.date=newArr[i].date
-                      obj.limit_mor=newArr[i].limit
-                      obj.sched_mor=newArr[i].sched
-                      obj.indSched_mor=newArr[i].indSched
-                      obj.remain_mor=newArr[i].remain
-                      obj. descs_mor=newArr[i].descs
-                      obj.limit_aft=""
-                      obj.sched_aft=""
-                      obj.indSched_aft=""
-                      obj.remain_aft=""
-                      obj. descs_aft=""
-                      obj. isSelected=false
-
-
-                    }else if(newArr[i].session===2){
-                      obj.date=newArr[i].date
-                      obj.limit_mor=""
-                      obj.sched_mor=""
-                      obj.indSched_mor=""
-                      obj.remain_mor=""
-                      obj. descs_mor=""
-                      obj.limit_aft=newArr[i].limit
-                      obj.sched_aft=newArr[i].sched
-                      obj.indSched_aft=newArr[i].indSched
-                      obj.remain_aft=newArr[i].remain
-                      obj. descs_aft=newArr[i].descs
-                      obj. isSelected=false
+                      }else if(newArr[i].session===2){
+                        obj.date=newArr[i].date
+                        obj.limit_mor=anArray[j].limit
+                        obj.sched_mor=anArray[j].sched
+                        obj.indSched_mor=anArray[j].indSched
+                        obj.remain_mor=anArray[j].remain
+                        obj.descs_mor=anArray[j].descs
+                        obj.limit_aft=newArr[i].limit
+                        obj.sched_aft=newArr[i].sched
+                        obj.indSched_aft=newArr[i].indSched
+                        obj.remain_aft=newArr[i].remain
+                        obj.descs_aft=newArr[i].descs
+                        obj.preSched_mor=anArray[i].preSched
+                        obj.preSched_aft=newArr[j].preSched
+                        obj.preSchedRemain_mor=anArray[i].preSchedRemain
+                        obj.preSchedRemain_aft=newArr[j].preSchedRemain
+                        obj.isSelected=false
+                      }
+                      daysArray.push(obj)
                     }
-                    // console.log(obj);
-                    daysArray.push(obj)
-
 
                   }
-                  if(newArr[i].date==anArray[j].date){
-                    // console.log(newArr[i]);
-                    var obj={
-                      date:'',
-                      limit_mor:'',
-                      limit_aft:'',
-                      sched_mor:'',
-                      sched_aft:'',
-                      indSched_mor:'',
-                      indSched_aft:'',
-                      remain_mor:'',
-                      remain_aft:'',
-                      descs_mor:'',
-                      descs_aft:'',
-                      isSelected:false
-                    }
-                    if(newArr[i].session===1){
-
-                      obj.date=newArr[i].date
-                      obj.limit_mor=newArr[i].limit
-                      obj.sched_mor=newArr[i].sched
-                      obj.indSched_mor=newArr[i].indSched
-                      obj.remain_mor=newArr[i].remain
-                      obj. descs_mor=newArr[i].descs
-                      obj.limit_aft=anArray[j].limit
-                      obj.sched_aft=anArray[j].sched
-                      obj.indSched_aft=anArray[j].indSched
-                      obj.remain_aft=anArray[j].remain
-                      obj. descs_aft=anArray[j].descs
-                      obj. isSelected=false
-
-                    }else if(newArr[i].session===2){
-                      obj.date=newArr[i].date
-                      obj.limit_mor=anArray[j].limit
-                      obj.sched_mor=anArray[j].sched
-                      obj.indSched_mor=anArray[j].indSched
-                      obj.remain_mor=anArray[j].remain
-                      obj. descs_mor=anArray[j].descs
-                      obj.limit_aft=newArr[i].limit
-                      obj.sched_aft=newArr[i].sched
-                      obj.indSched_aft=newArr[i].indSched
-                      obj.remain_aft=newArr[i].remain
-                      obj. descs_aft=newArr[i].descs
-                      obj. isSelected=false
-                    }
-                    daysArray.push(obj)
+                }else{
+                  var obj={
+                    date:'',
+                    limit_mor:'',
+                    limit_aft:'',
+                    sched_mor:'',
+                    sched_aft:'',
+                    indSched_mor:'',
+                    indSched_aft:'',
+                    remain_mor:'',
+                    remain_aft:'',
+                    descs_mor:'',
+                    descs_aft:'',
+                    preSched_mor:'',
+                    preSched_aft:'',
+                    preSchedRemain_mor:'',
+                    preSchedRemain_aft:'',
+                    isSelected:false
                   }
 
+                  if(newArr[i].session===1){
+
+                    obj.date=newArr[i].date
+                    obj.limit_mor=newArr[i].limit
+                    obj.sched_mor=newArr[i].sched
+                    obj.indSched_mor=newArr[i].indSched
+                    obj.remain_mor=newArr[i].remain
+                    obj.descs_mor=newArr[i].descs
+                    obj.preSched_mor=newArr[i].preSched
+                    obj.preSchedRemain_mor=newArr[i].preSchedRemain
+                    obj.limit_aft=""
+                    obj.sched_aft=""
+                    obj.indSched_aft=""
+                    obj.remain_aft=""
+                    obj.descs_aft=""
+                    obj.preSched_aft=""
+                    obj.preSchedRemain_aft=""
+                    obj.isSelected=false
+
+
+                  }else if(newArr[i].session===2){
+                    obj.date=newArr[i].date
+                    obj.limit_mor=""
+                    obj.sched_mor=""
+                    obj.indSched_mor=""
+                    obj.remain_mor=""
+                    obj.descs_mor=""
+                    obj.limit_aft=newArr[i].limit
+                    obj.sched_aft=newArr[i].sched
+                    obj.indSched_aft=newArr[i].indSched
+                    obj.remain_aft=newArr[i].remain
+                    obj.descs_aft=newArr[i].descs
+                    obj.preSched_aft=newArr[i].preSched
+                    obj.preSchedRemain_aft=newArr[i].preSchedRemain
+                    obj.isSelected=false
+                  }
+                  // console.log(obj);
+                  daysArray.push(obj)
+                  console.log(daysArray);
                 }
+
               }
               console.log(daysArray);
 
@@ -1023,13 +1222,74 @@
               this.AllHospitalMsg.choiceTime=""
               this.AllHospitalMsg.PQCCtitle=""
               this.AllHospitalMsg.PQCCList=[];
-              this.AllHospitalMsg.days=[];
+              var curDate = new Date();
+              var curMonth = curDate.getMonth();
+              curDate.setMonth(curMonth + 1);
+              curDate.setDate(0);
+              var dayArry = [];
+              var day = curDate.getDate();
+              for (var k = 1; k <= day; k++) {
+                dayArry.push(k);
+              }
+              console.log(dayArry);
+              dayArry.forEach((item,index)=>{
+
+                var obj={
+                  date:that.changeTimeformat(item),
+                  limit_mor:"",
+                  sched_mor:"",
+                  indSched_mor:"",
+                  remain_mor:"",
+                  descs_mor:"",
+                  limit_aft:"",
+                  sched_aft:"",
+                  indSched_aft:"",
+                  remain_aft:"",
+                  descs_aft:"",
+                  preSched_mor:'',
+                  preSched_aft:'',
+                  preSchedRemain_mor:'',
+                  preSchedRemain_aft:'',
+                  isSelected:false,
+                }
+                this.AllHospitalMsg.days.push(obj);
+              })
+              console.log(this.AllHospitalMsg.days);
             }
           })
           .catch(err => {
             console.log(err);
           });
 
+      },
+      changeTimeformat(val){
+            var day = new Date();
+            var Year = 0;
+            var Month = 0;
+            var Day = 0;
+            var CurrentDate = "";
+            Year = day.getFullYear(); //ie火狐下都可以
+            Month = day.getMonth() + 1;
+            Day = val;
+            CurrentDate += Year + "-";
+            if (Month >= 10)
+            {
+              CurrentDate += Month + "-";
+            }
+            else
+            {
+              CurrentDate += "0" + Month + "-";
+            }
+            if (Day >= 10)
+            {
+              CurrentDate += Day;
+            }
+            else
+            {
+              CurrentDate += "0" + Day;
+            }
+            // console.log(CurrentDate)
+            return CurrentDate
       },
       changeTime(day){
         // console.log(day)
@@ -1109,7 +1369,7 @@
 		}
 		.timeChoose{
 
-			width: 200px;
+			width: 210px;
 			border: 1px solid #DCDFE6;
 			padding: 0px 35px 0px 15px;
 			color:#606266;
