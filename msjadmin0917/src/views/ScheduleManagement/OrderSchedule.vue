@@ -6,13 +6,18 @@
 				<span>&nbsp&nbsp&nbsp返回</span>
 			</div>
 			<div class="checkSchedule_form">
-				<el-form  :inline="false" :model="AllHospitalMsg" label-position='left' label-width="120px" size="medium">
+				<el-form  :inline="false" :model="AllHospitalMsg" label-position='left' label-width="180px" size="medium">
 
-				 <div class="checkSchedule_paiqi">
-				 	<el-form-item label="订单排期" style="font-size: 24px;">
+				 <div v-if="AllHospitalMsg.type==0" class="checkSchedule_paiqi">
+				 	<el-form-item label="新增预排申请" style="font-size: 24px;">
 
 	       			 </el-form-item>
 				 </div>
+          <div v-if="AllHospitalMsg.type==1" class="checkSchedule_paiqi">
+            <el-form-item label="新增排期申请" style="font-size: 24px;">
+
+            </el-form-item>
+          </div>
 
 				<el-form-item label="单据号：">
 			         <el-input  v-model="AllHospitalMsg.id" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
@@ -43,7 +48,7 @@
                        <div style="float: left;margin-left: 150px">
                          <div  v-for="(itemtancan,indexitemtancan) in itemMsg.combos">
                            <div v-if="AllHospitalMsg.type==1" style="float: left;padding-top: 10px">
-                             <el-select v-model="itemtancan.comboParse" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择场次" style="width:200px">
+                             <el-select v-model="itemtancan.comboParse" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择套餐" style="width:200px">
                                <el-option v-for="item in AllHospitalMsg.combos" :key="item.comboID" :label="item.comboName" :value="item.comboParse"></el-option>
                              </el-select>
                            </div>
@@ -231,6 +236,7 @@
       this.AllHospitalMsg.id=this.$route.query.id
       this.AllHospitalMsg.DWDM=this.$route.query.DWDM
       this.AllHospitalMsg.YWYDM=this.$route.query.YWYDM
+      this.AllHospitalMsg.type=this.$route.query.type
       this.GetAllHospital();
       if(this.AllHospitalMsg.type==1){
         this.GetCombo()
@@ -524,6 +530,7 @@
       submitToFWQ(){
 
       },
+
       input_change_leadTime(e) {
 
         console.log(22222222)

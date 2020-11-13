@@ -1009,9 +1009,20 @@ let OperationRouter = [{
       }
     },
      {
+      path: "CheckHospitalSchedule",
+      name: "CheckHospitalSchedule",
+      component: "ScheduleManagement/CheckHospitalSchedule",
+      meta: {
+        title: "查看分院排期",
+        mark: "CheckHospitalSchedule",
+        icon: "CheckHospitalSchedule"
+      }
+    },
+    {
       path: "CheckSchedule",
       name: "CheckSchedule",
       component: "ScheduleManagement/CheckSchedule",
+      hidden: "true",
       meta: {
         title: "查看排期",
         mark: "CheckSchedule",

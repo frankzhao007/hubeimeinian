@@ -1404,6 +1404,14 @@ let Operation = [
         verifyName: "edit0",
         url: "",
         selected: false
+      },
+      {
+        id: "OM004",
+        roleName: "查看分院排期",
+        mark: "CheckHospitalSchedule",
+        verifyName: "edit2",
+        url: "",
+        selected: false
       }
 
     ]
