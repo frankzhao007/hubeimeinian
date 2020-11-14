@@ -67,8 +67,8 @@
         ></el-table-column>
         <el-table-column prop="request.DWDM" label="单位代码"></el-table-column>
         <el-table-column prop="request.DWMC" label="单位名称"></el-table-column>
-        <el-table-column prop="order.YWYXM" label="业务员"></el-table-column>
-        <el-table-column prop="order.auditStatus" label="订单状态">
+        <el-table-column prop="request.YWYXM" label="业务员"></el-table-column>
+        <el-table-column v-if="order" prop="order.auditStatus" label="订单状态">
           <template slot-scope="scope">
             {{ STATUSchange2(scope.row.order.auditStatus) }}
           </template>
@@ -189,6 +189,7 @@ export default {
           this.tableobj.list = res.data.data;
           this.tableobj.total = res.data.count;
           this.tableobj.loading = false;
+          console.log(this.tableobj.list);
         })
         .catch((err) => {
           console.log(err);

@@ -161,12 +161,10 @@
             > -->
             <!-- <el-button disabled size="mini" type="text" v-if="role=='湖北销售主管'||role=='内勤'">锁定</el-button> -->
             <div>
-              <el-button size="mini" type="text" @click="toPQ(scope.row)"
-                >查看排期</el-button
-              >
+              <el-button size="mini" type="text" @click="toPQ(scope.row)">查看排期</el-button>
             </div>
             <div>
-              <el-button size="mini" type="text" @click="">提交审核</el-button>
+              <el-button size="mini" type="text" @click="SubmitAudit(scope.row)">提交审核</el-button>
             </div>
             <div>
               <el-button size="mini" type="text" @click="">排期撤销</el-button>
@@ -337,6 +335,43 @@ export default {
 
   },
   methods: {
+    SubmitAudit(val){
+      console.log(val)
+      // return ;
+      this.$confirm('确认提交审核吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var body={
+          id:val.request.id,
+          hospitalCode:val.request.hospitalCode,// 分院ID
+          schedules:val.request.schedules,/// 排期详情，同排期申请
+
+        };
+        this.$network3
+          .post("/mnoracle/schedule/UpdateAndAllowRequest",body)
+          .then((res)=>{
+            if(res.code==200){
+              this.GetDWList();
+              // that.$router.push('/ScheduleManagement/ScheduleList')
+            }else if(res.code==600){
+              this.$message.error('排期失败');
+
+            }
+
+          })
+          .catch((err)=>{
+            console.log(err);
+          });
+
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消操作'
+        });
+      });
+    },
     PQcreateConfirm(){
       if(this.PQcreate.PQstate==0){
         if(!this.PQcreate.PQDWDM){
@@ -439,8 +474,9 @@ export default {
       this.GetDWList();
     },
     handleCurrentTableobjChange(val) {
-      console.log(val.MsjBILLCODE);
-      this.current_chang = val.MsjBILLCODE;
+      console.log(val);
+      console.log(val.order.MsjBILLCODE);
+      this.current_chang = val.order.MsjBILLCODE;
     },
     tablesizechange(val) {
       console.log(val);

@@ -2,7 +2,7 @@
   <div style="margin: 20px">
     <div style="font-size: 20px">
       <i @click="$router.go(-1)" class="el-icon-my-back backbtn"></i>
-      <span>&nbsp&nbsp&nbsp订单排期</span>
+      <span>&nbsp&nbsp&nbsp新增排期</span>
     </div>
 
     <el-form

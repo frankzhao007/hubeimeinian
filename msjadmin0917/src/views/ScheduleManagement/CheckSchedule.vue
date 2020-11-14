@@ -57,8 +57,8 @@
                       <div  v-if="AllHospitalMsg.type==0" style="margin-left:0px;float: left;height: 50px;padding-top: 10px;width: 150px">
                         <el-input disabled v-model.trim="itemMsg.quota" maxlength=10000   placeholder="请输入人数" style="width:130px" clearable></el-input>
                       </div>
-                      <div @click="decreaseTancanAndPerson(indexitemMsg,indexitemtancan)" v-if="indexitemtancan!=0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:23px;float: left;width: 35px;height: 35px;line-height:35px;border-radius: 50%;text-align:center;border: 1px solid #DCDFE6;color: #DCDFE6;">—</div>
-                      <div @click="addTancanAndPerson(indexitemMsg)" v-if="indexitemtancan==0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:36px;float: left;width: 35px;height: 35px;line-height:35px;text-align:center;border-radius: 50%;border: 1px solid #DCDFE6;color: #DCDFE6;">+</div>
+<!--                      <div @click="decreaseTancanAndPerson(indexitemMsg,indexitemtancan)" v-if="indexitemtancan!=0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:23px;float: left;width: 35px;height: 35px;line-height:35px;border-radius: 50%;text-align:center;border: 1px solid #DCDFE6;color: #DCDFE6;">—</div>-->
+<!--                      <div @click="addTancanAndPerson(indexitemMsg)" v-if="indexitemtancan==0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:36px;float: left;width: 35px;height: 35px;line-height:35px;text-align:center;border-radius: 50%;border: 1px solid #DCDFE6;color: #DCDFE6;">+</div>-->
                     </div>
                     <div  v-if="AllHospitalMsg.type==0" style="margin-left:0px;float: left;height: 50px;padding-top: 10px;width: 150px">
                       <el-input disabled v-model.trim="itemMsg.quota" maxlength=10000   placeholder="请输入人数" style="width:130px" clearable></el-input>
