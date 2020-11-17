@@ -68,9 +68,14 @@
         <el-table-column prop="request.DWDM" label="单位代码"></el-table-column>
         <el-table-column prop="request.DWMC" label="单位名称"></el-table-column>
         <el-table-column prop="request.YWYXM" label="业务员"></el-table-column>
-        <el-table-column v-if="order" prop="order.auditStatus" label="订单状态">
-          <template slot-scope="scope">
-            {{ STATUSchange2(scope.row.order.auditStatus) }}
+        <el-table-column   label="订单状态">
+          <template  slot-scope="scope">
+            <div v-if="scope.row.order">
+              {{ STATUSchange2(scope.row.order.auditStatus)}}
+            </div>
+            <div v-if="scope.row.order==null">
+              未制单
+            </div>
           </template>
         </el-table-column>
         <el-table-column
@@ -210,23 +215,29 @@ export default {
       this.$router.push("/TuanAdmin/AddBranchMM");
     },
     LookDetil(row) {
-      console.log(row.order);
+      // console.log(row.order);
+      var stringVal=JSON.stringify(row)
+      // console.log(stringVal);
+      // return ;
       this.$router.push(
-        "/TuanAdmin/CheckTuanDetail?MsjBILLCODE=" +
-          row.order.MsjBILLCODE +
-          "&DJSJ=" +
-          row.order.DJSJ +
-          "&TJFY=" +
-          row.request.hospitalName +
-          "&TJFYcode=" +
-          row.request.hospitalCode +
-          "&date=" +
-          row.request.date +
-          "&id=" +
-          row.request.id +
-          "&quota=" +
-          row.request.quota
-      );
+        "/TuanAdmin/CheckTuanDetail?stringVal=" +stringVal);
+
+      // this.$router.push(
+      //   "/TuanAdmin/CheckTuanDetail?MsjBILLCODE=" +
+      //     row.order.MsjBILLCODE +
+      //     "&DJSJ=" +
+      //     row.order.DJSJ +
+      //     "&TJFY=" +
+      //     row.request.hospitalName +
+      //     "&TJFYcode=" +
+      //     row.request.hospitalCode +
+      //     "&date=" +
+      //     row.request.date +
+      //     "&id=" +
+      //     row.request.id +
+      //     "&quota=" +
+      //     row.request.quota
+      // );
     },
     PQcreate(row) {
       console.log(row);
@@ -370,6 +381,7 @@ export default {
       this.GetPQList();
     },
     STATUSchange2(val) {
+      // console.log(val);
       switch (val) {
         case 0:
           return "未审核";

@@ -9,12 +9,12 @@
         <el-form  :inline="false" :model="AllHospitalMsg" label-position='left' label-width="180px" size="medium">
 
           <div v-if="AllHospitalMsg.type==0" class="checkSchedule_paiqi">
-            <el-form-item label="新增预排申请" style="font-size: 24px;">
+            <el-form-item label="查看预排申请" style="font-size: 24px;">
 
             </el-form-item>
           </div>
           <div v-if="AllHospitalMsg.type==1" class="checkSchedule_paiqi">
-            <el-form-item label="新增排期申请" style="font-size: 24px;">
+            <el-form-item label="查看排期申请" style="font-size: 24px;">
 
             </el-form-item>
           </div>
@@ -24,6 +24,12 @@
           </el-form-item>
           <el-form-item label="提交时间：">
             <el-input  v-model="AllHospitalMsg.submitAt" :disabled="true" placeholder="0000-00-00 00：00：00" style="width:200px" size="mini"></el-input>
+          </el-form-item>
+          <el-form-item label="单位代码：">
+            <el-input  v-model="AllHospitalMsg.DWDM" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
+          </el-form-item>
+          <el-form-item label="单位名称：">
+            <el-input  v-model="AllHospitalMsg.DWMC" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
           </el-form-item>
           <el-form-item label="* 选择分院：">
             <el-select disabled v-model="AllHospitalMsg.HospitalShow" @change="selectChange" placeholder="请选择分院" style="width:200px">
@@ -102,6 +108,7 @@ export default {
       AllHospitalMsg:{
         type:0,
         combos:[],
+        DWMC:'',
         DWDM:'',
         YWYDM:'',
         id:'',
@@ -144,7 +151,8 @@ export default {
     this.AllHospitalMsg.id=jsonVal.request.orderID
     this.AllHospitalMsg.submitAt=jsonVal.request.submitAt
     this.AllHospitalMsg.HospitalShow=jsonVal.request.hospitalName
-    this.AllHospitalMsg.DWDM=this.$route.query.DWDM
+    this.AllHospitalMsg.DWDM=jsonVal.request.DWDM
+    this.AllHospitalMsg.DWMC=jsonVal.request.DWMC
     this.AllHospitalMsg.YWYDM=this.$route.query.YWYDM
     this.AllHospitalMsg.type=jsonVal.request.type
     this.CalculatePQTime(jsonVal)
@@ -212,10 +220,18 @@ export default {
       if(val.request.schedules.length>0&&val.request.schedules){
         var tempSchedules=val.request.schedules
         console.log(tempSchedules)
-        for (var i=0;i<tempSchedules.length;i++){
-          time=tempSchedules[i].date+"~"+tempSchedules[tempSchedules.length-1].date
+        if(tempSchedules.length>=1){
+          for (var i=0;i<tempSchedules.length;i++){
+            time=tempSchedules[0].date+"~"+tempSchedules[tempSchedules.length-1].date
 
+          }
+        }else if(tempSchedules.length==1){
+          // for (var i=0;i<tempSchedules.length;i++){
+            time=tempSchedules[0].date
+
+          // }
         }
+
 
       }
       this.AllHospitalMsg.choiceTime=time;
@@ -269,7 +285,7 @@ export default {
     goback() {
       // if(this.ischange) {
       console.log("++++++++++++++++++");
-      this.$confirm("您还未保存，离开将不保存该数据", "提示", {
+      this.$confirm("确认返回吗？", "提示", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning"
@@ -1323,7 +1339,7 @@ export default {
     padding: 0px 35px 0px 15px;
     color:#606266;
     border-radius: 4px;
-    cursor: pointer;
+    //cursor: pointer;
     background-color: #F5F7FA;
   }
   .isSelectchoose{

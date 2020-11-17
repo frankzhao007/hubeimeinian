@@ -34,7 +34,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="体检分院：">
-          <el-select v-model="seekobj.TJFY" placeholder="请选择">
+          <el-select v-model="seekobj.TJFY" placeholder="请选择体检分院">
             <el-option
               v-for="item in TJFYList"
               :key="item.code"
@@ -167,11 +167,11 @@
               <el-button size="mini" type="text" @click="SubmitAudit(scope.row)">提交审核</el-button>
             </div>
             <div>
-              <el-button size="mini" type="text" @click="">排期撤销</el-button>
+              <el-button size="mini" type="text" @click="PQrevocation(scope.row)">排期撤销</el-button>
             </div>
-            <div>
-              <el-button size="mini" type="text" @click="">删除</el-button>
-            </div>
+<!--            <div>-->
+<!--              <el-button size="mini" type="text" @click="">删除</el-button>-->
+<!--            </div>-->
             <!-- <el-button
               :disabled="scope.row.auditStatus != 0"
               size="mini"
@@ -230,12 +230,28 @@
           </div>
           <div v-else>
             <el-form-item label="单据号" :label-width="formLabelWidth">
-              <el-input
+              <el-select
                 style="width: 220px"
                 v-model="PQcreate.PQDJH"
+                filterable
+                remote
+                reserve-keyword
                 placeholder="请输入单据号"
-                clearable
-              ></el-input>
+                :remote-method="remoteMethod"
+                :loading="loading">
+                <el-option
+                  v-for="item in MSJCodeArray"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+<!--              <el-input-->
+<!--                style="width: 220px"-->
+<!--                v-model="PQcreate.PQDJH"-->
+<!--                placeholder="请输入单据号"-->
+<!--                clearable-->
+<!--              ></el-input>-->
             </el-form-item>
           </div>
         </el-form>
@@ -254,6 +270,11 @@ export default {
   components: {},
   data() {
     return {
+
+      // value: [],
+      MSJCodeList: [],
+      loading: false,
+      MSJCodeArray:[],
       seekobj: {
         DWMC: "",
         DWDM: "",
@@ -326,6 +347,8 @@ export default {
   mounted() {
     this.GetDWList();
     this.usermsg = this.$store.getters.getRoleInfo;
+    this.GetAllHospital();
+    this.GetAllMsjCOde();
 
     console.log(this.usermsg.MNId)
     if(this.usermsg.MNId){
@@ -335,6 +358,111 @@ export default {
 
   },
   methods: {
+    // 搜索匹配
+    remoteMethod(query) {
+      if (query !== '') {
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+          this.MSJCodeArray = this.MSJCodeList.filter(item => {
+            return item.label.toLowerCase()
+              .indexOf(query.toLowerCase()) > -1;
+          });
+        }, 200);
+      } else {
+        this.MSJCodeArray = [];
+      }
+    },
+    // 获取所有单据号
+    GetAllMsjCOde() {
+      var that = this;
+      var body = {
+        YWYDM: this.$store.getters.getRoleInfo.MNId,
+        auditStatus:"",
+        page:1, // 页码
+        size:9999 // 单页条数
+      }
+      this.$network3
+        .get("/mnoracle/msj/GetOrderList", body)
+        .then((res) => {
+          console.log(res.data);
+          var Temp=[];
+          that.MSJCodeList=[];
+          Temp=res.data.OrderList||[];
+          Temp.map((item,index)=>{
+            var Obj={
+              MsjBILLCODE:item.MsjBILLCODE,
+              DWDM:item.DWDM,
+              DWMC:item.DWMC,
+            }
+           var stringObj=JSON.stringify(Obj)
+            that.MSJCodeList.push({ value: `${stringObj}`, label: `${item.MsjBILLCODE}` })
+          })
+          console.log(that.MSJCodeList);
+
+        })
+        .catch(err => {
+          console.log("err", err);
+        });
+    },
+    // 获取所有分院
+    GetAllHospital() {
+      var that = this;
+      var body = {
+        // page:1, // 页码
+        // size:9999 // 单页条数
+      }
+      this.$network3
+        .get("/mnoracle/schedule/HospitalList")
+        .then(res => {
+          console.log(res.data);
+          that.TJFYList=[];
+          that.TJFYList=res.data||[];
+          console.log(that.TJFYList);
+
+        })
+        .catch(err => {
+          console.log("err", err);
+        });
+    },
+    PQrevocation(row) {
+      console.log(row);
+      var body = {
+        id: row.request.id, // 申请记录ID
+      };
+
+      this.$confirm("你确定要撤销此条排期吗？?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$network3
+            .post("/mnoracle/schedule/RevokeRequest", body)
+            .then((res) => {
+              console.log(res);
+              if (res.code == 200) {
+                this.$message({
+                  type: "success",
+                  message: "排期已撤销!",
+                });
+                this.GetDWList();
+              } else {
+                this.$message.error(res.msg);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              this.$message.error(err.msg);
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+    },
     SubmitAudit(val){
       console.log(val)
       // return ;
@@ -373,13 +501,16 @@ export default {
       });
     },
     PQcreateConfirm(){
+      console.log(this.PQcreate)
+      console.log(this.PQcreate.PQDJH)
+      // return ;
       if(this.PQcreate.PQstate==0){
         if(!this.PQcreate.PQDWDM){
           this.$message.error('请输入单位代码');
           return;
         }
         this.dialogFormVisible=false;
-        this.$router.push("/ScheduleManagement/OrderSchedule?type=" + this.PQcreate.PQstate+ "&DWDM=" + this.PQcreate.PQDWDM+"&YWYDM=" + this.usermsg.MNId);
+        this.$router.push("/ScheduleManagement/OrderSchedule?type=" + this.PQcreate.PQstate+"&DWMC="+ this.PQcreate.PQDWMC+"&DWDM=" + this.PQcreate.PQDWDM+"&YWYDM=" + this.usermsg.MNId);
       }else if(this.PQcreate.PQstate==1){
         if(!this.PQcreate.PQDJH){
           this.$message.error('请输入单据号');
@@ -451,7 +582,7 @@ export default {
       var body = {
         DWMC: this.seekobj.DWMC, // 单位代码
         DWDM: this.seekobj.DWDM, // 单位名称
-        schedStatus: this.seekobj.auditStatus,
+        hospitalCode: this.seekobj.TJFY,//体检分院
         YWYDM: this.$store.getters.getRoleInfo.MNId,
         page: this.seekobj.pageindex, // 页码
         size: this.seekobj.pagesize, // 单页条数
