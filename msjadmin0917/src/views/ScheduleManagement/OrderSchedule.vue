@@ -246,14 +246,17 @@
         this.AllHospitalMsg.DWMC=jsonid.DWMC
         this.AllHospitalMsg.DWDM=jsonid.DWDM
       }
+      if(this.$route.query.DWDM){
+        var JSNDWDM=JSON.parse(this.$route.query.DWDM)
+        this.AllHospitalMsg.DWDM=JSNDWDM.DWDM
+      }
 
-      this.AllHospitalMsg.DWDM=this.$route.query.DWDM
       this.AllHospitalMsg.YWYDM=this.$route.query.YWYDM
       this.AllHospitalMsg.type=this.$route.query.type
       this.GetAllHospital();
       if(this.AllHospitalMsg.type==1){
         this.GetCombo()
-
+        this.GetAllMsjCOde(this.AllHospitalMsg.id)
         // this.AllHospitalMsg.DWDM=jsonid.DWDM
 
       }else if(this.AllHospitalMsg.type==0){
@@ -279,6 +282,45 @@
 
     },
 		methods: {
+      // 获取所有单据号
+      GetAllMsjCOde(val) {
+        var that = this;
+        var body = {
+          YWYDM: this.$store.getters.getRoleInfo.MNId,
+          auditStatus:"",
+          page:1, // 页码
+          size:9999 // 单页条数
+        }
+        this.$network3
+          .get("/mnoracle/msj/GetOrderList", body)
+          .then((res) => {
+            console.log(res.data);
+            var Temp=[];
+            that.MSJCodeList=[];
+            Temp=res.data.OrderList||[];
+            Temp.map((item,index)=>{
+              var Obj={
+                MsjBILLCODE:item.MsjBILLCODE,
+                DWDM:item.DWDM,
+                DWMC:item.DWMC,
+              }
+              var stringObj=JSON.stringify(Obj)
+              that.MSJCodeList.push({ value: `${stringObj}`, label: `${item.MsjBILLCODE}` })
+            })
+            console.log(that.MSJCodeList);
+            that.MSJCodeList.map((item,index)=>{
+              if(item.label==val){
+                var parseValue=JSON.parse(item.value)
+                this.AllHospitalMsg.DWMC=parseValue.DWMC
+                this.AllHospitalMsg.DWDM=parseValue.DWDM
+              }
+            })
+
+          })
+          .catch(err => {
+            console.log("err", err);
+          });
+      },
       // 03-获取订单套餐信息
       GetCombo() {
         var that=this;
@@ -385,6 +427,8 @@
         if(verify){
           return
         }
+
+
         console.log(56565656)
         console.log(this.AllHospitalMsg.choiceTime)
         this.$confirm('确认提交审核吗?', '提示', {
@@ -474,13 +518,14 @@
           });
           return true;
         }
+        console.log(this.AllHospitalMsg.PQCCList)
         console.log(this.AllHospitalMsg.PQCCList.length)
         if(this.AllHospitalMsg.PQCCList.length>0) {
-          for(var i=0;i<this.AllHospitalMsg.PQCCList.length;i++)
-          {
-            var TempQuota=0
-            for(var j=0;j<this.AllHospitalMsg.PQCCList[i].combos.length;j++){
+          var TempQuota=0
+          for(var i=0;i<this.AllHospitalMsg.PQCCList.length;i++){
 
+            for(var j=0;j<this.AllHospitalMsg.PQCCList[i].combos.length;j++){
+              // console.log(this.AllHospitalMsg.PQCCList[i].combos[j].quota)
               if(this.AllHospitalMsg.type==1){
                 if(!this.AllHospitalMsg.PQCCList[i].combos[j].comboParse){
                   console.log(1111111111111111)
@@ -499,12 +544,15 @@
                 });
                 return true;
               }
-              console.log(this.AllHospitalMsg.PQCCList[i].remain)
+              console.log(this.AllHospitalMsg.PQCCList[i])
               console.log(this.AllHospitalMsg.PQCCList[i].combos[j].quota)
-
               TempQuota+=Number(this.AllHospitalMsg.PQCCList[i].combos[j].quota)
 
+
+
             }
+
+          }
             console.log(TempQuota)
             if(TempQuota<7){
               that.$message({
@@ -522,7 +570,7 @@
             }
 
             // if(this.AllHospitalMsg.type==1){
-          }
+
 
 
         }else{

@@ -210,13 +210,30 @@
           </el-form-item>
           <div v-if="PQcreate.PQstate == 0">
             <el-form-item label="单位代码" :label-width="formLabelWidth">
-              <el-input
-                style="width: 220px"
-                v-model.trim="PQcreate.PQDWDM"
-                placeholder="请输入单位代码"
+              <el-select
                 @change="PQDWDMChange"
-                clearable
-              ></el-input>
+                style="width: 220px"
+                v-model="PQcreate.PQDWDM"
+                filterable
+                remote
+                reserve-keyword
+                placeholder="请输入单据号"
+                :remote-method="DWDMremoteMethod"
+                :loading="DWDMloading">
+                <el-option
+                  v-for="item in DWDMMSJCodeArray"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+<!--              <el-input-->
+<!--                style="width: 220px"-->
+<!--                v-model.trim="PQcreate.PQDWDM"-->
+<!--                placeholder="请输入单位代码"-->
+<!--                @change="PQDWDMChange"-->
+<!--                clearable-->
+<!--              ></el-input>-->
             </el-form-item>
             <el-form-item label="单位名称" :label-width="formLabelWidth">
               <el-input
@@ -231,6 +248,7 @@
           <div v-else>
             <el-form-item label="单据号" :label-width="formLabelWidth">
               <el-select
+
                 style="width: 220px"
                 v-model="PQcreate.PQDJH"
                 filterable
@@ -270,6 +288,10 @@ export default {
   components: {},
   data() {
     return {
+
+      DWDMMSJCodeList: [],
+      DWDMloading: false,
+      DWDMMSJCodeArray:[],
 
       // value: [],
       MSJCodeList: [],
@@ -349,7 +371,7 @@ export default {
     this.usermsg = this.$store.getters.getRoleInfo;
     this.GetAllHospital();
     this.GetAllMsjCOde();
-
+    console.log(this.usermsg)
     console.log(this.usermsg.MNId)
     if(this.usermsg.MNId){
       this.GetfuzzyFirmMn();
@@ -358,6 +380,21 @@ export default {
 
   },
   methods: {
+    // 单位代码搜索匹配
+    DWDMremoteMethod(query) {
+      if (query !== '') {
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+          this.DWDMMSJCodeArray = this.DWDMMSJCodeList.filter(item => {
+            return item.label.toLowerCase()
+              .indexOf(query.toLowerCase()) > -1;
+          });
+        }, 200);
+      } else {
+        this.DWDMMSJCodeArray = [];
+      }
+    },
     // 搜索匹配
     remoteMethod(query) {
       if (query !== '') {
@@ -524,13 +561,15 @@ export default {
     PQDWDMChange(){
       console.log(this.PQcreate.PQDWDM);
       console.log(this.PQcreate.DWMCArry);
-      if(this.DWMCArry&&this.DWMCArry.length>0){
-        this.DWMCArry.map((item,index)=>{
-          if(item.DWDM==this.PQcreate.PQDWDM){
-            this.PQcreate.PQDWMC=item.DWMC
-          }
-        })
-      }
+      var PQDWDM=JSON.parse(this.PQcreate.PQDWDM)
+      this.PQcreate.PQDWMC=PQDWDM.DWMC
+      // if(this.DWMCArry&&this.DWMCArry.length>0){
+      //   this.DWMCArry.map((item,index)=>{
+      //     if(item.DWDM==this.PQcreate.PQDWDM){
+      //       this.PQcreate.PQDWMC=item.DWMC
+      //     }
+      //   })
+      // }
       console.log( this.PQcreate.PQDWMC);
     },
     GetfuzzyFirmMn() {
@@ -544,6 +583,21 @@ export default {
         .then((res) => {
           console.log(res);
           that.DWMCArry=res.data.firmList||[]
+
+          console.log(res.data);
+          var Temp=[];
+          that.DWDMMSJCodeList=[];
+          Temp=res.data.firmList||[];
+          Temp.map((item,index)=>{
+            var Obj={
+              id:item.id,
+              DWDM:item.DWDM,
+              DWMC:item.DWMC,
+            }
+            var stringObj=JSON.stringify(Obj)
+            that.DWDMMSJCodeList.push({ value: `${stringObj}`, label: `${item.DWDM}` })
+          })
+          console.log(that.DWDMMSJCodeList);
 
         })
         .catch((err) => {
@@ -691,7 +745,12 @@ export default {
         var tempSchedules=val.request.schedules
         console.log(tempSchedules)
         for (var i=0;i<tempSchedules.length;i++){
-          time=tempSchedules[i].date+"~"+tempSchedules[tempSchedules.length-1].date
+          if(tempSchedules.length==1){
+            time=tempSchedules[0].date
+          }else if(tempSchedules.length>1){
+            time=tempSchedules[0].date+"~"+tempSchedules[tempSchedules.length-1].date
+          }
+
 
         }
 
