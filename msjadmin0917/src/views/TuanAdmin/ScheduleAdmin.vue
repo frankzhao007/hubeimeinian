@@ -67,7 +67,7 @@
         ></el-table-column>
         <el-table-column prop="request.DWDM" label="单位代码"></el-table-column>
         <el-table-column prop="request.DWMC" label="单位名称"></el-table-column>
-        <el-table-column prop="request.YWYXM" label="业务员"></el-table-column>
+        <el-table-column prop="request.YWYDM" label="业务员"></el-table-column>
         <el-table-column   label="订单状态">
           <template  slot-scope="scope">
             <div v-if="scope.row.order">
@@ -78,13 +78,28 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column label="排期类型" min-width="100px">
+          <template slot-scope="scope">
+            {{ PQchange(scope.row.request.type) }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="request.submitAt"
           label="提交时间"
         ></el-table-column>
         <el-table-column label="排期状态">
           <template slot-scope="scope">
-            {{ STATUSchange(scope.row.request.status) }}
+            {{ ZXFWchange(scope.row.request.status) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="request.submitAt" label="排期时间" min-width="110px">
+          <template slot-scope="scope">
+            {{ CalculatePQTime(scope.row) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="排期人数" min-width="110px">
+          <template slot-scope="scope">
+            {{ CalculatePQQuantity(scope.row) }}
           </template>
         </el-table-column>
         <el-table-column
@@ -177,6 +192,82 @@ export default {
     this.GetFYList();
   },
   methods: {
+    CalculatePQQuantity(val){
+      console.log(val)
+      var quantity=0
+      if(val.request.status==2){
+        if(val.request.schedules.length>0&&val.request.schedules){
+          var tempSchedules=val.request.schedules
+          console.log(tempSchedules)
+          tempSchedules.map((item,index)=>{
+            quantity+=Number(item.quota)
+
+          })
+        }
+        return "撤"+quantity.toString();
+      }else{
+        if(val.order){
+          if(val.request.schedules.length>0&&val.request.schedules){
+            var tempSchedules=val.request.schedules
+            console.log(tempSchedules)
+            tempSchedules.map((item,index)=>{
+              quantity+=Number(item.quota)
+
+            })
+          }
+          return "预"+quantity.toString();
+        }else{
+          if(val.request.schedules.length>0&&val.request.schedules){
+            var tempSchedules=val.request.schedules
+            console.log(tempSchedules)
+            tempSchedules.map((item,index)=>{
+              quantity+=Number(item.quota)
+
+            })
+          }
+          return "已排"+quantity.toString();
+        }
+      }
+
+
+      console.log(quantity)
+    },
+    CalculatePQTime(val){
+      console.log(val)
+      var time=""
+      if(val.request.schedules.length>0&&val.request.schedules){
+        var tempSchedules=val.request.schedules
+        console.log(tempSchedules)
+        for (var i=0;i<tempSchedules.length;i++){
+          if(tempSchedules.length==1){
+            time=tempSchedules[0].date
+          }else if(tempSchedules.length>1){
+            time=tempSchedules[0].date+"~"+tempSchedules[tempSchedules.length-1].date
+          }
+
+
+        }
+
+      }
+      return time;
+      console.log(time)
+    },
+    PQchange(val) {
+      console.log(val)
+      switch (val.toString()) {
+        case "0":
+          return "预排";
+          break;
+        case "1":
+          return "排期";
+          break;
+        case "2":
+          return "外部导入排期";
+          break;
+        default:
+          break;
+      }
+    },
     GetPQList() {
       this.tableobj.loading = true;
       var body = {
@@ -215,12 +306,12 @@ export default {
       this.$router.push("/TuanAdmin/AddBranchMM");
     },
     LookDetil(row) {
-      // console.log(row.order);
+      console.log(row);
       var stringVal=JSON.stringify(row)
       // console.log(stringVal);
       // return ;
       this.$router.push(
-        "/TuanAdmin/CheckTuanDetail?stringVal=" +stringVal);
+        "/TuanAdmin/CheckTuanDetail?id=" +row.request.id);
 
       // this.$router.push(
       //   "/TuanAdmin/CheckTuanDetail?MsjBILLCODE=" +
@@ -412,6 +503,21 @@ export default {
           return "拒绝排期";
           break;
 
+        default:
+          break;
+      }
+    },
+    ZXFWchange(val) {
+      switch (val.toString()) {
+        case "0":
+          return "预排期";
+          break;
+        case "1":
+          return "排期生效";
+          break;
+        case "2":
+          return "排期撤销";
+          break;
         default:
           break;
       }

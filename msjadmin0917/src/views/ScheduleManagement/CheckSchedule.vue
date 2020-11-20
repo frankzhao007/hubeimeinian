@@ -20,7 +20,7 @@
           </div>
 
           <el-form-item label="单据号：">
-            <el-input  v-model="AllHospitalMsg.id" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
+            <el-input  v-model="AllHospitalMsg.orderID" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
           </el-form-item>
           <el-form-item label="提交时间：">
             <el-input  v-model="AllHospitalMsg.submitAt" :disabled="true" placeholder="0000-00-00 00：00：00" style="width:200px" size="mini"></el-input>
@@ -60,9 +60,9 @@
                       <div v-if="AllHospitalMsg.type==1" style="float: left;height: 50px;margin-left: 30px;padding-top: 10px;width: 150px">
                         <el-input disabled v-model.trim="itemtancan.quota" maxlength=10000   placeholder="请输入人数" style="width:130px" clearable></el-input>
                       </div>
-                      <div  v-if="AllHospitalMsg.type==0" style="margin-left:0px;float: left;height: 50px;padding-top: 10px;width: 150px">
-                        <el-input disabled v-model.trim="itemMsg.quota" maxlength=10000   placeholder="请输入人数" style="width:130px" clearable></el-input>
-                      </div>
+<!--                      <div  v-if="AllHospitalMsg.type==0" style="margin-left:0px;float: left;height: 50px;padding-top: 10px;width: 150px">-->
+<!--                        <el-input disabled v-model.trim="itemMsg.quota" maxlength=10000   placeholder="请输入人数" style="width:130px" clearable></el-input>-->
+<!--                      </div>-->
 <!--                      <div @click="decreaseTancanAndPerson(indexitemMsg,indexitemtancan)" v-if="indexitemtancan!=0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:23px;float: left;width: 35px;height: 35px;line-height:35px;border-radius: 50%;text-align:center;border: 1px solid #DCDFE6;color: #DCDFE6;">—</div>-->
 <!--                      <div @click="addTancanAndPerson(indexitemMsg)" v-if="indexitemtancan==0" style="margin-top: 10px;cursor: pointer;margin-left: 30px;font-size:36px;float: left;width: 35px;height: 35px;line-height:35px;text-align:center;border-radius: 50%;border: 1px solid #DCDFE6;color: #DCDFE6;">+</div>-->
                     </div>
@@ -146,23 +146,15 @@ export default {
 
   },
   mounted() {
-    var jsonVal=JSON.parse(this.$route.query.StringVal)
-    console.log(jsonVal);
-    this.AllHospitalMsg.id=jsonVal.request.orderID
-    this.AllHospitalMsg.submitAt=jsonVal.request.submitAt
-    this.AllHospitalMsg.HospitalShow=jsonVal.request.hospitalName
-    this.AllHospitalMsg.DWDM=jsonVal.request.DWDM
-    this.AllHospitalMsg.DWMC=jsonVal.request.DWMC
-    this.AllHospitalMsg.YWYDM=this.$route.query.YWYDM
-    this.AllHospitalMsg.type=jsonVal.request.type
-    this.CalculatePQTime(jsonVal)
-    // this.GetAllHospital();
-    console.log(this.AllHospitalMsg.type);
-    if(this.AllHospitalMsg.type==1){
-
-
+    // var jsonVal=JSON.parse(this.$route.query.id)
+    // console.log(jsonVal);
+    this.AllHospitalMsg.id=this.$route.query.id
+    console.log(this.AllHospitalMsg.id);
+    if(this.AllHospitalMsg.id){
+      this.GetRequestDetail();
     }
-    this.getDeatail(jsonVal)
+    return
+
     // this.getRequestDetail()
 
 
@@ -182,9 +174,45 @@ export default {
 
   },
   methods: {
+    // 获取排期详情
+    GetRequestDetail() {
+      var that=this;
+      this.$network3
+        .get("/mnoracle/schedule/RequestDetail", {
+          id: this.AllHospitalMsg.id,
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.code == 200) {
+
+            if (res.data) {
+              var jsonVal=res.data
+              this.AllHospitalMsg.submitAt=jsonVal.submitAt
+              this.AllHospitalMsg.HospitalShow=jsonVal.hospitalName
+              this.AllHospitalMsg.DWDM=jsonVal.DWDM
+              this.AllHospitalMsg.DWMC=jsonVal.DWMC
+              this.AllHospitalMsg.YWYDM=jsonVal.YWYDM
+              this.AllHospitalMsg.type=jsonVal.type
+              this.AllHospitalMsg.orderID=jsonVal.orderID
+              this.CalculatePQTime(jsonVal)
+              // this.GetAllHospital();
+              console.log(this.AllHospitalMsg.type);
+              if(this.AllHospitalMsg.type==1){
+
+
+              }
+              this.getDeatail(jsonVal)
+
+            } else {
+
+            }
+          }
+        });
+    },
     getDeatail(val){
-      if(val.request.schedules.length>0&&val.request.schedules){
-        var chooseHospitalMsg=val.request.schedules
+      console.log(val)
+      if(val.schedules.length>0&&val.schedules){
+        var chooseHospitalMsg=val.schedules
         var chooseHospitalMsgTempt=[]
         for(var i=0;i<chooseHospitalMsg.length;i++){
 
@@ -217,8 +245,8 @@ export default {
     CalculatePQTime(val){
       console.log(val)
       var time=""
-      if(val.request.schedules.length>0&&val.request.schedules){
-        var tempSchedules=val.request.schedules
+      if(val.schedules.length>0&&val.schedules){
+        var tempSchedules=val.schedules
         console.log(tempSchedules)
         if(tempSchedules.length>=1){
           for (var i=0;i<tempSchedules.length;i++){
@@ -237,7 +265,7 @@ export default {
       this.AllHospitalMsg.choiceTime=time;
       console.log(time)
     },
-    // 03-获取订单套餐信息
+    // 获取订单套餐信息
     GetCombo() {
       var that=this;
       this.$network3

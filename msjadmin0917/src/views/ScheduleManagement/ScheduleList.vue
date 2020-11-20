@@ -108,7 +108,13 @@
         <!-- <el-table-column prop="YWY_ZG" label="内勤审核人" min-width="100px"></el-table-column> -->
         <el-table-column label="订单状态" min-width="100px">
           <template slot-scope="scope">
-            {{ STATUSchange(scope.row.auditStatus) }}
+            <div v-if="scope.row.order">
+              {{ STATUSchange(scope.row.order.auditStatus) }}
+            </div>
+            <div v-if="!scope.row.order">
+              未制单
+            </div>
+
           </template>
         </el-table-column>
         <el-table-column label="排期类型" min-width="100px">
@@ -151,7 +157,7 @@
         <!-- <el-table-column prop="YWY_ZG_SHSJ" label="内勤审核时间" min-width="110px"></el-table-column>
         <el-table-column prop="LCDJR" label="财务审核人" min-width="100px"></el-table-column>
         <el-table-column prop="ZXWCSJ" label="财务审核时间" min-width="110px"></el-table-column>-->
-        <el-table-column label="操作" fixed="right" min-width="200px">
+        <el-table-column label="操作" fixed="right" min-width="200px" >
           <template slot-scope="scope">
             <!-- <el-button
               size="mini"
@@ -163,12 +169,31 @@
             <div>
               <el-button size="mini" type="text" @click="toPQ(scope.row)">查看排期</el-button>
             </div>
-            <div>
-              <el-button size="mini" type="text" @click="SubmitAudit(scope.row)">提交审核</el-button>
+<!--            <div>-->
+<!--              <el-button size="mini" type="text" @click="SubmitAudit(scope.row)">提交审核</el-button>-->
+<!--            </div>-->
+            <div v-if="scope.row.order">
+              <div v-if="scope.row.order.auditStatus==1">
+                <el-button size="mini" type="text" @click="PQrevocation(scope.row)" >排期撤销</el-button>
+              </div>
+              <div v-else>
+                <el-tooltip class="item" effect="dark" content="请联系团单管理员撤销，排期记录无法多次提交" placement="top-start">
+                  <el-button size="mini" type="text" style="color: #C0C4CC"   >排期撤销</el-button>
+                </el-tooltip>
+
+              </div>
+
             </div>
-            <div>
-              <el-button size="mini" type="text" @click="PQrevocation(scope.row)">排期撤销</el-button>
+            <div v-if="!scope.row.order">
+              <el-tooltip class="item" effect="dark" content="请联系团单管理员撤销，排期记录无法多次提交" placement="top-start">
+                <el-button size="mini" type="text"  style="color: #C0C4CC" >排期撤销</el-button>
+              </el-tooltip>
+
             </div>
+
+<!--            <div v-if="scope.row.request.status!=1">-->
+<!--              <el-button size="mini" type="text" disabled>排期撤销</el-button>-->
+<!--            </div>-->
 <!--            <div>-->
 <!--              <el-button size="mini" type="text" @click="">删除</el-button>-->
 <!--            </div>-->
@@ -217,7 +242,7 @@
                 filterable
                 remote
                 reserve-keyword
-                placeholder="请输入单据号"
+                placeholder="请输入单位代码"
                 :remote-method="DWDMremoteMethod"
                 :loading="DWDMloading">
                 <el-option
@@ -617,7 +642,7 @@ export default {
     toPQ(val) {
       console.log(val);
       var StringVal=JSON.stringify(val)
-      this.$router.push("/ScheduleManagement/CheckSchedule?StringVal=" + StringVal);
+      this.$router.push("/ScheduleManagement/CheckSchedule?id=" + val.request.id);
     },
 
     GetFYList() {
@@ -696,7 +721,7 @@ export default {
     ZXFWchange(val) {
       switch (val.toString()) {
         case "0":
-          return "初始提交";
+          return "预排期";
           break;
         case "1":
           return "排期生效";
@@ -712,7 +737,7 @@ export default {
       console.log(val)
       switch (val.toString()) {
         case "0":
-          return "预排期";
+          return "预排";
           break;
         case "1":
           return "排期";
@@ -727,15 +752,41 @@ export default {
     CalculatePQQuantity(val){
       console.log(val)
       var quantity=0
-      if(val.request.schedules.length>0&&val.request.schedules){
-        var tempSchedules=val.request.schedules
-        console.log(tempSchedules)
-        tempSchedules.map((item,index)=>{
-          quantity+=Number(item.quota)
+      if(val.request.status==2){
+        if(val.request.schedules.length>0&&val.request.schedules){
+          var tempSchedules=val.request.schedules
+          console.log(tempSchedules)
+          tempSchedules.map((item,index)=>{
+            quantity+=Number(item.quota)
 
-        })
+          })
+        }
+        return "撤"+quantity.toString();
+      }else{
+        if(val.order){
+          if(val.request.schedules.length>0&&val.request.schedules){
+            var tempSchedules=val.request.schedules
+            console.log(tempSchedules)
+            tempSchedules.map((item,index)=>{
+              quantity+=Number(item.quota)
+
+            })
+          }
+          return "预"+quantity.toString();
+        }else{
+          if(val.request.schedules.length>0&&val.request.schedules){
+            var tempSchedules=val.request.schedules
+            console.log(tempSchedules)
+            tempSchedules.map((item,index)=>{
+              quantity+=Number(item.quota)
+
+            })
+          }
+          return "已排"+quantity.toString();
+        }
       }
-      return quantity.toString();
+
+
       console.log(quantity)
     },
     CalculatePQTime(val){

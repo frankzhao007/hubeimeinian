@@ -122,11 +122,11 @@
                   </div>
 
                   <div style="float:left;width:34%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_mor">{{matchingdata(AllHospitalMsg.days,data.day).sched_mor}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_mor">{{matchingdata(AllHospitalMsg.days,data.day).sched_mor+matchingdata(AllHospitalMsg.days,data.day).preSched_mor}}</span>
                     <span v-else>-</span>
                   </div>
                   <div style="float:left;width:33%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_mor">{{matchingdata(AllHospitalMsg.days,data.day).remain_mor}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_mor">{{matchingdata(AllHospitalMsg.days,data.day).remain_mor+matchingdata(AllHospitalMsg.days,data.day).preSchedRemain_mor}}</span>
                     <span v-else>-</span>
                   </div>
                 </div>
@@ -152,11 +152,11 @@
                     <span v-else>-</span>
                   </div>
                   <div style="float:left;width:34%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_aft">{{matchingdata(AllHospitalMsg.days,data.day).sched_aft}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_aft">{{matchingdata(AllHospitalMsg.days,data.day).sched_aft+matchingdata(AllHospitalMsg.days,data.day).preSched_aft}}</span>
                     <span v-else>-</span>
                   </div>
                   <div style="float:left;width:33%;text-align: center;">
-                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_aft">{{matchingdata(AllHospitalMsg.days,data.day).remain_aft}}</span>
+                    <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_aft">{{matchingdata(AllHospitalMsg.days,data.day).remain_aft+matchingdata(AllHospitalMsg.days,data.day).preSchedRemain_aft}}</span>
                     <span v-else>-</span>
                   </div>
                 </div>
@@ -665,6 +665,13 @@
           this.$message({ type: 'info', message: '当天无排期!' });
           return;
         }
+        if(this.AllHospitalMsg.chooseDAY.length==1){
+          this.AllHospitalMsg.choiceTime=this.AllHospitalMsg.chooseDAY[0]
+
+        }else if(this.AllHospitalMsg.chooseDAY.length>1){
+          this.AllHospitalMsg.choiceTime=this.AllHospitalMsg.chooseDAY[0]+"~"+this.AllHospitalMsg.chooseDAY[this.AllHospitalMsg.chooseDAY.length-1]
+
+        }
         this.operate.dialogFormVisible = false
 
         // if(this.choicetiem!=this.AllHospitalMsg.choiceTime){
@@ -866,6 +873,14 @@
           });
           return;
         }
+        if(this.AllHospitalMsg.chooseDAY.length>1){
+          console.log(this.compareTime)
+          var length=this.AllHospitalMsg.chooseDAY.length
+          this.compareTime.push(this.AllHospitalMsg.chooseDAY[0])
+          this.compareTime.push(this.AllHospitalMsg.chooseDAY[length-1])
+        }else if(this.AllHospitalMsg.chooseDAY.length==1){
+          this.compareTime.push(this.AllHospitalMsg.chooseDAY[0])
+        }
   				console.log(this.operate.dialogFormVisible)
 			},
       selectDate(val, dataval, id) {
@@ -882,8 +897,29 @@
           console.log(this.compareTime)
           console.log(this.compareTime.length)
           if(this.compareTime.length>=2){
-            this.compareTime.splice(this.compareTime.length-1,1)
+            // this.compareTime.splice(this.compareTime.length-1,1)
             this.compareTime.push(val.day)
+            var i = 0;
+            var j = 0;
+            let t;
+            for ( i = 0; i < this.compareTime.length; i++){
+              for (j = 0; j < this.compareTime.length; j++){
+                let oDate1 = new Date(this.compareTime[i]);
+                let oDate2 = new Date(this.compareTime[j]);
+                if (oDate1.getTime() < oDate2.getTime()){
+                  t = this.compareTime[i];
+                  this.compareTime[i] = this.compareTime[j];
+                  this.compareTime[j] = t;
+                }
+              }
+            }
+            var tempcompareTime=[];
+            tempcompareTime.push(this.compareTime[0])
+            tempcompareTime.push(this.compareTime[this.compareTime.length-1])
+            // return this.compareTime
+            this.compareTime=tempcompareTime
+
+            console.log(this.compareTime)
             this.getDates()
           }else if(this.compareTime.length==1){
             this.compareTime.push(val.day)
@@ -924,14 +960,24 @@
               }
               if(this.choicetiem == this.AllHospitalMsg.days[j].date) {
                 console.log(this.AllHospitalMsg.days[j])
-                if(!this.AllHospitalMsg.days[j].remain_aft||!this.AllHospitalMsg.days[j].remain_mor){
-                  this.$message({ type: 'info', message: '当天无排期!' });
+                // if(this.AllHospitalMsg.days[j].remain_aft==0||this.AllHospitalMsg.days[j].remain_mor==0){
+                //   console.log(1111111111111)
+                //   this.$message({ type: 'info', message: '当天无排期!' });
+                //   this.AllHospitalMsg.days[j].isSelected = false
+                //   this.choicetiem="";
+                //   this.compareTime=[];
+                //   return ;
+                // }
+                console.log(this.AllHospitalMsg.days[j].remain_aft)
+                console.log(this.AllHospitalMsg.days[j].remain_mor)
+                if(this.AllHospitalMsg.days[j].remain_aft==0&&this.AllHospitalMsg.days[j].remain_mor==0){
+                  console.log(22222222222)
+                  this.$message({ type: 'info', message: this.AllHospitalMsg.days[j].date+'日(日期)已满，无法进行排期' });
                   this.AllHospitalMsg.days[j].isSelected = false
                   this.choicetiem="";
                   this.compareTime=[];
                   return ;
                 }
-
                 console.log(this.AllHospitalMsg.days[j])
 
               }

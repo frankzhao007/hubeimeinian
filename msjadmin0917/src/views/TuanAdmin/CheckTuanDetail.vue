@@ -20,7 +20,7 @@
           </div>
 
           <el-form-item label="单据号：">
-            <el-input  v-model="AllHospitalMsg.id" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
+            <el-input  v-model="AllHospitalMsg.orderID" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
           </el-form-item>
           <el-form-item label="单位代码：">
             <el-input  v-model="AllHospitalMsg.DWDM" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
@@ -52,9 +52,9 @@
                 <div style="width: 1000px">
                   <div style="width: 330px;float: left;padding-top: 15px;font-size: 16px;white-space: normal;overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;word-break: break-all;">{{itemMsg.PQCCtitle}}</div>
                   <div style="float: left;margin-left: 150px">
-                    <div  v-for="(itemtancan,indexitemtancan) in itemMsg.combos">
+                    <div  v-if="AllHospitalMsg.type==1"v-for="(itemtancan,indexitemtancan) in itemMsg.combos">
                       <div v-if="AllHospitalMsg.type==1" style="float: left;padding-top: 10px">
-                        <el-select v-model="itemtancan.comboParse" visible-change="visibleChange" @change="selectPQCCChange" placeholder="请选择套餐" style="width:200px">
+                        <el-select v-model="itemtancan.comboName" visible-change="visibleChange" @change="selectPQCCChange(itemtancan.comboName,indexitemMsg,indexitemtancan)" placeholder="请选择套餐" style="width:200px">
                           <el-option v-for="item in AllHospitalMsg.combos" :key="item.comboID" :label="item.comboName" :value="item.comboParse"></el-option>
                         </el-select>
                       </div>
@@ -130,11 +130,11 @@
                     </div>
 
                     <div style="float:left;width:34%;text-align: center;">
-                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_mor">{{matchingdata(AllHospitalMsg.days,data.day).sched_mor}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_mor">{{matchingdata(AllHospitalMsg.days,data.day).sched_mor+matchingdata(AllHospitalMsg.days,data.day).preSched_mor}}</span>
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:33%;text-align: center;">
-                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_mor">{{matchingdata(AllHospitalMsg.days,data.day).remain_mor}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_mor">{{matchingdata(AllHospitalMsg.days,data.day).remain_mor+matchingdata(AllHospitalMsg.days,data.day).preSchedRemain_mor}}</span>
                       <span v-else>-</span>
                     </div>
                   </div>
@@ -160,11 +160,11 @@
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:34%;text-align: center;">
-                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_aft">{{matchingdata(AllHospitalMsg.days,data.day).sched_aft}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_aft">{{matchingdata(AllHospitalMsg.days,data.day).sched_aft+matchingdata(AllHospitalMsg.days,data.day).preSched_aft}}</span>
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:33%;text-align: center;">
-                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_aft">{{matchingdata(AllHospitalMsg.days,data.day).remain_aft}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_aft">{{matchingdata(AllHospitalMsg.days,data.day).remain_aft+matchingdata(AllHospitalMsg.days,data.day).preSchedRemain_aft}}</span>
                       <span v-else>-</span>
                     </div>
                   </div>
@@ -207,6 +207,7 @@ export default {
       TimePickervalue1:[],
       TimePickervalue1_model:[],
       AllHospitalMsg:{
+        CalendarFromEdit:[],
         chooseDAY:[],
         ResquestId:'',
         type:0,
@@ -249,58 +250,19 @@ export default {
   },
   mounted() {
 
-    var jsonVal=JSON.parse(this.$route.query.stringVal)
-    console.log(jsonVal);
-    this.AllHospitalMsg.type=jsonVal.request.type
+    // var jsonVal=JSON.parse(this.$route.query.stringVal)
+    // console.log(jsonVal);
+    this.AllHospitalMsg.id=this.$route.query.id
+    if(this.AllHospitalMsg.id){
+      this.GetRequestDetail();
+    }
 
-    this.AllHospitalMsg.DWDM=jsonVal.request.DWDM
-    this.AllHospitalMsg.DWMC=jsonVal.request.DWMC
-    this.AllHospitalMsg.YWYDM=jsonVal.request.YWYDM
 
-    this.AllHospitalMsg.submitAt=jsonVal.request.submitAt
-    this.AllHospitalMsg.hospitalCode=jsonVal.request.hospitalCode
-    this.AllHospitalMsg.HospitalShow=jsonVal.request.hospitalName
-    this.AllHospitalMsg.ResquestId=jsonVal.request.id
-    this.CalculatePQTime(jsonVal)//获取排期时间
+
 
     this.GetAllHospital();//获取所有分院
-    if(this.AllHospitalMsg.hospitalCode){
-      //刷新日历
-      this.getCalendar().then(res => {
-        console.log(res)
-        console.log(this.AllHospitalMsg.days)
-        console.log(2222222222222222222222222222)
-        //获取排期场次
 
-        this.getDeatail(jsonVal)
 
-      })
-      // new Promise(resolve => {
-      //   this.getCalendar()
-      //   console.log(11111111111111111111)
-      //
-      // }).then(res => {
-      //     console.log(res)
-      //   console.log(this.AllHospitalMsg.days)
-      //   console.log(2222222222222222222222222222)
-      //   //获取排期场次
-      //
-      //   this.getDeatail(jsonVal)
-      //   resolve("成功")
-      //   })
-
-      // this.getCalendar().then(val => {
-      //   //获取排期场次
-      //   console.log(val)
-      //   this.getDeatail(jsonVal)
-      // })
-
-    }
-    if(this.AllHospitalMsg.type==1){
-      this.AllHospitalMsg.id=jsonVal.order.MsjBILLCODE
-      // 获取订单套餐信息
-      this.GetCombo()
-    }
 
 
 
@@ -324,6 +286,126 @@ export default {
 
   },
   methods: {
+    getCalendarByDateTime(val){
+
+      return new Promise((resolve,reject)=>{
+        var that=this;
+        console.log(val)
+        var timeARRAY=[];
+        if(val.schedules.length>0){
+          val.schedules.map((item,index)=>{
+
+            timeARRAY.push(item.date)
+          })
+
+          timeARRAY=Array.from(new Set(timeARRAY))
+          console.log(timeARRAY)
+          var i = 0;
+          var j = 0;
+          let t;
+          for ( i = 0; i < timeARRAY.length; i++){
+            for (j = 0; j < timeARRAY.length; j++){
+              let oDate1 = new Date(timeARRAY[i]);
+              let oDate2 = new Date(timeARRAY[j]);
+              if (oDate1.getTime() < oDate2.getTime()){
+                t = timeARRAY[i];
+                timeARRAY[i] = timeARRAY[j];
+                timeARRAY[j] = t;
+              }
+            }
+          }
+          console.log(timeARRAY)
+          var tempcompareTime=[];
+          // tempcompareTime.push(this.compareTime[0])
+          // tempcompareTime.push(this.compareTime[this.compareTime.length-1])
+
+        }
+        var body = {
+          hospitalCode:this.AllHospitalMsg.hospitalCode,
+          month:"",
+          startDate: timeARRAY[0],
+          endDate: timeARRAY[timeARRAY.length-1],
+          // startDate:this.changeTime(this.TimePickervalue1[0]),
+          // endDate:this.changeTime(this.TimePickervalue1[1]),
+
+        };
+        this.$network3
+          .post("/mnoracle/schedule/Calendar", body)
+          .then(res => {
+            console.log(res);
+            console.log(res.data)
+            if (res.data) {
+
+              that.AllHospitalMsg.CalendarFromEdit=res.data||[]
+              resolve(this.AllHospitalMsg.CalendarFromEdit)
+              // that.getDeatail(val)
+            }else{
+
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+
+      })
+
+
+
+
+
+    },
+    // 获取排期详情
+    GetRequestDetail() {
+      var that=this;
+      this.$network3
+        .get("/mnoracle/schedule/RequestDetail", {
+          id: this.AllHospitalMsg.id,
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.code == 200) {
+
+            if (res.data) {
+              var jsonVal=res.data
+              this.AllHospitalMsg.type=jsonVal.type
+
+              this.AllHospitalMsg.DWDM=jsonVal.DWDM
+              this.AllHospitalMsg.DWMC=jsonVal.DWMC
+              this.AllHospitalMsg.YWYDM=jsonVal.YWYDM
+
+              this.AllHospitalMsg.submitAt=jsonVal.submitAt
+              this.AllHospitalMsg.hospitalCode=jsonVal.hospitalCode
+              this.AllHospitalMsg.HospitalShow=jsonVal.hospitalName
+              this.AllHospitalMsg.ResquestId=jsonVal.id
+              this.AllHospitalMsg.orderID=jsonVal.orderID
+              this.CalculatePQTime(jsonVal)//获取排期时间
+              if(this.AllHospitalMsg.hospitalCode){
+                //刷新日历
+                this.getCalendar(jsonVal)
+                this.getCalendarByDateTime(jsonVal).then(res => {
+                  console.log(res)
+                  console.log(this.AllHospitalMsg.days)
+                  console.log(2222222222222222222222222222)
+                  //获取排期场次
+
+                  this.getDeatail(jsonVal)
+
+                })
+
+
+              }
+              if(this.AllHospitalMsg.type==1){
+                this.AllHospitalMsg.orderID=jsonVal.orderID
+                // 获取订单套餐信息
+                this.GetCombo()
+              }
+
+            } else {
+
+            }
+          }
+        });
+    },
     PQrevocation() {
       var body = {
         id: this.AllHospitalMsg.ResquestId, // 申请记录ID
@@ -368,53 +450,83 @@ export default {
     getDeatail(val){
       console.log(val);
       console.log(this.AllHospitalMsg.days);
-      if(val.request.schedules.length>0&&val.request.schedules){
-        var chooseHospitalMsg=val.request.schedules
-        var chooseHospitalMsgTempt=[]
-        for(var i=0;i<chooseHospitalMsg.length;i++){
+      console.log(this.AllHospitalMsg.CalendarFromEdit);
+      if(val.schedules.length>0&&val.schedules) {
+        var chooseHospitalMsg = val.schedules
+        var chooseHospitalMsgTempt = []
+        for (var i = 0; i < chooseHospitalMsg.length; i++) {
 
-
-          console.log(1111111)
-          var PQCCtitleTemp=""
-          if(chooseHospitalMsg[i].session==1){
-            PQCCtitleTemp=chooseHospitalMsg[i].date+"上午"
-          }else if(chooseHospitalMsg[i].session==2){
-            PQCCtitleTemp=chooseHospitalMsg[i].date+"下午"
-          }
-
-          if(this.AllHospitalMsg.type==1){
-            for(var j=0;j<chooseHospitalMsg[i].combos.length;j++){
-              var item=chooseHospitalMsg[i].combos[j]
-              // var tempGROUPNAME=item.GROUPNAME.replace(" ","")
-              var IDAndName={
-                comboName:item.comboName,
-                comboID:item.comboID,
+              console.log(1111111)
+              var PQCCtitleTemp = ""
+              if (chooseHospitalMsg[i].session == 1) {
+                PQCCtitleTemp = chooseHospitalMsg[i].date + "上午";
+              } else if (chooseHospitalMsg[i].session == 2) {
+                PQCCtitleTemp = chooseHospitalMsg[i].date + "下午"
               }
-              // var obj={
-              //   comboName:tempGROUPNAME,
-              //   comboID:item.ID,
-              //   comboParse:JSON.stringify(IDAndName)
-              // }
-              chooseHospitalMsg[i].combos[j].comboParse=JSON.stringify(IDAndName)
-              // that.AllHospitalMsg.combos.push(obj)
-          }
+
+              if (this.AllHospitalMsg.type == 1) {
+                for (var j = 0; j < chooseHospitalMsg[i].combos.length; j++) {
+                  var item = chooseHospitalMsg[i].combos[j]
+                  // var tempGROUPNAME=item.GROUPNAME.replace(" ","")
+                  var IDAndName = {
+                    comboName: item.comboName,
+                    comboID: item.comboID,
+                  }
+
+                  chooseHospitalMsg[i].combos[j].comboParse = JSON.stringify(IDAndName)
+                }
+              }
+              var obj = {
+                PQCCtitle: PQCCtitleTemp,
+                date: chooseHospitalMsg[i].date,
+                quota: chooseHospitalMsg[i].quota,
+                session: chooseHospitalMsg[i].session,
+                combos: chooseHospitalMsg[i].combos
+              }
+              chooseHospitalMsgTempt.push(obj)
 
 
-
-          }
-          var obj={
-            PQCCtitle:PQCCtitleTemp,
-            date:chooseHospitalMsg[i].date,
-            quota:chooseHospitalMsg[i].quota,
-            session:chooseHospitalMsg[i].session,
-            combos:chooseHospitalMsg[i].combos
-
-
-          }
-          chooseHospitalMsgTempt.push(obj)
 
 
         }
+        for (var i = 0; i < chooseHospitalMsgTempt.length; i++) {
+          for(var j=0;j<this.AllHospitalMsg.CalendarFromEdit.length;j++){
+            if(chooseHospitalMsgTempt[i].date==this.AllHospitalMsg.CalendarFromEdit[j].date&&chooseHospitalMsgTempt[i].session==this.AllHospitalMsg.CalendarFromEdit[j].session){
+                  console.log(this.AllHospitalMsg.CalendarFromEdit[j])
+                  console.log(chooseHospitalMsgTempt[i])
+                  var PQCCtitleTemp = ""
+                  if (chooseHospitalMsg[i].session == 1) {
+                    chooseHospitalMsgTempt[i].PQCCtitle = chooseHospitalMsg[i].date + "上午"+"（排期剩余"+this.AllHospitalMsg.CalendarFromEdit[j].remain+",预排剩余"+this.AllHospitalMsg.CalendarFromEdit[j].preSchedRemain+")";
+                  } else if (chooseHospitalMsg[i].session == 2) {
+                    chooseHospitalMsgTempt[i].PQCCtitle  = chooseHospitalMsg[i].date + "下午"+"（排期剩余"+this.AllHospitalMsg.CalendarFromEdit[j].remain+",预排剩余"+this.AllHospitalMsg.CalendarFromEdit[j].preSchedRemain+")";
+                  }
+
+                  // if (this.AllHospitalMsg.type == 1) {
+                  //   for (var j = 0; j < chooseHospitalMsg[i].combos.length; j++) {
+                  //     var item = chooseHospitalMsg[i].combos[j]
+                  //     // var tempGROUPNAME=item.GROUPNAME.replace(" ","")
+                  //     var IDAndName = {
+                  //       comboName: item.comboName,
+                  //       comboID: item.comboID,
+                  //     }
+                  //
+                  //     chooseHospitalMsg[i].combos[j].comboParse = JSON.stringify(IDAndName)
+                  //   }
+                  // }
+                  // var obj = {
+                  //   PQCCtitle: PQCCtitleTemp,
+                  //   date: chooseHospitalMsg[i].date,
+                  //   quota: chooseHospitalMsg[i].quota,
+                  //   session: chooseHospitalMsg[i].session,
+                  //   combos: chooseHospitalMsg[i].combos
+                  // }
+                  // chooseHospitalMsgTempt.push(obj)
+
+            }
+
+
+        }
+      }
         this.AllHospitalMsg.PQCCList=chooseHospitalMsgTempt
         console.log(this.AllHospitalMsg.PQCCList)
       }
@@ -424,8 +536,8 @@ export default {
     CalculatePQTime(val){
       console.log(val)
       var time=""
-      if(val.request.schedules.length>0&&val.request.schedules){
-        var tempSchedules=val.request.schedules
+      if(val.schedules.length>0&&val.schedules){
+        var tempSchedules=val.schedules
         console.log(tempSchedules)
         for (var i=0;i<tempSchedules.length;i++){
           if(tempSchedules.length==1){
@@ -451,7 +563,7 @@ export default {
       var that=this;
       this.$network3
         .get("/mnoracle/msj/GetCombo", {
-          MsjBILLCODE: this.AllHospitalMsg.id,
+          MsjBILLCODE: this.AllHospitalMsg.orderID,
         })
         .then((res) => {
           console.log(res);
@@ -510,35 +622,29 @@ export default {
       //   this.$router.go(-1);
       // }
     },
-    getRequestDetail(){
-      var body={
-        id:this.AllHospitalMsg.id,
-
-      };
-      this.$network3
-        .get("/mnoracle/schedule/RequestDetail",body)
-        .then((res)=>{
-          this.AllHospitalMsg.hospitalCode=res.data.hospitalCode
-          this.AllHospitalMsg.HospitalShow=res.data.hospitalName
-          this.AllHospitalMsg.submitAt=res.data.submitAt
-          this.AllHospitalMsg.orderID=res.data.orderID
-          this.AllHospitalMsg.choiceTime=res.data.date
-          this.AllHospitalMsg.session=res.data.session
-          this.AllHospitalMsg.PQRS=res.data.quota
-          // if(res.data.session==1){
-          //   this.AllHospitalMsg.PQCCtitle=
-          //     res.data.date+"上午"+"（剩余"+res.data.remain+")";
-          // }else if(res.data.session==2){
-          //   this.AllHospitalMsg.PQCCtitle=
-          //     res.data.date+"下午"+"（剩余"+res.data.remain+")";
-          // }
-          console.log(this.AllHospitalMsg);
-          this. PQCClook();
-        })
-        .catch((err)=>{
-          console.log(err);
-        });
-    },
+    // getRequestDetail(){
+    //   var body={
+    //     id:this.AllHospitalMsg.id,
+    //
+    //   };
+    //   this.$network3
+    //     .get("/mnoracle/schedule/RequestDetail",body)
+    //     .then((res)=>{
+    //       this.AllHospitalMsg.hospitalCode=res.data.hospitalCode
+    //       this.AllHospitalMsg.HospitalShow=res.data.hospitalName
+    //       this.AllHospitalMsg.submitAt=res.data.submitAt
+    //       this.AllHospitalMsg.orderID=res.data.orderID
+    //       this.AllHospitalMsg.choiceTime=res.data.date
+    //       this.AllHospitalMsg.session=res.data.session
+    //       this.AllHospitalMsg.PQRS=res.data.quota
+    //
+    //       console.log(this.AllHospitalMsg);
+    //       this. PQCClook();
+    //     })
+    //     .catch((err)=>{
+    //       console.log(err);
+    //     });
+    // },
     submit(){
       var that=this
       var verify= this.verify();
@@ -758,8 +864,202 @@ export default {
     cancel(){
       this.$router.push('/ScheduleManagement/ScheduleList')
     },
+
+    visibleChange(){
+      console.log(787878788787)
+
+    },
+    selectPQCCChange(e,index,idx){
+      console.log(e)
+      var parseObj=JSON.parse(e)
+
+      var comboID=parseObj.comboID
+      var comboName=parseObj.comboName
+      var comboParseTempt={comboName: comboName,comboID:comboID}
+      var comboParse=JSON.stringify(comboParseTempt)
+      console.log(this.AllHospitalMsg.choiceTime)
+
+      if(this.AllHospitalMsg.PQCCList.length>0){
+        if(this.AllHospitalMsg.type==1){
+          this.AllHospitalMsg.PQCCList[index].combos[idx].comboID=comboID
+          this.AllHospitalMsg.PQCCList[index].combos[idx].comboName=comboName
+          this.AllHospitalMsg.PQCCList[index].combos[idx].comboParse=comboParse
+
+        }
+
+      }
+      console.log(this.AllHospitalMsg.PQCCList);
+      console.log(this.AllHospitalMsg.session);
+
+
+    },
+    selectChange(e){
+      this.AllHospitalMsg.hospitalCode=e
+      this.AllHospitalMsg.PQCCList=[]
+      this.getCalendar()
+      this.AllHospitalMsg.chooseDAY=[];
+      this.compareTime=[];
+      this.AllHospitalMsg.choiceTime=""
+
+      console.log(e)
+    },
+    PQCClook(){
+      var that=this;
+      var body={
+        code:this.AllHospitalMsg.hospitalCode,//分院代码
+        date:this.AllHospitalMsg.choiceTime,//日期
+      };
+      this.$network3
+        .post("/mnoracle/schedule/CheckHospitalQuota",body)
+        .then((res)=>{
+          console.log(res.data);
+          if(res.data){
+            if(res.data.length==0){
+
+              console.log("当天无排期!")
+              that.$message({
+                type: 'info',
+                message: '当天无排期!'
+              });
+              return;
+            }
+            res.data.map((item)=>{
+              if(item.session==1){
+                if(this.AllHospitalMsg.session&&this.AllHospitalMsg.choiceTime){
+                  this.AllHospitalMsg.PQCCtitle=item.date+"上午"+"（剩余"+item.remain+")";
+                }
+
+                item.PQCCtitle= item.date+"上午"+"（剩余"+item.remain+")";
+              }else if(item.session==2){
+                if(this.AllHospitalMsg.session&&this.AllHospitalMsg.choiceTime){
+                  this.AllHospitalMsg.PQCCtitle=item.date+"上午"+"（剩余"+item.remain+")";
+                }
+                item.PQCCtitle=item.date+"下午"+"（剩余"+item.remain+")";
+              }
+            });
+            this.AllHospitalMsg.PQCCList=res.data;
+            console.log(this.AllHospitalMsg.PQCCList);
+          }else{
+            this.AllHospitalMsg.choiceTime=""
+          }
+
+        })
+        .catch((err)=>{
+          console.log(err);
+        });
+    },
+    // 获取所有分院
+    GetAllHospital() {
+      var that = this;
+      var body = {
+        // page:1, // 页码
+        // size:9999 // 单页条数
+      }
+      this.$network3
+        .get("/mnoracle/schedule/HospitalList")
+        .then(res => {
+          console.log(res.data);
+          that.AllHospitalMsg.AllHospital=[];
+          that.AllHospitalMsg.AllHospital=res.data||[];
+          console.log(that.AllHospitalMsg.AllHospital);
+
+        })
+        .catch(err => {
+          console.log("err", err);
+        });
+    },
+    handleChange(){
+      console.log(val);
+    },
+    chooseSchedule(){
+      console.log(111111111111)
+      console.log(this.AllHospitalMsg.chooseDAY)
+      if(this.AllHospitalMsg.hospitalCode){
+        this.operate.dialogFormVisible=true
+        if(this.AllHospitalMsg.chooseDAY.length==0){
+          this.getCalendar()
+        }
+      }else{
+        this.$message({
+          type: 'info',
+          message: '请选择分院!'
+        });
+        return;
+      }
+
+      if(this.AllHospitalMsg.chooseDAY.length>1){
+        console.log(this.compareTime)
+        var length=this.AllHospitalMsg.chooseDAY.length
+        this.compareTime.push(this.AllHospitalMsg.chooseDAY[0])
+        this.compareTime.push(this.AllHospitalMsg.chooseDAY[length-1])
+      }else if(this.AllHospitalMsg.chooseDAY.length==1){
+        this.compareTime.push(this.AllHospitalMsg.chooseDAY[0])
+      }
+      console.log(this.operate.dialogFormVisible)
+    },
+    selectDate(val, dataval, id) {
+      console.log(56565656)
+      console.log(val)
+
+      console.log(val)
+
+      console.log(dataval)
+
+      if(val.type == "current-month") {
+        this.timechina = val.day.substring(0, 4) + '年' + val.day.substring(5, 7) + '月' + val.day.substring(8, 10) + '日'
+        this.choicetiem = val.day
+        this.compareTime=Array.from(new Set(this.compareTime))
+        console.log(this.compareTime)
+        console.log(this.compareTime.length)
+        if(this.compareTime.length>=2){
+          // this.compareTime.splice(this.compareTime.length-1,1)
+          this.compareTime.push(val.day)
+          var i = 0;
+          var j = 0;
+          let t;
+          for ( i = 0; i < this.compareTime.length; i++){
+            for (j = 0; j < this.compareTime.length; j++){
+              let oDate1 = new Date(this.compareTime[i]);
+              let oDate2 = new Date(this.compareTime[j]);
+              if (oDate1.getTime() < oDate2.getTime()){
+                t = this.compareTime[i];
+                this.compareTime[i] = this.compareTime[j];
+                this.compareTime[j] = t;
+              }
+            }
+          }
+          var tempcompareTime=[];
+          tempcompareTime.push(this.compareTime[0])
+          tempcompareTime.push(this.compareTime[this.compareTime.length-1])
+          // return this.compareTime
+          this.compareTime=tempcompareTime
+
+          console.log(this.compareTime)
+          this.getDates()
+        }else if(this.compareTime.length==1){
+          this.compareTime.push(val.day)
+          this.getDates()
+        }else{
+          this.compareTime.push(val.day)
+          this.getDates()
+        }
+
+        this.getDaysFromDuan();
+
+      } else {
+
+      }
+      console.log(val.day)
+      console.log(this.choicetiem)
+
+    },
+    getDaysFromDuan(){
+      console.log(this.compareTime)
+
+    },
     confirm_kuang() {
       console.log(this.choicetiem)
+      console.log(this.AllHospitalMsg.chooseDAY)
       console.log(this.AllHospitalMsg.choiceTime)
       console.log(this.AllHospitalMsg.days);
       console.log(this.AllHospitalMsg.PQCCList);
@@ -783,6 +1083,14 @@ export default {
           message: '当天无排期!'
         });
         return;
+      }
+
+      if(this.AllHospitalMsg.chooseDAY.length==1){
+        this.AllHospitalMsg.choiceTime=this.AllHospitalMsg.chooseDAY[0]
+
+      }else if(this.AllHospitalMsg.chooseDAY.length>1){
+        this.AllHospitalMsg.choiceTime=this.AllHospitalMsg.chooseDAY[0]+"~"+this.AllHospitalMsg.chooseDAY[this.AllHospitalMsg.chooseDAY.length-1]
+
       }
       this.operate.dialogFormVisible = false
 
@@ -876,8 +1184,8 @@ export default {
           }
 
         }
-      // }
-    }
+        // }
+      }
 
       console.log(chooseHospitalMsgTempt_mor);
       console.log(chooseHospitalMsgTempt_aft);
@@ -889,14 +1197,14 @@ export default {
       console.log(this.AllHospitalMsg.PQCCList);
       for (var i = 0; i < PQCCListTemp.length; i++){
         for (var j = 0; j < this.AllHospitalMsg.PQCCList.length; j++) {
-         if(PQCCListTemp[i].date==this.AllHospitalMsg.PQCCList[j].date&&PQCCListTemp[i].session==this.AllHospitalMsg.PQCCList[j].session){
-           if (this.AllHospitalMsg.type == 0) {
-             PQCCListTemp[i].quota = Number(this.AllHospitalMsg.PQCCList[j].quota)
-           }else if(this.AllHospitalMsg.type == 1){
-             PQCCListTemp[i].quota = Number(this.AllHospitalMsg.PQCCList[j].quota)
-             PQCCListTemp[i].combos = this.AllHospitalMsg.PQCCList[j].combos
-           }
-         }
+          if(PQCCListTemp[i].date==this.AllHospitalMsg.PQCCList[j].date&&PQCCListTemp[i].session==this.AllHospitalMsg.PQCCList[j].session){
+            if (this.AllHospitalMsg.type == 0) {
+              PQCCListTemp[i].quota = Number(this.AllHospitalMsg.PQCCList[j].quota)
+            }else if(this.AllHospitalMsg.type == 1){
+              PQCCListTemp[i].quota = Number(this.AllHospitalMsg.PQCCList[j].quota)
+              PQCCListTemp[i].combos = this.AllHospitalMsg.PQCCList[j].combos
+            }
+          }
 
         }
 
@@ -905,160 +1213,6 @@ export default {
       this.AllHospitalMsg.PQCCList=PQCCListTemp
 
       console.log(this.AllHospitalMsg.PQCCList);
-
-    },
-    visibleChange(){
-      console.log(787878788787)
-
-    },
-    selectPQCCChange(e){
-      console.log(e)
-      console.log(this.AllHospitalMsg.choiceTime)
-      this.AllHospitalMsg.PQCCtitle=e
-      if(this.AllHospitalMsg.PQCCList.length>0){
-        this.AllHospitalMsg.PQCCList.map((item,index)=>{
-          if(item.PQCCtitle==e){
-            this.AllHospitalMsg.session=item.session
-            this.AllHospitalMsg.comparePQRS=item.remain
-          }
-        })
-      }
-      console.log(this.AllHospitalMsg.PQCCList);
-      console.log(this.AllHospitalMsg.session);
-
-
-    },
-    selectChange(e){
-      this.AllHospitalMsg.hospitalCode=e
-      this.getCalendar()
-      this.AllHospitalMsg.chooseDAY=[];
-      this.compareTime=[];
-      this.AllHospitalMsg.choiceTime=""
-
-      console.log(e)
-    },
-    PQCClook(){
-      var that=this;
-      var body={
-        code:this.AllHospitalMsg.hospitalCode,//分院代码
-        date:this.AllHospitalMsg.choiceTime,//日期
-      };
-      this.$network3
-        .post("/mnoracle/schedule/CheckHospitalQuota",body)
-        .then((res)=>{
-          console.log(res.data);
-          if(res.data){
-            if(res.data.length==0){
-
-              console.log("当天无排期!")
-              that.$message({
-                type: 'info',
-                message: '当天无排期!'
-              });
-              return;
-            }
-            res.data.map((item)=>{
-              if(item.session==1){
-                if(this.AllHospitalMsg.session&&this.AllHospitalMsg.choiceTime){
-                  this.AllHospitalMsg.PQCCtitle=item.date+"上午"+"（剩余"+item.remain+")";
-                }
-
-                item.PQCCtitle= item.date+"上午"+"（剩余"+item.remain+")";
-              }else if(item.session==2){
-                if(this.AllHospitalMsg.session&&this.AllHospitalMsg.choiceTime){
-                  this.AllHospitalMsg.PQCCtitle=item.date+"上午"+"（剩余"+item.remain+")";
-                }
-                item.PQCCtitle=item.date+"下午"+"（剩余"+item.remain+")";
-              }
-            });
-            this.AllHospitalMsg.PQCCList=res.data;
-            console.log(this.AllHospitalMsg.PQCCList);
-          }else{
-            this.AllHospitalMsg.choiceTime=""
-          }
-
-        })
-        .catch((err)=>{
-          console.log(err);
-        });
-    },
-    // 获取所有分院
-    GetAllHospital() {
-      var that = this;
-      var body = {
-        // page:1, // 页码
-        // size:9999 // 单页条数
-      }
-      this.$network3
-        .get("/mnoracle/schedule/HospitalList")
-        .then(res => {
-          console.log(res.data);
-          that.AllHospitalMsg.AllHospital=[];
-          that.AllHospitalMsg.AllHospital=res.data||[];
-          console.log(that.AllHospitalMsg.AllHospital);
-
-        })
-        .catch(err => {
-          console.log("err", err);
-        });
-    },
-    handleChange(){
-      console.log(val);
-    },
-    chooseSchedule(){
-      console.log(111111111111)
-      console.log(this.AllHospitalMsg.chooseDAY)
-      if(this.AllHospitalMsg.hospitalCode){
-        this.operate.dialogFormVisible=true
-        if(this.AllHospitalMsg.chooseDAY.length==0){
-          this.getCalendar()
-        }
-      }else{
-        this.$message({
-          type: 'info',
-          message: '请选择分院!'
-        });
-        return;
-      }
-      console.log(this.operate.dialogFormVisible)
-    },
-    selectDate(val, dataval, id) {
-      console.log(56565656)
-      console.log(val)
-
-      console.log(val)
-
-      console.log(dataval)
-
-      if(val.type == "current-month") {
-        this.timechina = val.day.substring(0, 4) + '年' + val.day.substring(5, 7) + '月' + val.day.substring(8, 10) + '日'
-        this.choicetiem = val.day
-        this.compareTime=Array.from(new Set(this.compareTime))
-        console.log(this.compareTime)
-        console.log(this.compareTime.length)
-        if(this.compareTime.length>=2){
-          this.compareTime.splice(this.compareTime.length-1,1)
-          this.compareTime.push(val.day)
-          this.getDates()
-        }else if(this.compareTime.length==1){
-          this.compareTime.push(val.day)
-          this.getDates()
-        }else{
-          this.compareTime.push(val.day)
-          this.getDates()
-        }
-
-        this.getDaysFromDuan();
-
-      } else {
-
-      }
-      console.log(val.day)
-      console.log(this.choicetiem)
-
-    },
-    getDaysFromDuan(){
-      console.log(this.compareTime)
 
     },
     getDates() {
@@ -1078,14 +1232,23 @@ export default {
           }
           if(this.choicetiem == this.AllHospitalMsg.days[j].date) {
             console.log(this.AllHospitalMsg.days[j])
-            if(!this.AllHospitalMsg.days[j].remain_aft||!this.AllHospitalMsg.days[j].remain_mor){
-              this.$message({ type: 'info', message: '当天无排期!' });
+            // if(!this.AllHospitalMsg.days[j].remain_aft||!this.AllHospitalMsg.days[j].remain_mor){
+            //   this.$message({ type: 'info', message: '当天无排期!' });
+            //   this.AllHospitalMsg.days[j].isSelected = false
+            //   this.choicetiem="";
+            //   this.compareTime=[];
+            //   return ;
+            // }
+            console.log(this.AllHospitalMsg.days[j].remain_aft)
+            console.log(this.AllHospitalMsg.days[j].remain_mor)
+            if(this.AllHospitalMsg.days[j].remain_aft==0&&this.AllHospitalMsg.days[j].remain_mor==0){
+              console.log(22222222222)
+              this.$message({ type: 'info', message: this.AllHospitalMsg.days[j].date+'日(日期)已满，无法进行排期' });
               this.AllHospitalMsg.days[j].isSelected = false
               this.choicetiem="";
               this.compareTime=[];
               return ;
             }
-
             console.log(this.AllHospitalMsg.days[j])
 
           }
@@ -1096,6 +1259,7 @@ export default {
 
 
       }else if(this.compareTime.length==2){
+        console.log(this.compareTime)
         var startDate= this.compareTime[0]
         var stopDate= this.compareTime[1]
         console.log(Date.parse(this.compareTime[0]))
@@ -1107,7 +1271,7 @@ export default {
           stopDate= this.compareTime[0]
         }
 
-
+        console.log(this.compareTime)
         var array=  this.getDateArray(new Date(startDate), new Date(stopDate))
         this.AllHospitalMsg.chooseDAY=array
         console.log(array);
