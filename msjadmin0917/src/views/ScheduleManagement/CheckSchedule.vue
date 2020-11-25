@@ -106,6 +106,7 @@ export default {
       TimePickervalue1:[],
       TimePickervalue1_model:[],
       AllHospitalMsg:{
+        CalendarFromEdit:[],
         type:0,
         combos:[],
         DWMC:'',
@@ -153,7 +154,7 @@ export default {
     if(this.AllHospitalMsg.id){
       this.GetRequestDetail();
     }
-    return
+    // return
 
     // this.getRequestDetail()
 
@@ -174,6 +175,74 @@ export default {
 
   },
   methods: {
+    getCalendarByDateTime(val){
+
+      return new Promise((resolve,reject)=>{
+        var that=this;
+        console.log(val)
+        var timeARRAY=[];
+        if(val.schedules.length>0){
+          val.schedules.map((item,index)=>{
+
+            timeARRAY.push(item.date)
+          })
+
+          timeARRAY=Array.from(new Set(timeARRAY))
+          console.log(timeARRAY)
+          var i = 0;
+          var j = 0;
+          let t;
+          for ( i = 0; i < timeARRAY.length; i++){
+            for (j = 0; j < timeARRAY.length; j++){
+              let oDate1 = new Date(timeARRAY[i]);
+              let oDate2 = new Date(timeARRAY[j]);
+              if (oDate1.getTime() < oDate2.getTime()){
+                t = timeARRAY[i];
+                timeARRAY[i] = timeARRAY[j];
+                timeARRAY[j] = t;
+              }
+            }
+          }
+          console.log(timeARRAY)
+          var tempcompareTime=[];
+          // tempcompareTime.push(this.compareTime[0])
+          // tempcompareTime.push(this.compareTime[this.compareTime.length-1])
+
+        }
+        var body = {
+          hospitalCode:this.AllHospitalMsg.hospitalCode,
+          month:"",
+          startDate: timeARRAY[0],
+          endDate: timeARRAY[timeARRAY.length-1],
+          // startDate:this.changeTime(this.TimePickervalue1[0]),
+          // endDate:this.changeTime(this.TimePickervalue1[1]),
+
+        };
+        this.$network3
+          .post("/mnoracle/schedule/Calendar", body)
+          .then(res => {
+            console.log(res);
+            console.log(res.data)
+            if (res.data) {
+
+              that.AllHospitalMsg.CalendarFromEdit=res.data||[]
+              resolve(this.AllHospitalMsg.CalendarFromEdit)
+              that.getDeatail(val)
+            }else{
+
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+
+      })
+
+
+
+
+
+    },
     // 获取排期详情
     GetRequestDetail() {
       var that=this;
@@ -188,6 +257,7 @@ export default {
             if (res.data) {
               var jsonVal=res.data
               this.AllHospitalMsg.submitAt=jsonVal.submitAt
+              this.AllHospitalMsg.hospitalCode=jsonVal.hospitalCode
               this.AllHospitalMsg.HospitalShow=jsonVal.hospitalName
               this.AllHospitalMsg.DWDM=jsonVal.DWDM
               this.AllHospitalMsg.DWMC=jsonVal.DWMC
@@ -201,6 +271,7 @@ export default {
 
 
               }
+              this.getCalendarByDateTime(jsonVal);
               this.getDeatail(jsonVal)
 
             } else {
@@ -238,6 +309,24 @@ export default {
 
 
         }
+        for (var i = 0; i < chooseHospitalMsgTempt.length; i++) {
+          for(var j=0;j<this.AllHospitalMsg.CalendarFromEdit.length;j++){
+            if(chooseHospitalMsgTempt[i].date==this.AllHospitalMsg.CalendarFromEdit[j].date&&chooseHospitalMsgTempt[i].session==this.AllHospitalMsg.CalendarFromEdit[j].session){
+              console.log(this.AllHospitalMsg.CalendarFromEdit[j])
+              console.log(chooseHospitalMsgTempt[i])
+              var PQCCtitleTemp = ""
+              if (chooseHospitalMsg[i].session == 1) {
+                chooseHospitalMsgTempt[i].PQCCtitle = chooseHospitalMsg[i].date + "上午"+"（排期剩余"+this.AllHospitalMsg.CalendarFromEdit[j].remain+",预排剩余"+this.AllHospitalMsg.CalendarFromEdit[j].preSchedRemain+")";
+              } else if (chooseHospitalMsg[i].session == 2) {
+                chooseHospitalMsgTempt[i].PQCCtitle  = chooseHospitalMsg[i].date + "下午"+"（排期剩余"+this.AllHospitalMsg.CalendarFromEdit[j].remain+",预排剩余"+this.AllHospitalMsg.CalendarFromEdit[j].preSchedRemain+")";
+              }
+
+
+            }
+
+
+          }
+        }
         this.AllHospitalMsg.PQCCList=chooseHospitalMsgTempt
         console.log(this.AllHospitalMsg.PQCCList)
       }
@@ -248,7 +337,7 @@ export default {
       if(val.schedules.length>0&&val.schedules){
         var tempSchedules=val.schedules
         console.log(tempSchedules)
-        if(tempSchedules.length>=1){
+        if(tempSchedules.length>1){
           for (var i=0;i<tempSchedules.length;i++){
             time=tempSchedules[0].date+"~"+tempSchedules[tempSchedules.length-1].date
 
@@ -326,35 +415,29 @@ export default {
       //   this.$router.go(-1);
       // }
     },
-    getRequestDetail(){
-      var body={
-        id:this.AllHospitalMsg.id,
-
-      };
-      this.$network3
-        .get("/mnoracle/schedule/RequestDetail",body)
-        .then((res)=>{
-          this.AllHospitalMsg.hospitalCode=res.data.hospitalCode
-          this.AllHospitalMsg.HospitalShow=res.data.hospitalName
-          this.AllHospitalMsg.submitAt=res.data.submitAt
-          this.AllHospitalMsg.orderID=res.data.orderID
-          this.AllHospitalMsg.choiceTime=res.data.date
-          this.AllHospitalMsg.session=res.data.session
-          this.AllHospitalMsg.PQRS=res.data.quota
-          // if(res.data.session==1){
-          //   this.AllHospitalMsg.PQCCtitle=
-          //     res.data.date+"上午"+"（剩余"+res.data.remain+")";
-          // }else if(res.data.session==2){
-          //   this.AllHospitalMsg.PQCCtitle=
-          //     res.data.date+"下午"+"（剩余"+res.data.remain+")";
-          // }
-          console.log(this.AllHospitalMsg);
-          this. PQCClook();
-        })
-        .catch((err)=>{
-          console.log(err);
-        });
-    },
+    // getRequestDetail(){
+    //   var body={
+    //     id:this.AllHospitalMsg.id,
+    //
+    //   };
+    //   this.$network3
+    //     .get("/mnoracle/schedule/RequestDetail",body)
+    //     .then((res)=>{
+    //       this.AllHospitalMsg.hospitalCode=res.data.hospitalCode
+    //       this.AllHospitalMsg.HospitalShow=res.data.hospitalName
+    //       this.AllHospitalMsg.submitAt=res.data.submitAt
+    //       this.AllHospitalMsg.orderID=res.data.orderID
+    //       // this.AllHospitalMsg.choiceTime=res.data.date
+    //       this.AllHospitalMsg.session=res.data.session
+    //       this.AllHospitalMsg.PQRS=res.data.quota
+    //
+    //       console.log(this.AllHospitalMsg);
+    //       this. PQCClook();
+    //     })
+    //     .catch((err)=>{
+    //       console.log(err);
+    //     });
+    // },
     submit(){
       var that=this
       var verify= this.verify();
@@ -627,7 +710,7 @@ export default {
       // });
       console.log(chooseHospitalMsg)
       for(var i=0;i<chooseHospitalMsg.length;i++){
-        this.AllHospitalMsg.choiceTime=chooseHospitalMsg[0].date+"~"+chooseHospitalMsg[chooseHospitalMsg.length-1].date
+        // this.AllHospitalMsg.choiceTime=chooseHospitalMsg[0].date+"~"+chooseHospitalMsg[chooseHospitalMsg.length-1].date
         if(chooseHospitalMsg[i].remain_mor>0){
           console.log(1111111)
           var obj={

@@ -19,7 +19,7 @@
             </el-form-item>
           </div>
 
-          <el-form-item label="单据号：">
+          <el-form-item v-if="AllHospitalMsg.type==1" label="单据号：">
             <el-input  v-model="AllHospitalMsg.orderID" :disabled="true" placeholder="请填写" style="width:200px" size="mini"></el-input>
           </el-form-item>
           <el-form-item label="单位代码：">
@@ -130,11 +130,11 @@
                     </div>
 
                     <div style="float:left;width:34%;text-align: center;">
-                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_mor">{{matchingdata(AllHospitalMsg.days,data.day).sched_mor+matchingdata(AllHospitalMsg.days,data.day).preSched_mor}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&String(matchingdata(AllHospitalMsg.days,data.day).sched_mor)!=''">{{matchingdata(AllHospitalMsg.days,data.day).schedShow_mor}}</span>
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:33%;text-align: center;">
-                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_mor">{{matchingdata(AllHospitalMsg.days,data.day).remain_mor+matchingdata(AllHospitalMsg.days,data.day).preSchedRemain_mor}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&String(matchingdata(AllHospitalMsg.days,data.day).remain_mor)!=''">{{matchingdata(AllHospitalMsg.days,data.day).remainShow_mor}}</span>
                       <span v-else>-</span>
                     </div>
                   </div>
@@ -160,11 +160,11 @@
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:34%;text-align: center;">
-                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).sched_aft">{{matchingdata(AllHospitalMsg.days,data.day).sched_aft+matchingdata(AllHospitalMsg.days,data.day).preSched_aft}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&String(matchingdata(AllHospitalMsg.days,data.day).schedShow_aft)!=''">{{matchingdata(AllHospitalMsg.days,data.day).schedShow_aft}}</span>
                       <span v-else>-</span>
                     </div>
                     <div style="float:left;width:33%;text-align: center;">
-                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&matchingdata(AllHospitalMsg.days,data.day).remain_aft">{{matchingdata(AllHospitalMsg.days,data.day).remain_aft+matchingdata(AllHospitalMsg.days,data.day).preSchedRemain_aft}}</span>
+                      <span v-if="matchingdata(AllHospitalMsg.days,data.day)&&String(matchingdata(AllHospitalMsg.days,data.day).remainShow_aft)!=''">{{matchingdata(AllHospitalMsg.days,data.day).remainShow_aft}}</span>
                       <span v-else>-</span>
                     </div>
                   </div>
@@ -501,26 +501,6 @@ export default {
                     chooseHospitalMsgTempt[i].PQCCtitle  = chooseHospitalMsg[i].date + "下午"+"（排期剩余"+this.AllHospitalMsg.CalendarFromEdit[j].remain+",预排剩余"+this.AllHospitalMsg.CalendarFromEdit[j].preSchedRemain+")";
                   }
 
-                  // if (this.AllHospitalMsg.type == 1) {
-                  //   for (var j = 0; j < chooseHospitalMsg[i].combos.length; j++) {
-                  //     var item = chooseHospitalMsg[i].combos[j]
-                  //     // var tempGROUPNAME=item.GROUPNAME.replace(" ","")
-                  //     var IDAndName = {
-                  //       comboName: item.comboName,
-                  //       comboID: item.comboID,
-                  //     }
-                  //
-                  //     chooseHospitalMsg[i].combos[j].comboParse = JSON.stringify(IDAndName)
-                  //   }
-                  // }
-                  // var obj = {
-                  //   PQCCtitle: PQCCtitleTemp,
-                  //   date: chooseHospitalMsg[i].date,
-                  //   quota: chooseHospitalMsg[i].quota,
-                  //   session: chooseHospitalMsg[i].session,
-                  //   combos: chooseHospitalMsg[i].combos
-                  // }
-                  // chooseHospitalMsgTempt.push(obj)
 
             }
 
@@ -539,20 +519,39 @@ export default {
       if(val.schedules.length>0&&val.schedules){
         var tempSchedules=val.schedules
         console.log(tempSchedules)
+        var tempt=[];
         for (var i=0;i<tempSchedules.length;i++){
-          if(tempSchedules.length==1){
-            time=tempSchedules[0].date
-            if(tempSchedules[i].quota&&tempSchedules[i].quota>0){
-              this.AllHospitalMsg.chooseDAY.push(tempSchedules[i].date)
-            }
-          }else if(tempSchedules.length>1){
-            time=tempSchedules[0].date+"~"+tempSchedules[tempSchedules.length-1].date
-            if(tempSchedules[i].quota&&tempSchedules[i].quota>0){
-              this.AllHospitalMsg.chooseDAY.push(tempSchedules[i].date)
-            }
+          if(tempSchedules[i].quota&&tempSchedules[i].quota>0){
+            tempt.push(tempSchedules[i].date)
           }
 
+          // if(tempSchedules.length==1){
+          //   time=tempSchedules[0].date
+          //   if(tempSchedules[i].quota&&tempSchedules[i].quota>0){
+          //     this.AllHospitalMsg.chooseDAY.push(tempSchedules[i].date)
+          //   }
+          // }else if(tempSchedules.length>1){
+          //   time=tempSchedules[0].date+"~"+tempSchedules[tempSchedules.length-1].date
+          //   if(tempSchedules[i].quota&&tempSchedules[i].quota>0){
+          //     this.AllHospitalMsg.chooseDAY.push(tempSchedules[i].date)
+          //   }
+          // }
+
         }
+
+        tempt=Array.from(new Set(tempt))
+        for (var i=0;i<tempt.length;i++){
+          if(tempt.length==1){
+            time=tempSchedules[0].date
+            this.AllHospitalMsg.chooseDAY.push(tempt[i])
+          }else if(tempt.length>1){
+            time=tempt[0]+"~"+tempt[tempt.length-1]
+            this.AllHospitalMsg.chooseDAY.push(tempt[i])
+          }
+        }
+
+
+
 
       }
       this.AllHospitalMsg.choiceTime=time;
@@ -1014,6 +1013,25 @@ export default {
         if(this.compareTime.length>=2){
           // this.compareTime.splice(this.compareTime.length-1,1)
           this.compareTime.push(val.day)
+          for (var i = 0; i < this.compareTime.length; i++){
+            var max=new Date(this.compareTime[this.compareTime.length-1])
+            var min=new Date(this.compareTime[0])
+            var compareTime=new Date(this.compareTime[1])
+            if(max.getTime()<compareTime.getTime()&&max.getTime()>min.getTime()){
+              console.log(11111111111)
+              this.compareTime.splice(1,1)
+            }
+            if(max.getTime()>compareTime.getTime()&&max.getTime()>min.getTime()){
+              console.log(22222222222)
+              this.compareTime.splice(1,1)
+            }
+            if(max.getTime()<min.getTime()&&max.getTime()<compareTime.getTime()){
+              console.log(33333333333)
+              this.compareTime.splice(0,1)
+            }
+
+          }
+
           var i = 0;
           var j = 0;
           let t;
@@ -1421,6 +1439,8 @@ export default {
                 sched_aft:'',
                 indSched_mor:'',
                 indSched_aft:'',
+                schedShow_mor:'',
+                schedShow_aft:'',
                 remain_mor:'',
                 remain_aft:'',
                 descs_mor:'',
@@ -1429,6 +1449,8 @@ export default {
                 preSched_aft:'',
                 preSchedRemain_mor:'',
                 preSchedRemain_aft:'',
+                remainShow_mor:'',
+                remainShow_aft:'',
                 isSelected:false
               }
               let daysArray=[]
@@ -1457,6 +1479,10 @@ export default {
                         preSched_aft:'',
                         preSchedRemain_mor:'',
                         preSchedRemain_aft:'',
+                        remainShow_mor:'',
+                        remainShow_aft:'',
+                        schedShow_mor:'',
+                        schedShow_aft:'',
                         isSelected:false
                       }
 
@@ -1468,6 +1494,12 @@ export default {
                         obj.indSched_mor=newArr[i].indSched
                         obj.remain_mor=newArr[i].remain
                         obj.descs_mor=newArr[i].descs
+                        obj.preSchedRemain_mor=newArr[i].preSchedRemain
+                        obj.preSched_mor=newArr[i].preSched
+                        obj.remainShow_aft=""
+                        obj.schedShow_aft=""
+                        obj.remainShow_mor=newArr[i].limit-newArr[i].sched-newArr[i].preSched
+                        obj.schedShow_mor=newArr[i].sched+newArr[i].preSched
                         obj.limit_aft=""
                         obj.sched_aft=""
                         obj.indSched_aft=""
@@ -1496,6 +1528,10 @@ export default {
                         obj.descs_aft=newArr[i].descs
                         obj.preSched_aft=newArr[i].preSched
                         obj.preSchedRemain_aft=newArr[i].preSchedRemain
+                        obj.remainShow_mor=""
+                        obj.remainShow_aft=newArr[i].limit-newArr[i].sched-newArr[i].preSched
+                        obj.schedShow_mor=""
+                        obj.schedShow_aft=newArr[i].sched+newArr[i].preSched
                         obj.isSelected=false
                       }
                       // console.log(obj);
@@ -1521,6 +1557,10 @@ export default {
                         preSched_aft:'',
                         preSchedRemain_mor:'',
                         preSchedRemain_aft:'',
+                        remainShow_mor:'',
+                        remainShow_aft:'',
+                        schedShow_mor:'',
+                        schedShow_aft:'',
                         isSelected:false
                       }
                       if(newArr[i].session===1){
@@ -1540,6 +1580,10 @@ export default {
                         obj.preSched_aft=anArray[j].preSched
                         obj.preSchedRemain_mor=newArr[i].preSchedRemain
                         obj.preSchedRemain_aft=anArray[j].preSchedRemain
+                        obj.remainShow_mor=newArr[i].limit-newArr[i].sched-newArr[i].preSched
+                        obj.remainShow_aft=anArray[i].limit-anArray[i].sched-anArray[i].preSched
+                        obj.schedShow_mor=newArr[i].sched+newArr[i].preSched
+                        obj.schedShow_aft=anArray[i].sched+anArray[i].preSched
                         obj.isSelected=false
 
                       }else if(newArr[i].session===2){
@@ -1558,6 +1602,10 @@ export default {
                         obj.preSched_aft=newArr[j].preSched
                         obj.preSchedRemain_mor=anArray[i].preSchedRemain
                         obj.preSchedRemain_aft=newArr[j].preSchedRemain
+                        obj.remainShow_mor=anArray[i].limit-anArray[i].sched-anArray[i].preSched
+                        obj.remainShow_aft=newArr[i].limit-newArr[i].sched-newArr[i].preSched
+                        obj.schedShow_mor=anArray[i].sched+anArray[i].preSched
+                        obj.schedShow_aft=newArr[i].sched+newArr[i].preSched
                         obj.isSelected=false
                       }
                       daysArray.push(obj)
@@ -1581,6 +1629,10 @@ export default {
                     preSched_aft:'',
                     preSchedRemain_mor:'',
                     preSchedRemain_aft:'',
+                    remainShow_mor:'',
+                    remainShow_aft:'',
+                    schedShow_mor:'',
+                    schedShow_aft:'',
                     isSelected:false
                   }
 
@@ -1601,6 +1653,10 @@ export default {
                     obj.descs_aft=""
                     obj.preSched_aft=""
                     obj.preSchedRemain_aft=""
+                    obj.remainShow_mor=newArr[i].limit-newArr[i].sched-newArr[i].preSched
+                    obj.remainShow_aft=""
+                    obj.schedShow_mor=newArr[i].sched+newArr[i].preSched
+                    obj.schedShow_aft=""
                     obj.isSelected=false
 
 
@@ -1618,6 +1674,10 @@ export default {
                     obj.descs_aft=newArr[i].descs
                     obj.preSched_aft=newArr[i].preSched
                     obj.preSchedRemain_aft=newArr[i].preSchedRemain
+                    obj.remainShow_mor=""
+                    obj.remainShow_aft=newArr[i].limit-newArr[i].sched-newArr[i].preSched
+                    obj.schedShow_mor=""
+                    obj.schedShow_aft=newArr[i].sched+newArr[i].preSched
                     obj.isSelected=false
                   }
                   // console.log(obj);
@@ -1673,6 +1733,10 @@ export default {
                   preSched_aft:'',
                   preSchedRemain_mor:'',
                   preSchedRemain_aft:'',
+                  remainShow_mor:'',
+                  remainShow_aft:'',
+                  schedShow_mor:'',
+                  schedShow_aft:'',
                   isSelected:false,
                 }
                 this.AllHospitalMsg.days.push(obj);

@@ -206,7 +206,7 @@ export default {
         }
         return "撤"+quantity.toString();
       }else{
-        if(val.order){
+        if(val.request.status==0){
           if(val.request.schedules.length>0&&val.request.schedules){
             var tempSchedules=val.request.schedules
             console.log(tempSchedules)
@@ -216,7 +216,7 @@ export default {
             })
           }
           return "预"+quantity.toString();
-        }else{
+        }else if(val.request.status==1){
           if(val.request.schedules.length>0&&val.request.schedules){
             var tempSchedules=val.request.schedules
             console.log(tempSchedules)
